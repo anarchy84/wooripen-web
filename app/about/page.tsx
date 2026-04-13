@@ -1,3 +1,5 @@
+'use client'
+
 import { Icon } from '@iconify/react'
 import { ArrowRight, Phone, Send } from 'lucide-react'
 import FadeIn from '@/components/ui/FadeIn'

@@ -200,7 +200,7 @@ export default function TipsPage() {
               <p className="mt-3 text-base text-gray-500 break-keep">
                 매장 운영에 도움 되는 꿀팁을 이메일로 받아보세요.
               </p>
-              <form onSubmit={(e) => { e.preventDefault() }} className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <form action="#" className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                 <input type="email" placeholder="이메일 주소"
                   className="flex-1 rounded-xl border border-gray-200 px-4 py-3.5 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all" />
                 <button type="submit"
