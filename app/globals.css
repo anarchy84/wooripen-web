@@ -143,6 +143,37 @@
   100% { transform: translateX(-50%); }
 }
 
+/* ─── 쇼케이스 이미지 떠다니는 애니메이션 ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.showcase-float {
+  animation: float 5s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+}
+
+.showcase-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
 /* ─── 스크롤바 ─── */
 ::-webkit-scrollbar {
   width: 6px;

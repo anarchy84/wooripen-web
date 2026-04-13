@@ -242,21 +242,32 @@ function CountUp({ value, suffix = '', decimals = 0 }: { value: number; suffix?:
   return <span ref={ref}>{display}{suffix}</span>
 }
 
-/* 제품 쇼케이스 미디어 (GIF/영상 슬롯 — 네이버페이 스타일) */
+/* 제품 쇼케이스 미디어 (정지 이미지 + CSS 애니메이션) */
 function ShowcaseMedia({ src, fallbackIcon, accentColor }: { src: string; fallbackIcon: string; accentColor: string }) {
   const [hasMedia, setHasMedia] = useState(true)
 
   return hasMedia ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt=""
-      className="w-full h-full object-cover rounded-2xl"
-      onError={() => setHasMedia(false)}
-    />
+    <div className="relative w-full h-full flex items-center justify-center p-8 overflow-hidden">
+      {/* 배경 글로우 */}
+      <div className="absolute inset-0 opacity-40">
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full ${accentColor.replace('text-', 'bg-')} blur-[80px]`} />
+      </div>
+      {/* 떠다니는 이미지 + 쉬머 */}
+      <div className="relative showcase-float showcase-shimmer rounded-2xl overflow-hidden shadow-2xl">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt=""
+          className="w-full max-h-[400px] object-contain rounded-2xl"
+          onError={() => setHasMedia(false)}
+        />
+      </div>
+    </div>
   ) : (
     <div className="w-full h-full rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-      <Icon icon={fallbackIcon} className={`h-20 w-20 ${accentColor} opacity-30`} />
+      <div className="showcase-float">
+        <Icon icon={fallbackIcon} className={`h-24 w-24 ${accentColor} opacity-20`} />
+      </div>
     </div>
   )
 }
