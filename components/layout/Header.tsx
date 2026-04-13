@@ -6,10 +6,12 @@ import { Menu, X } from 'lucide-react'
 
 const navigation = [
   { name: '인터넷', href: '/internet' },
-  { name: '사업자 솔루션', href: '/business' },
-  { name: '렌탈', href: '/rental' },
-  { name: '혜택 찾기', href: '/recommend' },
+  { name: '단말기', href: '/business/terminal' },
+  { name: 'CCTV', href: '/business/cctv' },
+  { name: '키오스크', href: '/business/torder' },
+  { name: '맞춤추천', href: '/recommend' },
   { name: '꿀팁', href: '/tips' },
+  { name: '회사소개', href: '/about' },
 ]
 
 export default function Header() {

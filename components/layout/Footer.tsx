@@ -5,15 +5,14 @@ const footerLinks = {
     { name: '인터넷', href: '/internet' },
     { name: '결제단말기', href: '/business/terminal' },
     { name: 'CCTV', href: '/business/cctv' },
-    { name: '티오더', href: '/business/torder' },
-    { name: '렌탈', href: '/rental' },
+    { name: '키오스크·티오더', href: '/business/torder' },
   ],
   고객지원: [
-    { name: '혜택 찾기', href: '/recommend' },
+    { name: '맞춤 추천', href: '/recommend' },
     { name: '꿀팁', href: '/tips' },
-    { name: 'FAQ', href: '/faq' },
   ],
   회사: [
+    { name: '회사소개', href: '/about' },
     { name: '개인정보처리방침', href: '/privacy' },
     { name: '이용약관', href: '/terms' },
   ],
