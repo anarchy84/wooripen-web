@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pretendard 웹폰트 */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+@layer base {
+  body {
+    @apply font-sans text-navy antialiased;
+  }
+}
+
+@layer components {
+  /* 공통 CTA 버튼 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-accent px-6 py-3
+           text-base font-semibold text-white transition-all
+           hover:bg-accent-600 hover:shadow-lg active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3
+           text-base font-semibold text-white transition-all
+           hover:bg-primary-600 hover:shadow-lg active:scale-[0.98];
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-xl border-2 border-primary
+           px-6 py-3 text-base font-semibold text-primary transition-all
+           hover:bg-primary-50 active:scale-[0.98];
+  }
+
+  /* 섹션 컨테이너 */
+  .section-container {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+}
