@@ -9,9 +9,9 @@ const navigation = [
   { name: '단말기', href: '/business/terminal' },
   { name: 'CCTV', href: '/business/cctv' },
   { name: '키오스크', href: '/business/torder' },
+  { name: '렌탈', href: '/rental' },
   { name: '맞춤추천', href: '/recommend' },
   { name: '꿀팁', href: '/tips' },
-  { name: '회사소개', href: '/about' },
 ]
 
 export default function Header() {

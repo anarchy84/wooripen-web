@@ -6,6 +6,7 @@ const footerLinks = {
     { name: '결제단말기', href: '/business/terminal' },
     { name: 'CCTV', href: '/business/cctv' },
     { name: '키오스크·티오더', href: '/business/torder' },
+    { name: '렌탈', href: '/rental' },
   ],
   고객지원: [
     { name: '맞춤 추천', href: '/recommend' },
