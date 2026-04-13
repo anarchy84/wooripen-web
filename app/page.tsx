@@ -396,18 +396,19 @@ export default function HomePage() {
           {categories.map((cat, i) => (
             <FadeIn key={cat.title} delay={i * 80}>
               <Link href={cat.href}
-                className="group relative rounded-3xl bg-gray-50 p-6 md:p-7 overflow-hidden
+                className="group flex flex-col rounded-3xl bg-gray-50 p-5 md:p-7 overflow-hidden
                            transition-all duration-400 ease-toss
                            hover:bg-white hover:shadow-card-hover hover:-translate-y-1.5">
-                <span className="absolute top-4 right-4 text-[11px] font-semibold text-primary bg-primary-50 px-2.5 py-1 rounded-full">
+                {/* 태그 뱃지 — 상단 인라인 배치 */}
+                <span className="self-start text-[11px] font-semibold text-primary bg-primary-50 px-2.5 py-1 rounded-full mb-4 whitespace-nowrap">
                   {cat.tag}
                 </span>
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-5 transition-transform duration-400 ease-toss group-hover:scale-110`}>
-                  <Icon icon={cat.icon} className="h-7 w-7 text-white" />
+                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center shrink-0 mb-4 md:mb-5 transition-transform duration-400 ease-toss group-hover:scale-110`}>
+                  <Icon icon={cat.icon} className="h-6 w-6 md:h-7 md:w-7 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 break-keep">{cat.title}</h3>
-                <p className="mt-1.5 text-sm text-gray-500 break-keep">{cat.desc}</p>
-                <div className="mt-4 flex items-center text-sm font-medium text-gray-400 group-hover:text-primary transition-colors">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 break-keep">{cat.title}</h3>
+                <p className="mt-1.5 text-sm text-gray-500 break-keep line-clamp-2">{cat.desc}</p>
+                <div className="mt-auto pt-4 flex items-center text-sm font-medium text-gray-400 group-hover:text-primary transition-colors">
                   자세히 보기
                   <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
