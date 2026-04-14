@@ -12,6 +12,7 @@ const navigation = [
   { name: '렌탈', href: '/rental' },
   { name: '맞춤추천', href: '/recommend' },
   { name: '꿀팁', href: '/tips' },
+  { name: 'Q&A', href: '/qna' },
 ]
 
 export default function Header() {

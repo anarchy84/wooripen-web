@@ -103,6 +103,42 @@ export interface SiteSetting {
   updated_at: string
 }
 
+export interface FAQ {
+  id: string
+  question: string
+  answer: string
+  category: string
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface QnA {
+  id: string
+  title: string
+  content: string
+  author_name: string
+  author_phone: string | null
+  password: string
+  is_public: boolean
+  status: 'pending' | 'answered'
+  answer: string | null
+  answered_at: string | null
+  view_count: number
+  created_at: string
+  updated_at: string
+}
+
+export const FAQ_CATEGORIES: Record<string, string> = {
+  general: '일반',
+  internet: '인터넷',
+  terminal: '결제단말기',
+  cctv: 'CCTV',
+  torder: '키오스크',
+  rental: '렌탈',
+}
+
 // 상담 신청 폼 입력 타입
 export interface ConsultationFormData {
   name: string

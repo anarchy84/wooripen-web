@@ -11,6 +11,7 @@ const footerLinks = {
   고객지원: [
     { name: '맞춤 추천', href: '/recommend' },
     { name: '꿀팁', href: '/tips' },
+    { name: 'Q&A', href: '/qna' },
   ],
   회사: [
     { name: '회사소개', href: '/about' },

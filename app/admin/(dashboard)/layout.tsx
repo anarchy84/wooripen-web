@@ -9,6 +9,8 @@ const navItems = [
   { name: '대시보드', href: '/admin', icon: '📊' },
   { name: '상품 관리', href: '/admin/products', icon: '📦' },
   { name: '꿀팁 관리', href: '/admin/tips', icon: '📝' },
+  { name: 'FAQ 관리', href: '/admin/faqs', icon: '❓' },
+  { name: 'Q&A 관리', href: '/admin/qna', icon: '💬' },
   { name: '상담 신청', href: '/admin/consultations', icon: '📞' },
   { name: '미디어', href: '/admin/media', icon: '🖼️' },
   { name: 'SEO 관리', href: '/admin/seo', icon: '🔍' },
