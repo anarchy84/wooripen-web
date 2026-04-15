@@ -24,6 +24,7 @@
 | 3 | `20260415000003_create_site_stats.sql` | site_stats 테이블 (메인페이지 숫자 카드) | CREATE |
 | 4 | `20260415000004_create_nav_menus.sql` | nav_menus 테이블 + GNB 시드 데이터 (7 대메뉴 + 하위) | CREATE |
 | 5 | `20260415000005_extend_consultations_tracking.sql` | consultations에 3차 대비 플레이스홀더 필드 | ALTER |
+| 6 | `20260415000006_phase2a_reinforcement.sql` | 3팀 팀장 교차검수 보강안 (Phase 2-A 완성본) | ALTER |
 
 **⚠️ 실행 순서 중요**: 2번에서 정의한 `set_updated_at()` 함수를 3·4번이 재사용하므로 타임스탬프 순서대로 실행 필수. Supabase CLI는 파일명 정렬 순서로 실행하므로 자동으로 맞음.
 
@@ -94,6 +95,33 @@
 - nav_menus GNB 7개 대메뉴 + 하위 13개 → Step 2에서 확정한 IA 그대로 이식 ✓
 - packages 시드 2개(`startup`, `support`) 골격만 — **콘텐츠 본체는 Step 10에서 작성 예정** (합의됨)
 - site_stats 기본값 `1,200+`, `5년`, `20+` — 대웅이 어드민에서 실제 수치로 갱신 필요
+
+---
+
+## 4-1. 추가 보강 라운드 (Migration 6) — 3팀 팀장 교차검수 결과
+
+1~5번 완성 후, 팀장 3명이 합동 리뷰하여 Phase 2-A 컴포넌트 단계 직전에 빠질 수 없는 5개 필드를 추가.
+
+### 개발팀장 의견
+- **`packages.detail_sections jsonb`** — 없으면 패키지 상세페이지 렌더러 설계 자체가 막힘. 자유 블록 배열로 최대 유연성 확보.
+- **단독 파셜 인덱스 3개 추가** — `utm_campaign`, `gclid`, `marketing_agreed=true`에 파셜 인덱스. 어트리뷰션 쿼리 가속 + 저장 공간 최적화.
+
+### 마케팅팀장 의견
+- **`consultations.utm_content` / `utm_term`** — 광고 소재·키워드 레벨 CVR 분리 필수. 2차부터 수집 안 하면 3차 분석 시점에 역추적 불가.
+- **`consultations.consent_ip inet`** — 개보법 감사 + 분쟁 시 증빙. `marketing_agreed=true` 시점 IP 같이 저장.
+
+### 콘텐츠팀장 의견
+- **`packages.price_range_label`** — "월 3만원대부터" 같은 심리적 문턱 낮추는 카피 요소. 정확 단가(3차)와 별개 운영.
+- **`nav_menus.icon` / `badge_label` / `badge_color`** — 시즌 캠페인("신규 오픈 이벤트") 배포 없이 GNB에서 돌리기 위함.
+
+### 보강 결과 요약표
+
+| 대상 테이블 | 추가 컬럼 | 주관팀 |
+|-----------|---------|--------|
+| `packages` | `detail_sections`, `price_range_label` | 콘텐츠 |
+| `consultations` | `utm_content`, `utm_term`, `consent_ip` | 마케팅 |
+| `nav_menus` | `icon`, `badge_label`, `badge_color` | 콘텐츠 |
+| `consultations` (인덱스) | `idx_*_utm_campaign`, `idx_*_gclid`, `idx_*_marketing_agreed` | 개발 |
 
 ---
 
