@@ -252,10 +252,10 @@ export default function Header() {
               무료 상담 신청하기
             </Link>
             <a
-              href="tel:1234-5678"
+              href="tel:1600-6116"
               className="mt-3 block text-center text-body-2 text-gray-500"
             >
-              전화 상담 1234-5678
+              전화 상담 1600-6116
             </a>
           </div>
         </nav>

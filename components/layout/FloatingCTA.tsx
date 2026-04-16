@@ -44,14 +44,14 @@ export default function FloatingCTA() {
 
         {/* 전화 */}
         <a
-          href="tel:1234-5678"
+          href="tel:1600-6116"
           className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full
                      bg-white text-gray-900 shadow-card border border-gray-100
                      hover:shadow-card-hover hover:scale-105
                      transition-all duration-300 ease-toss"
         >
           <Phone className="h-4 w-4" />
-          <span className="text-caption font-semibold">1234-5678</span>
+          <span className="text-caption font-semibold">1600-6116</span>
         </a>
       </div>
 

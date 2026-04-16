@@ -35,10 +35,10 @@ export default function Footer() {
             </p>
             <div className="mt-6">
               <a
-                href="tel:1234-5678"
+                href="tel:1600-6116"
                 className="text-body-2 font-semibold text-gray-900 hover:text-primary transition-colors"
               >
-                1234-5678
+                1600-6116
               </a>
               <p className="mt-1 text-small text-gray-400">평일 09:00 - 18:00</p>
             </div>

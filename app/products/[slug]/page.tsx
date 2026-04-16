@@ -97,7 +97,7 @@ export default async function ProductDetailPage({ params }: Props) {
             </Link>
             {ctaSecondary && (
               <a
-                href="tel:1234-5678"
+                href="tel:1600-6116"
                 className="px-6 py-3 bg-white/10 border border-white/30 text-white font-semibold rounded-full hover:bg-white/20 backdrop-blur transition-colors"
               >
                 {ctaSecondary}
@@ -263,10 +263,10 @@ export default async function ProductDetailPage({ params }: Props) {
               {ctaPrimary}
             </Link>
             <a
-              href="tel:1234-5678"
+              href="tel:1600-6116"
               className="px-8 py-4 bg-white/10 border border-white/30 text-white font-bold rounded-full hover:bg-white/20 backdrop-blur transition-colors"
             >
-              📞 1234-5678
+              📞 1600-6116
             </a>
           </div>
         </div>

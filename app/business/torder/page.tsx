@@ -80,10 +80,10 @@ export default function TorderPage() {
                 무료 상담 받기
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </a>
-              <a href="tel:1234-5678"
+              <a href="tel:1600-6116"
                 className="inline-flex items-center justify-center rounded-full px-8 py-4 text-base font-semibold text-white glass-dark hover:bg-white/[0.08] transition-all duration-300">
                 <Phone className="mr-2 h-4 w-4" />
-                1234-5678
+                1600-6116
               </a>
             </div>
           </FadeIn>
