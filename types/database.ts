@@ -1,5 +1,28 @@
 // 우리편 DB 타입 정의
 
+// Phase 2-A 세부페이지용 블록 스키마
+export interface TrustBadge {
+  icon: string
+  label: string
+}
+
+export interface DetailFeature {
+  icon?: string
+  title: string
+  desc: string
+}
+
+export interface ComparisonTable {
+  columns?: string[]
+  rows?: Array<Record<string, string>>
+}
+
+// 패키지 상세페이지 블록 (자유도 높은 섹션 배열)
+export interface PackageSection {
+  type: 'hero' | 'benefits' | 'faq' | 'testimonial' | 'cta' | 'richtext'
+  data: Record<string, unknown>
+}
+
 export interface Product {
   id: string
   name: string
@@ -18,8 +41,90 @@ export interface Product {
   promo_active: boolean
   is_active: boolean
   sort_order: number
+  // Phase 2-A 세부페이지 필드
+  hero_title: string | null
+  hero_subtitle: string | null
+  hero_image: string | null
+  trust_badges: TrustBadge[] | null
+  detail_features: DetailFeature[] | null
+  comparison_table: ComparisonTable | null
+  cta_primary_label: string | null
+  cta_secondary_label: string | null
+  seo_title: string | null
+  seo_description: string | null
+  og_image_url: string | null
+  slug: string | null
   created_at: string
   updated_at: string
+}
+
+// Phase 2-A #2 패키지 (맞춤 상품 조합)
+// 실제 DB 스키마와 1:1 매칭 — target_industry, target_description, hero_title, hook_copy, is_visible
+export interface Package {
+  id: string
+  slug: string
+  name: string
+  target_industry: string | null     // '음식점', '카페', null=전체
+  target_description: string | null  // '창업 3개월 이내 사장님'
+  hero_title: string | null
+  hero_subtitle: string | null
+  hero_image: string | null
+  icon: string | null                // 패키지 카드 아이콘
+  hook_copy: string | null           // 메인카드 훅 문구
+  is_visible: boolean
+  sort_order: number
+  seo_title: string | null
+  seo_description: string | null
+  og_image_url: string | null
+  // Phase 2-A #6 보강
+  detail_sections: PackageSection[] | null
+  price_range_label: string | null
+  created_at: string
+  updated_at: string
+}
+
+// 패키지 포함 상품 (product_id NOT NULL — 반드시 products 참조)
+export interface PackageItem {
+  id: string
+  package_id: string
+  product_id: string
+  sort_order: number
+  is_highlighted: boolean             // 대표 구성품 표시
+  note: string | null                 // '2년 약정 시 추가 할인'
+  created_at: string
+  // JOIN 결과 (products 테이블 연동 시)
+  product?: Pick<Product, 'id' | 'name' | 'category' | 'image_url' | 'description' | 'slug' | 'price'> | null
+}
+
+// Phase 2-A #3 메인페이지 숫자 카드
+export interface SiteStat {
+  id: string
+  label: string
+  value: string
+  suffix: string
+  icon: string | null
+  description: string | null
+  is_visible: boolean
+  sort_order: number
+  updated_at: string
+}
+
+// Phase 2-A #4 GNB
+export interface NavMenu {
+  id: string
+  parent_id: string | null
+  label: string
+  url: string
+  is_external: boolean
+  is_visible: boolean
+  sort_order: number
+  // Phase 2-A #6 보강
+  icon: string | null
+  badge_label: string | null
+  badge_color: string | null
+  updated_at: string
+  // 트리 구조용 (API 응답)
+  children?: NavMenu[]
 }
 
 export interface Consultation {

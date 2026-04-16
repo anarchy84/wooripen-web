@@ -56,6 +56,19 @@ export async function POST(request: NextRequest) {
       promo_active: body.promo_active ?? false,
       is_active: body.is_active ?? true,
       sort_order: body.sort_order ?? 0,
+      // Phase 2-A 확장 필드
+      slug: body.slug || null,
+      hero_title: body.hero_title || null,
+      hero_subtitle: body.hero_subtitle || null,
+      hero_image: body.hero_image || null,
+      trust_badges: body.trust_badges || null,
+      detail_features: body.detail_features || null,
+      comparison_table: body.comparison_table || null,
+      cta_primary_label: body.cta_primary_label || null,
+      cta_secondary_label: body.cta_secondary_label || null,
+      seo_title: body.seo_title || null,
+      seo_description: body.seo_description || null,
+      og_image_url: body.og_image_url || null,
     })
     .select()
     .single()

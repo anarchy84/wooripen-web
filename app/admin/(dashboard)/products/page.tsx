@@ -198,7 +198,21 @@ function ProductFormModal({ productId, onClose, onSaved }: ProductFormModalProps
     is_active: true,
     sort_order: '0',
     image_url: '',
+    // Phase 2-A 세부페이지 필드 (Type A 렌더러)
+    slug: '',
+    hero_title: '',
+    hero_subtitle: '',
+    hero_image: '',
+    trust_badges: '',          // JSON 문자열 — [{icon,label,value}]
+    detail_features: '',       // JSON 문자열 — [{icon,title,description}]
+    comparison_table: '',      // JSON 문자열 — {headers, rows}
+    cta_primary_label: '',
+    cta_secondary_label: '',
+    seo_title: '',
+    seo_description: '',
+    og_image_url: '',
   })
+  const [showDetailSection, setShowDetailSection] = useState(false)
 
   useEffect(() => {
     if (isEdit && productId) {
@@ -222,6 +236,19 @@ function ProductFormModal({ productId, onClose, onSaved }: ProductFormModalProps
             is_active: data.is_active ?? true,
             sort_order: String(data.sort_order || 0),
             image_url: data.image_url || '',
+            // Phase 2-A
+            slug: data.slug || '',
+            hero_title: data.hero_title || '',
+            hero_subtitle: data.hero_subtitle || '',
+            hero_image: data.hero_image || '',
+            trust_badges: data.trust_badges ? JSON.stringify(data.trust_badges, null, 2) : '',
+            detail_features: data.detail_features ? JSON.stringify(data.detail_features, null, 2) : '',
+            comparison_table: data.comparison_table ? JSON.stringify(data.comparison_table, null, 2) : '',
+            cta_primary_label: data.cta_primary_label || '',
+            cta_secondary_label: data.cta_secondary_label || '',
+            seo_title: data.seo_title || '',
+            seo_description: data.seo_description || '',
+            og_image_url: data.og_image_url || '',
           })
         }
         setLoadingData(false)
@@ -232,6 +259,27 @@ function ProductFormModal({ productId, onClose, onSaved }: ProductFormModalProps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // JSON 필드 파싱 헬퍼 — 빈 문자열이면 null, 유효하지 않으면 alert 후 중단
+    const parseJSON = (label: string, raw: string): unknown => {
+      if (!raw || !raw.trim()) return null
+      try {
+        return JSON.parse(raw)
+      } catch (err) {
+        throw new Error(`${label} JSON 형식 오류: ${(err as Error).message}`)
+      }
+    }
+
+    let trust_badges: unknown, detail_features: unknown, comparison_table: unknown
+    try {
+      trust_badges = parseJSON('신뢰 배지', form.trust_badges)
+      detail_features = parseJSON('세부 기능', form.detail_features)
+      comparison_table = parseJSON('비교표', form.comparison_table)
+    } catch (err) {
+      alert((err as Error).message)
+      return
+    }
+
     setSaving(true)
 
     const payload = {
@@ -251,6 +299,19 @@ function ProductFormModal({ productId, onClose, onSaved }: ProductFormModalProps
       is_active: form.is_active,
       sort_order: Number(form.sort_order) || 0,
       image_url: form.image_url || null,
+      // Phase 2-A 세부페이지 필드
+      slug: form.slug || null,
+      hero_title: form.hero_title || null,
+      hero_subtitle: form.hero_subtitle || null,
+      hero_image: form.hero_image || null,
+      trust_badges,
+      detail_features,
+      comparison_table,
+      cta_primary_label: form.cta_primary_label || null,
+      cta_secondary_label: form.cta_secondary_label || null,
+      seo_title: form.seo_title || null,
+      seo_description: form.seo_description || null,
+      og_image_url: form.og_image_url || null,
     }
 
     const url = isEdit ? `/api/admin/products/${productId}` : '/api/admin/products'
@@ -467,6 +528,183 @@ function ProductFormModal({ productId, onClose, onSaved }: ProductFormModalProps
               </label>
             </div>
           </div>
+
+          {/* ─── 세부페이지 설정 (Phase 2-A) ─────────────────── */}
+          <div className="border-t border-gray-800 pt-4">
+            <button
+              type="button"
+              onClick={() => setShowDetailSection(!showDetailSection)}
+              className="w-full flex items-center justify-between text-sm font-bold text-white hover:text-blue-400 transition-colors"
+            >
+              <span>📄 세부페이지 설정 (/products/[slug])</span>
+              <span className="text-gray-500 text-xs">
+                {showDetailSection ? '접기 ▲' : '펼치기 ▼'}
+              </span>
+            </button>
+            <p className="text-xs text-gray-500 mt-1">
+              세부페이지를 만들려면 slug 필수. 나머지는 모두 선택 — 비어있으면 해당 섹션이 렌더되지 않습니다.
+            </p>
+          </div>
+
+          {showDetailSection && (
+            <div className="space-y-4 bg-gray-950 border border-gray-800 rounded-lg p-4 -mt-2">
+              {/* slug */}
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">
+                  slug (URL 식별자) <span className="text-red-400">*필수 (세부페이지 활성화)</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  placeholder="skt-internet-500m"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                />
+                <p className="text-xs text-gray-500 mt-1">영문 소문자·숫자·하이픈만. 예: /products/{form.slug || 'skt-internet-500m'}</p>
+              </div>
+
+              {/* 히어로 */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">히어로 헤드라인</label>
+                  <input
+                    type="text"
+                    value={form.hero_title}
+                    onChange={(e) => setForm({ ...form, hero_title: e.target.value })}
+                    placeholder="SKT 인터넷 500M 특가"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">히어로 서브카피</label>
+                  <input
+                    type="text"
+                    value={form.hero_subtitle}
+                    onChange={(e) => setForm({ ...form, hero_subtitle: e.target.value })}
+                    placeholder="최대 50만원 상당 사은품"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">히어로 배경 이미지 URL</label>
+                <input
+                  type="text"
+                  value={form.hero_image}
+                  onChange={(e) => setForm({ ...form, hero_image: e.target.value })}
+                  placeholder="https://...supabase.co/storage/v1/.../hero.webp"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                />
+              </div>
+
+              {/* CTA */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">메인 CTA 문구</label>
+                  <input
+                    type="text"
+                    value={form.cta_primary_label}
+                    onChange={(e) => setForm({ ...form, cta_primary_label: e.target.value })}
+                    placeholder="지금 상담 신청"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">보조 CTA 문구</label>
+                  <input
+                    type="text"
+                    value={form.cta_secondary_label}
+                    onChange={(e) => setForm({ ...form, cta_secondary_label: e.target.value })}
+                    placeholder="카카오톡 문의"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* 신뢰 배지 — JSON */}
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">
+                  신뢰 배지 (JSON 배열)
+                </label>
+                <textarea
+                  value={form.trust_badges}
+                  onChange={(e) => setForm({ ...form, trust_badges: e.target.value })}
+                  rows={4}
+                  placeholder={'[\n  {"icon":"solar:users-group-rounded-bold","label":"누적 가입","value":"3,000+"}\n]'}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">형식: <code>{'{icon, label, value}'}</code></p>
+              </div>
+
+              {/* 세부 기능 — JSON */}
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">
+                  세부 기능 블록 (JSON 배열)
+                </label>
+                <textarea
+                  value={form.detail_features}
+                  onChange={(e) => setForm({ ...form, detail_features: e.target.value })}
+                  rows={5}
+                  placeholder={'[\n  {"icon":"solar:shield-check-bold","title":"안정성","description":"24/7 관제"}\n]'}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">형식: <code>{'{icon, title, description}'}</code></p>
+              </div>
+
+              {/* 비교표 — JSON */}
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">
+                  비교표 (JSON 객체)
+                </label>
+                <textarea
+                  value={form.comparison_table}
+                  onChange={(e) => setForm({ ...form, comparison_table: e.target.value })}
+                  rows={5}
+                  placeholder={'{\n  "headers": ["항목","일반","우리편"],\n  "rows": [["설치비","5만원","무료"]]\n}'}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+                <p className="text-xs text-gray-500 mt-1">형식: <code>{'{headers: string[], rows: string[][]}'}</code></p>
+              </div>
+
+              {/* SEO */}
+              <div className="pt-3 border-t border-gray-800">
+                <h4 className="text-sm font-bold text-white mb-3">🔍 SEO 메타</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">SEO 타이틀 (60자 이내 권장)</label>
+                    <input
+                      type="text"
+                      value={form.seo_title}
+                      onChange={(e) => setForm({ ...form, seo_title: e.target.value })}
+                      placeholder="SKT 인터넷 500M 개통 | 우리편"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <p className="text-[10px] text-gray-500 mt-0.5">{form.seo_title.length}자</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">SEO 설명 (160자 이내 권장)</label>
+                    <textarea
+                      value={form.seo_description}
+                      onChange={(e) => setForm({ ...form, seo_description: e.target.value })}
+                      rows={2}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    />
+                    <p className="text-[10px] text-gray-500 mt-0.5">{form.seo_description.length}자</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">OG 이미지 URL (SNS 공유)</label>
+                    <input
+                      type="text"
+                      value={form.og_image_url}
+                      onChange={(e) => setForm({ ...form, og_image_url: e.target.value })}
+                      placeholder="https://...supabase.co/.../og.webp"
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 버튼 */}
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-800">
