@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import { ArrowRight, Phone, Send, Check } from 'lucide-react'
 import FadeIn from '@/components/ui/FadeIn'
+import { useConsultation } from '@/lib/useConsultation'
+import { useAttribution } from '@/lib/attribution'
 
 /* ── 통신사 요금 데이터 ── */
 const carriers = ['SKT', 'KT', 'LG U+'] as const
@@ -44,7 +46,38 @@ const plans: Plan[] = [
 ]
 
 export default function InternetPage() {
+  useAttribution()
+  const { submitting, error: submitError, submitConsultation } = useConsultation()
+  const [formName, setFormName] = useState('')
+  const [formPhone, setFormPhone] = useState('')
+  const [formShop, setFormShop] = useState('')
+  const [formProducts, setFormProducts] = useState<string[]>([])
+  const [privacyConsent, setPrivacyConsent] = useState(true)
+  const [marketingConsent, setMarketingConsent] = useState(true)
   const [selectedCarrier, setSelectedCarrier] = useState<Carrier | 'all'>('all')
+
+  const toggleProduct = (item: string) => {
+    setFormProducts((prev) =>
+      prev.includes(item) ? prev.filter((p) => p !== item) : [...prev, item]
+    )
+  }
+
+  const handleConsultSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await submitConsultation(
+      {
+        name: formName,
+        phone: formPhone,
+        product_category: 'internet',
+        business_address: formShop || undefined,
+        interested_products: formProducts,
+        privacy_consent: privacyConsent,
+        third_party_consent: privacyConsent,
+        marketing_consent: marketingConsent,
+      },
+      'internet'
+    )
+  }
 
   const filteredPlans = selectedCarrier === 'all'
     ? plans
@@ -392,35 +425,62 @@ export default function InternetPage() {
               </div>
             </FadeIn>
             <FadeIn delay={200}>
-              <form onSubmit={(e) => { e.preventDefault(); alert('상담 신청이 완료되었습니다!') }}
+              <form onSubmit={handleConsultSubmit}
                 className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 space-y-5">
                 <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">이름 <span className="text-red-400">*</span></label>
+                  <input type="text" required value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="홍길동" className="w-full rounded-xl bg-white/[0.06] border border-white/[0.1] px-4 py-3.5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200" />
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">연락처 <span className="text-red-400">*</span></label>
-                  <input type="tel" required placeholder="010-0000-0000"
+                  <input type="tel" required value={formPhone} onChange={(e) => setFormPhone(e.target.value)} placeholder="010-0000-0000"
                     className="w-full rounded-xl bg-white/[0.06] border border-white/[0.1] px-4 py-3.5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">매장명 <span className="text-gray-500">(선택)</span></label>
-                  <input type="text" placeholder="예: 강남역 카페"
+                  <input type="text" value={formShop} onChange={(e) => setFormShop(e.target.value)} placeholder="예: 강남역 카페"
                     className="w-full rounded-xl bg-white/[0.06] border border-white/[0.1] px-4 py-3.5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">관심 상품</label>
                   <div className="flex flex-wrap gap-2">
                     {['인터넷', '전화', 'IPTV', '결합할인'].map((item) => (
-                      <label key={item} className="inline-flex items-center px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.1] text-sm text-gray-300 has-[:checked]:bg-primary/20 has-[:checked]:border-primary/40 has-[:checked]:text-blue-300 cursor-pointer transition-all">
-                        <input type="checkbox" value={item} className="sr-only" />
+                      <label key={item} className={`inline-flex items-center px-4 py-2 rounded-full border text-sm cursor-pointer transition-all ${
+                        formProducts.includes(item)
+                          ? 'bg-primary/20 border-primary/40 text-blue-300'
+                          : 'bg-white/[0.06] border-white/[0.1] text-gray-300'
+                      }`}>
+                        <input type="checkbox" checked={formProducts.includes(item)} onChange={() => toggleProduct(item)} className="sr-only" />
                         {item}
                       </label>
                     ))}
                   </div>
                 </div>
-                <button type="submit"
-                  className="w-full mt-2 inline-flex items-center justify-center rounded-xl bg-primary px-6 py-4 text-base font-semibold text-white hover:bg-primary/90 hover:shadow-[0_0_40px_rgba(49,130,246,0.3)] active:scale-[0.98] transition-all duration-400 ease-toss">
-                  <Send className="mr-2 h-4 w-4" />
-                  무료 상담 신청하기
+                <div className="space-y-2 pt-2">
+                  <label className="flex items-start gap-2 text-xs text-gray-400 cursor-pointer">
+                    <input type="checkbox" checked={privacyConsent} onChange={(e) => setPrivacyConsent(e.target.checked)} className="mt-0.5 rounded border-gray-600" required />
+                    <span>[필수] 개인정보 수집·이용 및 제3자 제공에 동의합니다. <Link href="/privacy" className="text-primary-400 underline">자세히 보기</Link></span>
+                  </label>
+                  <label className="flex items-start gap-2 text-xs text-gray-400 cursor-pointer">
+                    <input type="checkbox" checked={marketingConsent} onChange={(e) => setMarketingConsent(e.target.checked)} className="mt-0.5 rounded border-gray-600" />
+                    <span>[선택] 마케팅 정보 수신에 동의합니다.</span>
+                  </label>
+                </div>
+                {submitError && <p className="text-sm text-red-400 text-center">{submitError}</p>}
+                <button type="submit" disabled={submitting}
+                  className="w-full mt-2 inline-flex items-center justify-center rounded-xl bg-primary px-6 py-4 text-base font-semibold text-white hover:bg-primary/90 hover:shadow-[0_0_40px_rgba(49,130,246,0.3)] active:scale-[0.98] transition-all duration-400 ease-toss disabled:opacity-50 disabled:cursor-not-allowed">
+                  {submitting ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      접수 중...
+                    </span>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      무료 상담 신청하기
+                    </>
+                  )}
                 </button>
-                <p className="text-center text-xs text-gray-500">상담 신청 시 개인정보 처리방침에 동의합니다.</p>
               </form>
             </FadeIn>
           </div>
