@@ -225,18 +225,13 @@ export default function HomeClient({ blocks }: HomeClientProps) {
       {/* 4. 카테고리 4카드 (BEST/EVENT/HOT/NEW) */}
       <CategoryCards />
 
-      {/* 5. 제품 딥다이브 — 카드 단말기 */}
+      {/* 5. 제품 딥다이브 — 카드 단말기 (편집 가능 : home.product.terminal.*) */}
       <ProductDeepDive
         id="terminal"
+        keyPrefix="home.product.terminal"
+        pagePath="/"
         eyebrow="카드 단말기"
-        title={
-          <>
-            모든 결제를
-            <br className="hidden sm:inline" />
-            {' '}
-            <span className="text-primary">단말기 한 대로</span>
-          </>
-        }
+        titleParts={{ line1: '모든 결제를', line2: '단말기 한 대로' }}
         vendor="tossplace"
         mainSubject="terminal-hero"
         mainLabel="카드단말기 대표컷"
@@ -244,49 +239,48 @@ export default function HomeClient({ blocks }: HomeClientProps) {
         mainIcon="solar:card-recive-bold-duotone"
         features={[
           {
+            keyBase: 'integrated',
             title: '카드 · QR · 간편결제 통합',
             desc: '애플페이, 삼성페이, 카카오페이까지 단말기 1대로.',
             icon: 'solar:card-bold-duotone',
           },
           {
+            keyBase: 'lowfee',
             title: '업종별 최저 수수료',
             desc: '카페 · 음식점 · 소매 업종별 VAN 수수료 우대 적용.',
             icon: 'solar:tag-price-bold-duotone',
           },
           {
+            keyBase: 'wireless',
             title: '무선 · 유선 모두 가능',
             desc: '매장 구조에 맞는 단말기 타입을 골라드려요.',
             icon: 'solar:wi-fi-router-bold-duotone',
           },
           {
+            keyBase: 'warranty',
             title: '수리 · 교체 평생 무상',
             desc: '렌탈 기간 중 고장나면 언제든 무상 교체해드립니다.',
             icon: 'solar:shield-check-bold-duotone',
           },
         ]}
         specs={[
-          { label: '467g', value: '초경량 휴대' },
-          { label: '8시간', value: '1회 충전 사용' },
-          { label: 'Wi-Fi + LTE', value: '이중 통신' },
-          { label: 'EMV 인증', value: '글로벌 표준' },
+          { keyBase: 'weight',  label: '467g',        value: '초경량 휴대' },
+          { keyBase: 'battery', label: '8시간',       value: '1회 충전 사용' },
+          { keyBase: 'network', label: 'Wi-Fi + LTE', value: '이중 통신' },
+          { keyBase: 'cert',    label: 'EMV 인증',    value: '글로벌 표준' },
         ]}
         ctaLabel="카드 단말기 상담"
         ctaHref="/business/terminal"
         bgClass="bg-white"
       />
 
-      {/* 6. 제품 딥다이브 — 키오스크 (reverse) */}
+      {/* 6. 제품 딥다이브 — 키오스크 (reverse, 편집 가능 : home.product.kiosk.*) */}
       <ProductDeepDive
         id="kiosk"
+        keyPrefix="home.product.kiosk"
+        pagePath="/"
         eyebrow="키오스크"
-        title={
-          <>
-            인건비는 줄이고
-            <br className="hidden sm:inline" />
-            {' '}
-            <span className="text-primary">주문 회전율은 올리고</span>
-          </>
-        }
+        titleParts={{ line1: '인건비는 줄이고', line2: '주문 회전율은 올리고' }}
         vendor="tossplace"
         mainSubject="kiosk-hero"
         mainLabel="키오스크 대표컷"
@@ -294,31 +288,35 @@ export default function HomeClient({ blocks }: HomeClientProps) {
         mainIcon="solar:monitor-smartphone-bold-duotone"
         features={[
           {
+            keyBase: 'selfpay',
             title: '터치 주문 + 자동 결제',
             desc: '고객이 직접 주문 → 결제까지, 매장 직원 부담 절감.',
             icon: 'solar:hand-money-bold-duotone',
           },
           {
+            keyBase: 'poslink',
             title: '포스 · 주방 프린터 연동',
             desc: '주문 내역이 바로 주방으로 전달되어 운영 지연 없음.',
             icon: 'solar:printer-bold-duotone',
           },
           {
+            keyBase: 'menuimg',
             title: '메뉴 이미지 관리 쉬움',
             desc: '어드민에서 이미지 · 가격 · 품절 실시간 변경.',
             icon: 'solar:gallery-edit-bold-duotone',
           },
           {
+            keyBase: 'payments',
             title: '카드 · 현금 · 포인트',
             desc: '모든 결제 수단 지원 + 할인쿠폰 · 멤버십 연동.',
             icon: 'solar:ticket-sale-bold-duotone',
           },
         ]}
         specs={[
-          { label: '21.5inch', value: '대형 터치' },
-          { label: '평균 35%', value: '인건비 절감' },
-          { label: '스탠드 · 벽걸이', value: '설치 자유' },
-          { label: 'A/S 24시간', value: '원격 대응' },
+          { keyBase: 'display',  label: '21.5inch',     value: '대형 터치' },
+          { keyBase: 'laborcut', label: '평균 35%',     value: '인건비 절감' },
+          { keyBase: 'install',  label: '스탠드 · 벽걸이', value: '설치 자유' },
+          { keyBase: 'support',  label: 'A/S 24시간',   value: '원격 대응' },
         ]}
         ctaLabel="키오스크 상담"
         ctaHref="/business/kiosk"
@@ -326,18 +324,13 @@ export default function HomeClient({ blocks }: HomeClientProps) {
         reverse
       />
 
-      {/* 7. 제품 딥다이브 — CCTV */}
+      {/* 7. 제품 딥다이브 — CCTV (편집 가능 : home.product.cctv.*) */}
       <ProductDeepDive
         id="cctv"
+        keyPrefix="home.product.cctv"
+        pagePath="/"
         eyebrow="CCTV 설치"
-        title={
-          <>
-            4K 화질로
-            <br className="hidden sm:inline" />
-            {' '}
-            <span className="text-primary">매장을 24시간 지키다</span>
-          </>
-        }
+        titleParts={{ line1: '4K 화질로', line2: '매장을 24시간 지키다' }}
         vendor="wooripen"
         mainSubject="cctv-hero"
         mainLabel="CCTV 설치 현장"
@@ -345,31 +338,35 @@ export default function HomeClient({ blocks }: HomeClientProps) {
         mainIcon="solar:videocamera-record-bold-duotone"
         features={[
           {
+            keyBase: 'uhd',
             title: '4K UHD 초고화질',
             desc: '사람 얼굴 · 번호판까지 선명하게 식별.',
             icon: 'solar:eye-scan-bold-duotone',
           },
           {
+            keyBase: 'remote',
             title: '스마트폰 원격 감시',
             desc: '외출 중에도 앱으로 매장 실시간 확인.',
             icon: 'solar:smartphone-bold-duotone',
           },
           {
+            keyBase: 'backup',
             title: '30일 자동 녹화 보관',
             desc: '사건 발생 시 즉시 영상 확인 · 추출 가능.',
             icon: 'solar:database-bold-duotone',
           },
           {
+            keyBase: 'nightir',
             title: '야간 적외선 촬영',
             desc: '조명 없어도 컬러에 가까운 야간 촬영.',
             icon: 'solar:moon-bold-duotone',
           },
         ]}
         specs={[
-          { label: '4K UHD', value: '800만 화소' },
-          { label: '30m 적외선', value: '야간 선명' },
-          { label: 'IP67', value: '방수 · 방진' },
-          { label: '설치비 0원', value: '4채널 기본' },
+          { keyBase: 'resolution', label: '4K UHD',     value: '800만 화소' },
+          { keyBase: 'ir_range',   label: '30m 적외선',  value: '야간 선명' },
+          { keyBase: 'proof',      label: 'IP67',       value: '방수 · 방진' },
+          { keyBase: 'install',    label: '설치비 0원', value: '4채널 기본' },
         ]}
         ctaLabel="CCTV 상담"
         ctaHref="/business/cctv"
