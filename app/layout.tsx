@@ -2,6 +2,11 @@ import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import FloatingCTA from '@/components/layout/FloatingCTA'
+// 인라인 편집 — 전역 편집 컨텍스트 & 모달 (admin 로그인 시에만 실질 동작)
+import { EditorProvider } from '@/components/editable/EditorProvider'
+import { EditorModal } from '@/components/editable/EditorModal'
+// 관리자 권한 체크 — 앱 전체에서 Supabase auth 호출을 1회로 축소 (NavigatorLock 경쟁 방지)
+import { AdminGuardProvider } from '@/components/editable/AdminGuardProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -76,10 +81,22 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <FloatingCTA />
+        {/*
+          AdminGuardProvider : 앱 전체에서 Supabase auth 체크를 1회로 묶음
+            - 바깥쪽에 둬서 EditorProvider/EditorModal/Header 등이 모두 같은 context 를 읽게 함
+            - 비로그인 방문자에게도 오버헤드 거의 0 (1회 getUser + 이벤트 구독 1개)
+          EditorProvider : 편집 세션 관리 (어떤 블록을 누가 편집 중인지)
+        */}
+        <AdminGuardProvider>
+          <EditorProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <FloatingCTA />
+            {/* 전역 편집 모달 — admin 이 ✏️ 눌렀을 때만 실제 DOM 에 나타남 */}
+            <EditorModal />
+          </EditorProvider>
+        </AdminGuardProvider>
       </body>
     </html>
   )
