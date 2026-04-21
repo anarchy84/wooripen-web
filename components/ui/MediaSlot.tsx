@@ -35,6 +35,7 @@ import { Icon } from '@iconify/react'
 import { cn } from '@/lib/utils/cn'
 import type { ImageValue } from '@/lib/content-blocks'
 import { EditOverlay } from '@/components/editable/EditOverlay'
+import type { SaveTarget } from '@/components/editable/EditorProvider'
 
 type MediaUsage = 'logo' | 'product' | 'scene' | 'case' | 'docs'
 
@@ -46,6 +47,17 @@ interface MediaSlotProps {
   value?: ImageValue
   /** revalidate 대상 경로 — blockKey 와 세트 */
   pagePath?: string
+  /**
+   * content_blocks 대신 다른 테이블 (packages/products) 에 저장할 때 지정.
+   * EditorModal 이 이 타겟으로 PATCH 호출.
+   */
+  saveTarget?: SaveTarget
+  /**
+   * 이미지 업로드 시 storage 경로 prefix.
+   * saveTarget 쓸 때는 blockKey 가 가짜 식별자이므로 이걸로 경로 분리.
+   * 예: `packages/cafe-business/hero`
+   */
+  uploadPathPrefix?: string
 
   // ── 레거시 메타 (개발용 힌트) ──────────────
   /** 벤더 코드 — 플레이스홀더 filename 표기용 */
@@ -91,6 +103,8 @@ export default function MediaSlot({
   blockKey,
   value,
   pagePath,
+  saveTarget,
+  uploadPathPrefix,
   vendor,
   usage = 'scene',
   subject,
@@ -200,6 +214,8 @@ export default function MediaSlot({
         currentValue: value ?? { url: '', alt: label },
         semanticTag:  'img',
         pagePath:     pagePath ?? null,
+        saveTarget,
+        uploadPathPrefix,
       }}
     >
       {inner}

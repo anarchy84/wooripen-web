@@ -53,7 +53,7 @@ function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           className="w-full px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="admin@wooripen.co.kr"
+          placeholder="admin@ourteam.kr"
         />
       </div>
 

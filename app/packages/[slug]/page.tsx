@@ -9,6 +9,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Package, PackageItem, PackageSection } from '@/types/database'
+import { BgImageEditOverlay } from '@/components/editable/BgImageEditOverlay'
 
 interface Props {
   params: { slug: string }
@@ -244,6 +245,20 @@ export default async function PackageDetailPage({ params }: Props) {
             : { background: 'linear-gradient(135deg, #1A1A2E 0%, #0F3460 100%)' }
         }
       >
+        {/* 인라인 편집 ✏️ — admin 에게만 보임 */}
+        <BgImageEditOverlay
+          blockKey={`packages.${pkg.id}.hero_image`}
+          currentUrl={pkg.hero_image}
+          alt={`${pkg.name} 패키지 히어로`}
+          pagePath={`/packages/${pkg.slug}`}
+          saveTarget={{
+            api:          '/api/admin/packages/image',
+            method:       'PATCH',
+            extraPayload: { packageId: pkg.id, column: 'hero_image' },
+          }}
+          uploadPathPrefix={`packages/${pkg.slug}/hero`}
+        />
+
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <span className="inline-block px-3 py-1 bg-blue-500/90 text-white text-xs font-bold rounded-full mb-4">
             PACKAGE
@@ -321,16 +336,37 @@ export default async function PackageDetailPage({ params }: Props) {
                         ⭐ 대표 구성
                       </span>
                     )}
-                    {product.image_url && (
-                      <div
-                        className="w-full h-32 rounded-xl mb-4 bg-gray-100"
-                        style={{
-                          backgroundImage: `url(${product.image_url})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center',
+                    {/*
+                       * 구성품 썸네일
+                       * - admin 이면 이미지 없어도 hover ✏️ 뜨도록 항상 렌더
+                       * - 편집은 products.image_url 직접 업데이트 (단일 진실원)
+                       * - 해당 상품을 쓰는 모든 패키지 slug 가 API 에서 revalidate 됨
+                       */}
+                    <div
+                      className="relative w-full h-32 rounded-xl mb-4 bg-gray-100 overflow-hidden"
+                      style={
+                        product.image_url
+                          ? {
+                              backgroundImage: `url(${product.image_url})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                            }
+                          : undefined
+                      }
+                    >
+                      <BgImageEditOverlay
+                        blockKey={`products.${product.id}.image_url`}
+                        currentUrl={product.image_url}
+                        alt={product.name}
+                        pagePath={`/products/${product.slug ?? ''}`}
+                        saveTarget={{
+                          api:          '/api/admin/products/image',
+                          method:       'PATCH',
+                          extraPayload: { productId: product.id, column: 'image_url' },
                         }}
+                        uploadPathPrefix={`products/${product.slug ?? product.id}/image`}
                       />
-                    )}
+                    </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2">{product.name}</h3>
                     {product.description && (
                       <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>

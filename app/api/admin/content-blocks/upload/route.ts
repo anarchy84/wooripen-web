@@ -50,14 +50,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'multipart/form-data 가 아닙니다.' }, { status: 400 })
   }
 
-  const file     = formData.get('file')
-  const blockKey = (formData.get('block_key') as string | null)?.trim()
+  const file       = formData.get('file')
+  const blockKey   = (formData.get('block_key')   as string | null)?.trim()
+  const pathPrefix = (formData.get('path_prefix') as string | null)?.trim()
 
   if (!file || !(file instanceof File)) {
     return NextResponse.json({ error: 'file 필드가 필요합니다.' }, { status: 400 })
   }
-  if (!blockKey) {
-    return NextResponse.json({ error: 'block_key 필드가 필요합니다.' }, { status: 400 })
+
+  // block_key (홈 인라인 편집 경로) 또는 path_prefix (테이블 직접 편집 경로) 중 하나는 필요
+  //   - block_key   : content_blocks 용 — 저장 경로 = {block_key}/{ts}.webp
+  //   - path_prefix : packages/products 등 — 저장 경로 = {path_prefix}/{ts}.webp
+  const storageKey = blockKey || pathPrefix
+  if (!storageKey) {
+    return NextResponse.json(
+      { error: 'block_key 또는 path_prefix 중 하나는 필수입니다.' },
+      { status: 400 }
+    )
   }
 
   // MIME 검증 — bucket 정책과 중복이지만 명확한 에러 메시지 위해
@@ -131,11 +140,13 @@ export async function POST(request: NextRequest) {
 
   // -------------------------------------------------------------
   // 6) Storage 업로드
-  //    경로 : {block_key}/{timestamp}.{ext}
-  //    block_key 에 점(.) 이 들어가도 storage path 는 그대로 사용 가능
+  //    경로 : {storageKey}/{timestamp}.{ext}
+  //    storageKey 는 block_key (도트 표기법) 또는 path_prefix (슬래시 허용)
+  //    점(.)·슬래시(/)는 storage path 에서 그대로 사용 가능
   // -------------------------------------------------------------
   const timestamp = Date.now()
-  const keyPrefix = blockKey.replace(/[^a-zA-Z0-9._-]/g, '_') // 안전한 경로 문자만
+  // 안전한 경로 문자만 허용 (영숫자·점·언더스코어·하이픈·슬래시)
+  const keyPrefix = storageKey.replace(/[^a-zA-Z0-9._\-/]/g, '_')
   const webpPath  = `${keyPrefix}/${timestamp}.webp`
   const pngPath   = `${keyPrefix}/${timestamp}.png`
 

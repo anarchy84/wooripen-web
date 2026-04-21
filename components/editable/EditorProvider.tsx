@@ -35,6 +35,32 @@ import type { BlockValue } from '@/lib/content-blocks'
 // -------------------------------------------------------------
 export type BlockType = 'text' | 'image' | 'link'
 
+/**
+ * 저장 타겟 — 기본값(undefined)이면 content_blocks 로 저장.
+ * packages/products 처럼 고유 테이블 컬럼으로 저장해야 하는 경우에만 지정.
+ *
+ * 예 : 패키지 히어로 이미지
+ *   {
+ *     api: '/api/admin/packages/image',
+ *     method: 'PATCH',
+ *     extraPayload: { packageId, column: 'hero_image' },
+ *   }
+ *
+ * EditorModal 이 저장할 때 :
+ *   fetch(saveTarget.api, {
+ *     method: saveTarget.method ?? 'PATCH',
+ *     body: JSON.stringify({ ...saveTarget.extraPayload, value: draft })
+ *   })
+ */
+export interface SaveTarget {
+  /** 저장할 API 엔드포인트 (절대경로) */
+  api:           string
+  /** HTTP 메서드 (기본 PATCH) */
+  method?:       'PATCH' | 'POST' | 'PUT'
+  /** 바디에 머지될 추가 필드 (테이블 id, 컬럼명 등) */
+  extraPayload?: Record<string, unknown>
+}
+
 export interface EditSession {
   blockKey:     string
   blockType:    BlockType
@@ -44,6 +70,17 @@ export interface EditSession {
   semanticTag?: string | null
   /** 저장 후 revalidate 대상 경로 */
   pagePath?:    string | null
+  /**
+   * content_blocks 말고 다른 테이블로 저장할 때만 지정.
+   * 이미지 편집이 주 용도.
+   */
+  saveTarget?:  SaveTarget
+  /**
+   * 이미지 업로드 시 storage 경로 prefix 오버라이드.
+   * 지정 안 하면 blockKey 가 prefix 로 쓰임.
+   * packages 처럼 blockKey 가 가짜 식별자일 때 명시적으로 지정.
+   */
+  uploadPathPrefix?: string
 }
 
 interface EditorContextValue {

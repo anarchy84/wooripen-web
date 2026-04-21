@@ -103,22 +103,42 @@ function EditorBody() {
 
   // -----------------------------------------------
   // 저장 — PATCH 호출
+  //   기본 : /api/admin/content-blocks (content_blocks 테이블)
+  //   saveTarget 지정 시 : 해당 엔드포인트 (packages/products 등)
   // -----------------------------------------------
   const handleSave = async () => {
     if (!session) return
     setStep('saving')
     try {
-      const res = await fetch('/api/admin/content-blocks', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          block_key:    session.blockKey,
-          block_type:   session.blockType,
-          value:        draft,
-          semantic_tag: session.semanticTag ?? null,
-          page_path:    session.pagePath ?? null,
-        }),
-      })
+      let res: Response
+
+      if (session.saveTarget) {
+        // ── 테이블 직접 저장 경로 ────────────────────
+        // packages/products 의 컬럼을 업데이트. body 에 value 만 합쳐 보냄.
+        const payload = {
+          ...(session.saveTarget.extraPayload ?? {}),
+          value: draft,
+        }
+        res = await fetch(session.saveTarget.api, {
+          method:  session.saveTarget.method ?? 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(payload),
+        })
+      } else {
+        // ── 기본 content_blocks 경로 ─────────────────
+        res = await fetch('/api/admin/content-blocks', {
+          method:  'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            block_key:    session.blockKey,
+            block_type:   session.blockType,
+            value:        draft,
+            semantic_tag: session.semanticTag ?? null,
+            page_path:    session.pagePath ?? null,
+          }),
+        })
+      }
+
       const json = await res.json()
       if (!res.ok || !json.success) {
         throw new Error(json.error ?? '저장 실패')
@@ -341,7 +361,13 @@ function ImageUploadForm({
     try {
       const fd = new FormData()
       fd.append('file', file)
-      fd.append('block_key', session.blockKey)
+      // uploadPathPrefix 지정되면 그것을 사용 (packages/products 용 저장 경로)
+      // 아니면 blockKey 를 storage 경로로 사용 (홈 섹션용 기본)
+      if (session.uploadPathPrefix) {
+        fd.append('path_prefix', session.uploadPathPrefix)
+      } else {
+        fd.append('block_key', session.blockKey)
+      }
 
       const res = await fetch('/api/admin/content-blocks/upload', {
         method: 'POST',

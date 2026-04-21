@@ -8,6 +8,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Product, TrustBadge, DetailFeature, ComparisonTable } from '@/types/database'
+import { BgImageEditOverlay } from '@/components/editable/BgImageEditOverlay'
 
 interface Props {
   params: { slug: string }
@@ -75,6 +76,20 @@ export default async function ProductDetailPage({ params }: Props) {
             : { background: 'linear-gradient(135deg, #1A1A2E 0%, #0F3460 100%)' }
         }
       >
+        {/* 인라인 편집 ✏️ — admin 에게만 보임 (hero_image 교체) */}
+        <BgImageEditOverlay
+          blockKey={`products.${p.id}.hero_image`}
+          currentUrl={p.hero_image}
+          alt={`${p.name} 상세 히어로`}
+          pagePath={`/products/${p.slug}`}
+          saveTarget={{
+            api:          '/api/admin/products/image',
+            method:       'PATCH',
+            extraPayload: { productId: p.id, column: 'hero_image' },
+          }}
+          uploadPathPrefix={`products/${p.slug}/hero`}
+        />
+
         <div className="max-w-5xl mx-auto text-center relative z-10">
           {p.promo_badge && p.promo_active && (
             <span className="inline-block px-3 py-1 bg-amber-500/90 text-white text-xs font-bold rounded-full mb-4">
