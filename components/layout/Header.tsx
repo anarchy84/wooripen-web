@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import type { NavMenu } from '@/types/database'
+// 상단 프로모 바 — Header 최상단에 삽입되어 스크롤 시 접힘
+import PromoBar from '@/components/sections/home/PromoBar'
 
 // 트리 구조 — 하위 children 포함
 interface NavNode extends NavMenu {
@@ -88,18 +90,31 @@ export default function Header() {
   }
 
   return (
-    <header
-      className={`
-        fixed top-0 left-0 right-0 z-50
-        transition-all duration-300 ease-toss
-        ${scrolled
-          ? 'bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-soft'
-          : 'bg-transparent'
-        }
-      `}
-    >
-      <div className="section-container">
-        <div className="flex h-16 items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50">
+      {/* 상단 프로모 바 — 스크롤 10px 이상이면 높이 0으로 접혀서 네비만 남음
+          max-h 값: 모바일(2줄) = 96px / md 이상(1줄) = 48px */}
+      <div
+        className={`
+          overflow-hidden transition-[max-height,opacity] duration-300 ease-toss
+          ${scrolled ? 'max-h-0 opacity-0' : 'max-h-24 md:max-h-12 opacity-100'}
+        `}
+        aria-hidden={scrolled}
+      >
+        <PromoBar />
+      </div>
+
+      {/* 네비 영역 — scrolled 상태에 따라 배경 전환 */}
+      <div
+        className={`
+          transition-all duration-300 ease-toss
+          ${scrolled
+            ? 'bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-soft'
+            : 'bg-transparent'
+          }
+        `}
+      >
+        <div className="section-container">
+          <div className="flex h-16 items-center justify-between">
           {/* 로고 */}
           <Link href="/" className="relative z-10">
             <span className={`
@@ -195,6 +210,7 @@ export default function Header() {
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
+        </div>
         </div>
       </div>
 

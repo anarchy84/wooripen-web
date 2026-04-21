@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "generated_at": null,
+  "note": "이 파일은 scripts/image_pipeline/build_manifest.py가 output_urls.csv로부터 자동 생성한다. 수동 편집 금지.",
+  "items": {}
+}

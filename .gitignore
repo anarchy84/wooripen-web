@@ -32,3 +32,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# image pipeline — 원본 이미지와 결과물은 커밋 X
+scripts/image_pipeline/staging/
+scripts/image_pipeline/output_urls.csv
+scripts/image_pipeline/.venv/
+scripts/image_pipeline/__pycache__/

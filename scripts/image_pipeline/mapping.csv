@@ -1,0 +1,54 @@
+original_filename,vendor,usage,subject,variant,note
+# ===== 토스플레이스 =====
+# 로고 (원본 파일명은 대웅이 다운로드 후 실제 파일명으로 맞춰줘)
+logo-place-primary.png,tossplace,logo,primary,,
+logo-place-mono.png,tossplace,logo,mono,,
+logo-place-reverse.png,tossplace,logo,reverse,,
+logo-place-simple.png,tossplace,logo,simple,,
+# 제품 누끼 (안드로이드 POS)
+android_pos_01.jpg,tossplace,product,androidpos,01,
+android_pos_02.jpg,tossplace,product,androidpos,02,
+# 제품 누끼 (PC POS)
+place_pc_pos.png,tossplace,product,pcpos,,
+# 브랜드컷 (연출) — scene으로 통합
+place-2024-brandcut-01.jpg,tossplace,scene,cafe,01,
+place-2024-brandcut-02.jpg,tossplace,scene,cafe,02,
+# 배경 — scene으로 통합
+place-original-bg-01.jpg,tossplace,scene,store,01,대용량(16MB+) 리사이즈 필수
+# 키오스크 목업 — scene으로 통합
+place-kiosk-mockup-01.png,tossplace,scene,kiosk,01,
+# 영수증 프린터
+place-original--printer-receipt-no-bg-7.png,tossplace,product,printer,01,
+# ===== 티오더 =====
+# 공식 로고
+t'order_Brand_Logo_1.png,torder,logo,primary,01,
+t'order_Brand_Logo_3.png,torder,logo,primary,02,
+t'order_Brand_Logo_mono_1.png,torder,logo,mono,01,
+t'order_Brand_Logo_mono_2.png,torder,logo,mono,02,
+# 앱 아이콘 — logo로 통합
+t'order_Brand_app-icon_512_512_1.png,torder,logo,appicon,01,
+t'order_Brand_app-icon_512_512_2.png,torder,logo,appicon,02,
+t'order_Brand_app-icon_512_512_3.png,torder,logo,appicon,03,
+# 거치대 배너 (5/6/8 누락) — scene으로 통합
+main-design-bnr1.jpg,torder,scene,banner,01,
+main-design-bnr2.jpg,torder,scene,banner,02,
+main-design-bnr3.jpg,torder,scene,banner,03,
+main-design-bnr4.jpg,torder,scene,banner,04,
+main-design-bnr7 (1).jpg,torder,scene,banner,07,
+main-design-bnr9.jpg,torder,scene,banner,09,
+main-design-bnr10.jpg,torder,scene,banner,10,
+main-design-bnr11.jpg,torder,scene,banner,11,
+# 도입 사례
+torder_BBQ-0.png,torder,case,bbq,01,BBQ 프랜차이즈
+torder_craft-hans-0.png,torder,case,crafthans,01,크래프트한스
+torder_forest-0.png,torder,case,forest,01,포레스트
+torder_mattna-0.png,torder,case,mattna,01,맷나
+torder_thehago-0.png,torder,case,thehago,01,더하고
+# 홍보물 — scene으로 통합
+홍보물_티오더01.png,torder,scene,promo,01,
+홍보물_티오더02.png,torder,scene,promo,02,
+# 거치대 목업 — scene으로 통합
+table-order-section4-fix-pre.png,torder,scene,tabletfixed,01,고정형 거치대
+table-order-section4-move-pre.png,torder,scene,tabletmobile,01,이동형 거치대
+# 브로셔 (PDF는 스크립트에서 자동 스킵됨 — 별도 업로드) — docs로 변경
+티오더_서비스소개서_채널영업팀_2025-05-15.pdf,torder,docs,service,202505,수동 업로드

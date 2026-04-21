@@ -1,0 +1,7 @@
+# 우리편 이미지 파이프라인 — 의존성
+# 설치: pip install -r requirements.txt
+
+Pillow>=10.2.0           # 이미지 리사이즈·포맷 변환
+supabase>=2.5.0          # Supabase 클라이언트
+python-dotenv>=1.0.0     # .env.local 환경변수 로드
+rich>=13.7.0             # 터미널 출력 예쁘게 (진행률 바 등)

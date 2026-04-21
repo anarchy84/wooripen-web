@@ -188,3 +188,14 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #b0b8c1;
 }
+
+/* 가로 스크롤 카드 레일에서 스크롤바 숨김 (Chrome/Safari/Firefox/Edge 공통) */
+.scrollbar-hide {
+  -ms-overflow-style: none;       /* IE, old Edge */
+  scrollbar-width: none;          /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;                  /* Chrome, Safari, 신 Edge */
+  width: 0;
+  height: 0;
+}
