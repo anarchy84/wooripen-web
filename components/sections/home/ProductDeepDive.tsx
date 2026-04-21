@@ -21,7 +21,7 @@ import MediaSlot from '@/components/ui/MediaSlot'
 import { EditableText } from '@/components/editable/EditableText'
 import { EditableLink } from '@/components/editable/EditableLink'
 import { useBlocks } from '@/components/editable/BlocksProvider'
-import { pickTextOrUndef, pickLinkOrUndef } from '@/lib/content-blocks'
+import { pickTextOrUndef, pickLinkOrUndef, pickImageOrUndef } from '@/lib/content-blocks'
 
 // -------------------------------------------------------------
 // 데이터 타입 — 인라인 편집용 keyBase 필드 추가
@@ -165,21 +165,29 @@ export default function ProductDeepDive({
             reverse ? 'lg:[&>*:first-child]:order-2' : ''
           }`}
         >
-          {/* 좌: 메인 제품컷 */}
+          {/* 좌: 메인 제품컷 — keyPrefix 있으면 blockKey 로 DB 이미지 연결, hover 시 ✏️ 업로드 */}
           <FadeIn delay={60} direction={reverse ? 'right' : 'left'}>
             <div className="relative rounded-3xl overflow-hidden shadow-card">
-              <MediaSlot
-                vendor={vendor}
-                usage="product"
-                subject={mainSubject}
-                number="01"
-                aspect="4/3"
-                label={mainLabel}
-                hint={mainHint}
-                icon={mainIcon}
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                fit="cover"
-              />
+              {(() => {
+                const mainImgKey = isEditable ? `${keyPrefix}.main_image` : undefined
+                return (
+                  <MediaSlot
+                    blockKey={mainImgKey}
+                    value={mainImgKey ? pickImageOrUndef(blocks, mainImgKey) : undefined}
+                    pagePath={pagePath}
+                    vendor={vendor}
+                    usage="product"
+                    subject={mainSubject}
+                    number="01"
+                    aspect="4/3"
+                    label={mainLabel}
+                    hint={mainHint}
+                    icon={mainIcon}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    fit="cover"
+                  />
+                )
+              })()}
             </div>
 
             {/* 스펙 하이라이트 (선택) */}

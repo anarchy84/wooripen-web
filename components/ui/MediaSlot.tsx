@@ -1,72 +1,98 @@
 'use client'
 
 // ─────────────────────────────────────────────
-// MediaSlot — 이미지 슬롯 컴포넌트
+// MediaSlot — 이미지 슬롯 컴포넌트 (2026-04-21 DB 기반으로 전면 개편)
 //
-// 1) lib/media-manifest.json 에 해당 파일이 등록되어 있으면 → next/image 렌더
-// 2) 아직 업로드 안 됐으면 → "어떤 이미지가 들어갈 자리인지" 표시하는
-//    블루 그라디언트 플레이스홀더 (페이히어 톤)
+// 변경 배경 :
+//   - 매니페스트(lib/media-manifest.json) + Google Drive 임포트 파이프라인 폐기
+//   - 모든 이미지는 어드민의 인라인 편집 ✏️ 로 업로드·교체
+//   - 업로드된 이미지는 Supabase Storage 'public-content' 에 저장되고
+//     같은 block_key 로 다시 업로드하면 새 타임스탬프로 URL 이 갱신됨
 //
-// 사용 예:
+// 동작 원리 :
+//   1) blockKey 와 value(SSR 에서 DB 조회한 ImageValue) 를 부모가 내려줌
+//   2) value 있으면 → 실제 이미지 렌더 (+ admin 이면 hover 시 ✏️)
+//   3) value 없으면 → 블루 그라디언트 플레이스홀더
+//                     (+ admin 이면 hover 시 ✏️ → 첫 업로드)
+//
+// 사용 예 :
 //   <MediaSlot
-//     vendor="wooripen"
-//     usage="scene"
-//     subject="hero-cafe"
-//     number="01"
+//     blockKey="home.hero.slide1.image"
+//     value={pickImageOrUndef(blocks, 'home.hero.slide1.image')}
 //     aspect="16/9"
 //     label="히어로 슬라이드 1 — 카페 창업"
 //     hint="매장 실사 / 1920x1080+"
+//     pagePath="/"
 //     priority
 //   />
+//
+// 레거시 prop (vendor/usage/subject/number) :
+//   - 기존 호출처 유지용 — 플레이스홀더 파일명 힌트로만 사용
+//   - 리팩터가 끝나면 순차적으로 제거 예정
 // ─────────────────────────────────────────────
 
-import Image from 'next/image'
 import { Icon } from '@iconify/react'
 import { cn } from '@/lib/utils/cn'
-import { makeMediaKey, resolveMedia } from '@/lib/media'
+import type { ImageValue } from '@/lib/content-blocks'
+import { EditOverlay } from '@/components/editable/EditOverlay'
 
 type MediaUsage = 'logo' | 'product' | 'scene' | 'case' | 'docs'
 
 interface MediaSlotProps {
-  /** 벤더 코드 (wooripen / tossplace / torder 등) */
-  vendor: string
-  /** 용도 — 5개 중 하나 */
-  usage: MediaUsage
-  /** 주제 (영소문자+하이픈) */
-  subject: string
-  /** 번호 — 숫자(자동 2자리 패딩) 또는 "01" 같은 문자열 */
-  number: string | number
-  /** 비율 — "16/9" | "4/3" | "1/1" | "3/4" 등 CSS aspect-ratio 문자열 */
+  // ── 편집 연결 (신규) ───────────────────────
+  /** DB block_key (도트 표기법) — 인라인 편집 ✏️ 에 필수 */
+  blockKey?: string
+  /** SSR 에서 조회한 DB 값 (없으면 플레이스홀더) */
+  value?: ImageValue
+  /** revalidate 대상 경로 — blockKey 와 세트 */
+  pagePath?: string
+
+  // ── 레거시 메타 (개발용 힌트) ──────────────
+  /** 벤더 코드 — 플레이스홀더 filename 표기용 */
+  vendor?: string
+  /** 용도 — 기본 아이콘 결정에 사용 */
+  usage?: MediaUsage
+  /** 주제 — 플레이스홀더 filename 표기용 */
+  subject?: string
+  /** 번호 — 플레이스홀더 filename 표기용 */
+  number?: string | number
+
+  // ── 레이아웃 ────────────────────────────────
+  /** 비율 — CSS aspect-ratio 문자열 */
   aspect?: string
   /** 대체 텍스트 / 플레이스홀더 상단 라벨 */
   label: string
   /** 플레이스홀더 하단 힌트 (권장 사이즈 등) */
   hint?: string
-  /** 이미지 로딩 우선순위 (히어로용) */
+  /** LCP 후보 (히어로용) — native img 에 loading="eager" 적용 */
   priority?: boolean
-  /** next/image sizes 속성 */
+  /** 반응형 sizes 힌트 */
   sizes?: string
-  /** 부모에 채울지 여부 (default: true) */
+  /** 부모에 채울지 (default: true) */
   fill?: boolean
   /** 이미지 object-fit */
   fit?: 'cover' | 'contain'
-  /** 아이콘 오버라이드 (플레이스홀더에 표시될 아이콘) */
+  /** 아이콘 오버라이드 */
   icon?: string
   /** 추가 className (컨테이너) */
   className?: string
   /** 이미지 자체에 적용할 className */
   imgClassName?: string
-  /** 플레이스홀더 테마 (light: 흰 배경용, dark: 어두운 배경용) */
+  /** 플레이스홀더 테마 */
   theme?: 'light' | 'dark'
 }
 
 /**
  * 이미지 슬롯.
- * 매니페스트에 등록돼 있으면 실제 이미지, 아니면 "채울 자리" 플레이스홀더.
+ * DB 에 값이 있으면 실제 이미지, 없으면 "채울 자리" 플레이스홀더.
+ * admin 이면 어떤 경우든 hover 시 ✏️ 버튼으로 업로드·교체 가능.
  */
 export default function MediaSlot({
+  blockKey,
+  value,
+  pagePath,
   vendor,
-  usage,
+  usage = 'scene',
   subject,
   number,
   aspect = '16/9',
@@ -81,51 +107,103 @@ export default function MediaSlot({
   imgClassName,
   theme = 'light',
 }: MediaSlotProps) {
-  const key = makeMediaKey(vendor, usage, subject, number)
-  const media = resolveMedia(key)
-
-  // 용도별 기본 아이콘
   const defaultIcon = icon ?? getDefaultIcon(usage)
 
-  // 번호 2자리로 정규화
+  // 번호 2자리 정규화 (개발용 힌트)
   const normalizedNumber =
-    typeof number === 'number' ? String(number).padStart(2, '0') : number
-  const expectedFilename = `${vendor}-${usage}-${subject}-${normalizedNumber}`
+    typeof number === 'number' ? String(number).padStart(2, '0') : (number ?? '')
+  const legacyFilename =
+    vendor && subject && normalizedNumber
+      ? `${vendor}-${usage}-${subject}-${normalizedNumber}`
+      : null
 
-  return (
-    <div
-      className={cn(
-        'relative overflow-hidden',
-        !fill && 'inline-block',
-        className,
-      )}
-      style={{ aspectRatio: aspect }}
-      data-media-key={key}
-    >
-      {media ? (
-        // ── 실제 이미지 렌더 ────────────────────
-        <Image
-          src={media.webp_available && media.webp_url ? media.webp_url : media.public_url}
-          alt={label}
-          fill={fill}
-          sizes={sizes ?? '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw'}
-          priority={priority}
+  // 실제 렌더할 이미지 URL 결정
+  // value.fallback_url 이 있으면 <picture> 로 WebP+PNG 병행
+  const hasImage = !!(value && value.url)
+
+  const imageNode = hasImage && value ? (
+    value.fallback_url ? (
+      <picture>
+        <source srcSet={value.url} type="image/webp" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={value.fallback_url}
+          alt={value.alt ?? label}
+          width={value.width}
+          height={value.height}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          sizes={sizes}
           className={cn(
+            'absolute inset-0 w-full h-full',
             fit === 'cover' ? 'object-cover' : 'object-contain',
             imgClassName,
           )}
         />
-      ) : (
-        // ── 플레이스홀더 (페이히어 톤 블루 그라디언트) ──
-        <Placeholder
-          label={label}
-          hint={hint}
-          icon={defaultIcon}
-          filename={expectedFilename}
-          theme={theme}
-        />
-      )}
-    </div>
+      </picture>
+    ) : (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={value.url}
+        alt={value.alt ?? label}
+        width={value.width}
+        height={value.height}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        sizes={sizes}
+        className={cn(
+          'absolute inset-0 w-full h-full',
+          fit === 'cover' ? 'object-cover' : 'object-contain',
+          imgClassName,
+        )}
+      />
+    )
+  ) : null
+
+  const inner = hasImage ? (
+    imageNode
+  ) : (
+    <Placeholder
+      label={label}
+      hint={hint}
+      icon={defaultIcon}
+      filename={legacyFilename ?? blockKey ?? 'unnamed'}
+      theme={theme}
+    />
+  )
+
+  const baseClassName = cn(
+    'relative overflow-hidden',
+    !fill && 'inline-block',
+    className,
+  )
+  const baseStyle: React.CSSProperties = { aspectRatio: aspect }
+
+  // blockKey 없으면 편집 불가 — 그냥 내용만 렌더
+  if (!blockKey) {
+    return (
+      <div className={baseClassName} style={baseStyle}>
+        {inner}
+      </div>
+    )
+  }
+
+  // 편집 가능 — EditOverlay 로 감싸서 ✏️ 노출
+  return (
+    <EditOverlay
+      as="div"
+      className={baseClassName}
+      style={baseStyle}
+      session={{
+        blockKey,
+        blockType:    'image',
+        currentValue: value ?? { url: '', alt: label },
+        semanticTag:  'img',
+        pagePath:     pagePath ?? null,
+      }}
+    >
+      {inner}
+    </EditOverlay>
   )
 }
 
@@ -149,14 +227,13 @@ function Placeholder({ label, hint, icon, filename, theme }: PlaceholderProps) {
       className={cn(
         'absolute inset-0 flex flex-col items-center justify-center',
         'text-center px-4 py-6 overflow-hidden',
-        // 블루 그라디언트 배경 (페이히어 톤, 우리편 primary #3182F6 기반)
         isDark
           ? 'bg-gradient-to-br from-[#1B4FD1] via-[#2663EA] to-[#3182F6]'
           : 'bg-gradient-to-br from-primary-50 via-primary-100 to-white',
       )}
       aria-label={`이미지 예정: ${label}`}
     >
-      {/* 배경 장식 — 은은한 도트/글로우 */}
+      {/* 배경 장식 */}
       <div
         className={cn(
           'absolute inset-0 pointer-events-none',
@@ -174,9 +251,7 @@ function Placeholder({ label, hint, icon, filename, theme }: PlaceholderProps) {
       <div
         className={cn(
           'relative w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center mb-3',
-          isDark
-            ? 'bg-white/15 backdrop-blur-sm'
-            : 'bg-primary/10',
+          isDark ? 'bg-white/15 backdrop-blur-sm' : 'bg-primary/10',
         )}
       >
         <Icon
@@ -210,7 +285,7 @@ function Placeholder({ label, hint, icon, filename, theme }: PlaceholderProps) {
         </div>
       )}
 
-      {/* 파일명 힌트 (배포 환경에선 숨김, 개발 환경에서만 노출) */}
+      {/* 파일명 힌트 — 개발 환경에서만 노출 */}
       {process.env.NODE_ENV !== 'production' && (
         <div
           className={cn(
