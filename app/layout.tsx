@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import FloatingCTA from '@/components/layout/FloatingCTA'
+// 어드민 경로(/admin/**) 에선 메인 사이트 GNB·Footer·FloatingCTA 숨기는 client wrapper
+import SiteShell from '@/components/layout/SiteShell'
 // 인라인 편집 — 전역 편집 컨텍스트 & 모달 (admin 로그인 시에만 실질 동작)
 import { EditorProvider } from '@/components/editable/EditorProvider'
 import { EditorModal } from '@/components/editable/EditorModal'
@@ -89,10 +91,18 @@ export default function RootLayout({
         */}
         <AdminGuardProvider>
           <EditorProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <FloatingCTA />
+            {/*
+              SiteShell : /admin/** 경로면 메인 셸(GNB·Footer·FloatingCTA) 숨김.
+              어드민 페이지가 자체 layout 으로 화면 그리도록 양보.
+              비어드민 경로면 기존처럼 Header / main / Footer / FloatingCTA 그대로 렌더.
+            */}
+            <SiteShell
+              header={<Header />}
+              footer={<Footer />}
+              floatingCta={<FloatingCTA />}
+            >
+              {children}
+            </SiteShell>
             {/* 전역 편집 모달 — admin 이 ✏️ 눌렀을 때만 실제 DOM 에 나타남 */}
             <EditorModal />
           </EditorProvider>
