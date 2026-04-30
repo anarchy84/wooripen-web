@@ -12,6 +12,7 @@
 //  - 블록 키 : home.social.header.* / home.social.{keyBase}.*
 // ─────────────────────────────────────────────
 
+import { useRef } from 'react'
 import { Icon } from '@iconify/react'
 import FadeIn from '@/components/ui/FadeIn'
 import MediaSlot from '@/components/ui/MediaSlot'
@@ -98,6 +99,16 @@ const TESTIMONIALS: Testimonial[] = [
 
 export default function SocialProof() {
   const blocks = useBlocks()
+  // 가로 스크롤 컨테이너 ref — 좌우 화살표 버튼이 직접 scrollLeft 조정
+  const railRef = useRef<HTMLDivElement | null>(null)
+
+  // 한 번에 카드 약 2장 정도 이동 (모바일 280, 데스크톱 320 + gap)
+  const scrollByAmount = (dir: 'prev' | 'next') => {
+    const el = railRef.current
+    if (!el) return
+    const step = el.clientWidth * 0.7 // 가시 너비의 70% 이동 → 자연스러운 페이지 넘김
+    el.scrollBy({ left: dir === 'next' ? step : -step, behavior: 'smooth' })
+  }
 
   return (
     <section className="py-16 md:py-24 bg-white">
@@ -148,12 +159,33 @@ export default function SocialProof() {
         <FadeIn delay={80}>
           {/*
             가로 스크롤 카드 레일.
-            - 기존엔 scrollbar-hide 라 데스크톱 마우스 사용자가 좌우 이동을 못 했음
-            - scrollbar-x-visible 로 변경 → 하단에 얇은 스크롤바 노출 + 트랙패드 / 마우스 모두 작동
+            - scrollbar-x-visible 로 하단 스크롤바 강제 노출 (macOS 자동 숨김 우회)
+            - 좌우 화살표 버튼으로 클릭 이동도 가능 (마우스 사용자 친화)
             - pb-6 로 여유를 둬서 카드 그림자가 스크롤바와 겹치지 않게
           */}
           <div className="relative -mx-4 md:-mx-8">
-            <div className="flex gap-4 md:gap-6 overflow-x-auto px-4 md:px-8 pb-6 snap-x snap-mandatory scrollbar-x-visible">
+            {/* 좌측 화살표 (md 이상 노출 — 모바일은 스와이프로 충분) */}
+            <button
+              type="button"
+              onClick={() => scrollByAmount('prev')}
+              aria-label="이전 후기"
+              className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white hover:bg-gray-50 text-gray-700 shadow-lg border border-gray-100 items-center justify-center transition-all hover:scale-105"
+            >
+              <Icon icon="solar:arrow-left-linear" className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollByAmount('next')}
+              aria-label="다음 후기"
+              className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 rounded-full bg-white hover:bg-gray-50 text-gray-700 shadow-lg border border-gray-100 items-center justify-center transition-all hover:scale-105"
+            >
+              <Icon icon="solar:arrow-right-linear" className="w-5 h-5" />
+            </button>
+
+            <div
+              ref={railRef}
+              className="flex gap-4 md:gap-6 px-4 md:px-8 pb-6 snap-x snap-mandatory scrollbar-x-visible"
+            >
               {TESTIMONIALS.map((t) => (
                 <article
                   key={t.keyBase}
