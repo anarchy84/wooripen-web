@@ -130,6 +130,10 @@ export default function HeroCarousel() {
     setTimeout(() => setPaused(false), 10000)
   }
 
+  // 좌우 화살표용 — 순환 이동 (마지막 → 처음, 처음 → 마지막)
+  const goPrev = () => goTo((index - 1 + SLIDES.length) % SLIDES.length)
+  const goNext = () => goTo((index + 1) % SLIDES.length)
+
   const current = SLIDES[index]
 
   // 현재 슬라이드의 CTA DB 값 (없으면 defaults)
@@ -224,6 +228,28 @@ export default function HeroCarousel() {
               className="relative rounded-3xl overflow-hidden shadow-card"
               style={{ aspectRatio: '16/9' }}
             >
+              {/*
+                좌우 화살표 — 이미지 좌우 중앙에 absolute 배치.
+                z-20 으로 슬라이드 레이어(z-10 이하) 보다 위.
+                반투명 배경 + 그림자 → 어떤 슬라이드 위에서도 가독성 확보.
+              */}
+              <button
+                type="button"
+                onClick={goPrev}
+                aria-label="이전 슬라이드"
+                className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-lg flex items-center justify-center transition-all hover:scale-105"
+              >
+                <Icon icon="solar:arrow-left-linear" className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                aria-label="다음 슬라이드"
+                className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white text-gray-800 shadow-lg flex items-center justify-center transition-all hover:scale-105"
+              >
+                <Icon icon="solar:arrow-right-linear" className="w-5 h-5 md:w-6 md:h-6" />
+              </button>
+
               {SLIDES.map((slide, i) => {
                 // 각 슬라이드 이미지 블록키 — home.hero.slide{1..5}.image
                 const imgKey = `home.hero.${slide.keyBase}.image`

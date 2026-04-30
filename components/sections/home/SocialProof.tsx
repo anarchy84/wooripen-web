@@ -146,11 +146,14 @@ export default function SocialProof() {
 
         {/* 가로 스크롤 카드 */}
         <FadeIn delay={80}>
-          <div className="relative -mx-4 md:-mx-8 overflow-hidden">
-            <div
-              className="flex gap-4 md:gap-6 overflow-x-auto px-4 md:px-8 pb-4 snap-x snap-mandatory scrollbar-hide"
-              style={{ scrollbarWidth: 'none' }}
-            >
+          {/*
+            가로 스크롤 카드 레일.
+            - 기존엔 scrollbar-hide 라 데스크톱 마우스 사용자가 좌우 이동을 못 했음
+            - scrollbar-x-visible 로 변경 → 하단에 얇은 스크롤바 노출 + 트랙패드 / 마우스 모두 작동
+            - pb-6 로 여유를 둬서 카드 그림자가 스크롤바와 겹치지 않게
+          */}
+          <div className="relative -mx-4 md:-mx-8">
+            <div className="flex gap-4 md:gap-6 overflow-x-auto px-4 md:px-8 pb-6 snap-x snap-mandatory scrollbar-x-visible">
               {TESTIMONIALS.map((t) => (
                 <article
                   key={t.keyBase}
