@@ -2,6 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
 
+// sharp 는 native 모듈 — Edge runtime 에서 안 됨. 명시적으로 nodejs 강제
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 // GET: 미디어 목록
 export async function GET() {
   const supabase = createClient()
@@ -60,8 +64,14 @@ export async function POST(request: NextRequest) {
       .resize({ width: 1200, withoutEnlargement: true })
       .webp({ quality: 82 })
       .toBuffer()
-  } catch {
-    return NextResponse.json({ error: 'Image processing failed' }, { status: 500 })
+  } catch (err) {
+    // sharp 모듈 자체 누락 / 변환 실패 — 에러 메시지 정확히 응답에 포함
+    const msg = err instanceof Error ? err.message : 'Image processing failed'
+    console.error('[media sharp]', err)
+    return NextResponse.json(
+      { error: `Image processing failed: ${msg}` },
+      { status: 500 },
+    )
   }
 
   // 원본 업로드

@@ -48,11 +48,25 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
 
     try {
       const res = await fetch('/api/admin/media', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error('Upload failed')
-      const media = await res.json()
-      editor.chain().focus().setImage({ src: media.webp_path || media.storage_path, alt: media.alt_text }).run()
-    } catch {
-      alert('이미지 업로드에 실패했습니다.')
+      // 응답 본문을 미리 읽어서 디버깅에 활용
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        // 서버가 보낸 정확한 에러 메시지를 사용자에게 표시
+        const msg = (data && typeof data.error === 'string') ? data.error : `HTTP ${res.status}`
+        alert(`이미지 업로드 실패: ${msg}`)
+        // 콘솔에도 전체 응답 남김 — 개발자 도구에서 확인 가능
+        console.error('[image upload]', res.status, data)
+        return
+      }
+      editor
+        .chain()
+        .focus()
+        .setImage({ src: data.webp_path || data.storage_path, alt: data.alt_text })
+        .run()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '네트워크 오류'
+      alert(`이미지 업로드 실패: ${msg}`)
+      console.error('[image upload exception]', err)
     }
   }, [editor])
 

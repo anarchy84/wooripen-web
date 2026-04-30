@@ -200,6 +200,76 @@
   height: 0;
 }
 
+/* ─── TipTap 에디터 (어드민 꿀팁 작성용) ───
+   다크 배경(bg-gray-800) 위에 검정 글씨로 안 보이는 문제 해결.
+   .ProseMirror 는 TipTap 이 기본적으로 부여하는 root 클래스. */
+.ProseMirror {
+  color: #f3f4f6;                    /* gray-100 — 본문 흰색 계열 */
+  min-height: 300px;
+}
+.ProseMirror p,
+.ProseMirror li,
+.ProseMirror blockquote {
+  color: #f3f4f6;
+}
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4 {
+  color: #ffffff;
+  font-weight: 700;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+.ProseMirror h2 { font-size: 1.5em; }
+.ProseMirror h3 { font-size: 1.25em; }
+.ProseMirror h4 { font-size: 1.1em; }
+.ProseMirror p   { margin: 0.6em 0; line-height: 1.7; }
+.ProseMirror ul,
+.ProseMirror ol  { padding-left: 1.5em; margin: 0.6em 0; }
+.ProseMirror ul  { list-style: disc; }
+.ProseMirror ol  { list-style: decimal; }
+.ProseMirror blockquote {
+  border-left: 3px solid #4b5563;    /* gray-600 */
+  padding-left: 1em;
+  color: #d1d5db;                    /* gray-300 */
+  font-style: italic;
+  margin: 0.8em 0;
+}
+.ProseMirror code {
+  color: #fbbf24;                    /* amber-400 */
+  background: #1f2937;               /* gray-800 */
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.ProseMirror pre {
+  background: #111827;               /* gray-900 */
+  color: #e5e7eb;
+  padding: 0.8em 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.8em 0;
+}
+.ProseMirror pre code { background: transparent; padding: 0; color: inherit; }
+.ProseMirror img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 0.8em 0;
+}
+.ProseMirror a {
+  color: #60a5fa;                    /* blue-400 */
+  text-decoration: underline;
+}
+/* placeholder (빈 에디터 안내 문구) */
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #6b7280;                    /* gray-500 */
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
 /* 가로 스크롤 카드 레일 — 스크롤바 강제 표시 (macOS 자동 숨김 무시) */
 .scrollbar-x-visible {
   /* overflow-x: scroll 명시 → auto 보다 트랙 영역 확보 잘 됨 */
