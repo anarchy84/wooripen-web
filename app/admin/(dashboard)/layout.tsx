@@ -48,7 +48,7 @@ export default function DashboardLayout({
     // ThemeProvider — 어드민 전체에 다크/라이트 컨텍스트 제공
     // root <html> 에 .dark / .light class 토글 (Tailwind dark: 변형 활성)
     <AdminThemeProvider>
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex transition-colors">
+    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-950 flex transition-colors">
       {/* 모바일 오버레이 */}
       {sidebarOpen && (
         <div
@@ -109,7 +109,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* 메인 영역 */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* 모바일 헤더 */}
         <header className="h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 lg:hidden">
           <button
@@ -125,7 +125,7 @@ export default function DashboardLayout({
         </header>
 
         {/* 콘텐츠 — 어드민 페이지 본문. 라이트 모드에선 흰색, 다크 모드에선 어두운 배경 */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto text-gray-900 dark:text-gray-100">{children}</main>
+        <main className="flex-1 min-h-0 p-4 lg:p-6 overflow-y-auto text-gray-900 dark:text-gray-100">{children}</main>
       </div>
     </div>
     </AdminThemeProvider>
