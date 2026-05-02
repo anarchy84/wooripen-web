@@ -89,9 +89,15 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
   if (!editor) return null
 
   return (
-    <div className="border border-gray-700 rounded-lg overflow-hidden bg-gray-800">
-      {/* 툴바 */}
-      <div className="flex flex-wrap gap-0.5 px-2 py-1.5 border-b border-gray-700 bg-gray-850">
+    // 외부 wrapper :
+    //  - overflow-hidden 제거 (sticky 자식 차단 방지)
+    //  - 자식들에 rounded 처리 (툴바 = rounded-t, 본문 = rounded-b)
+    <div className="border border-gray-700 rounded-lg bg-gray-800">
+      {/* 툴바 — 스크롤 시 main 상단에 고정 (sticky)
+          top-0 = 부모 scroll container 상단 기준
+          z-20 = 본문 위 + 사이드바와 충돌 없게
+          bg-gray-900 명시 = 본문이 비치지 않게 (불투명) */}
+      <div className="sticky top-0 z-20 flex flex-wrap gap-0.5 px-2 py-1.5 border-b border-gray-700 bg-gray-900 rounded-t-lg">
         <ToolBtn
           active={editor.isActive('heading', { level: 2 })}
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
