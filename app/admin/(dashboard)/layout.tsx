@@ -48,7 +48,10 @@ export default function DashboardLayout({
     // ThemeProvider — 어드민 전체에 다크/라이트 컨텍스트 제공
     // root <html> 에 .dark / .light class 토글 (Tailwind dark: 변형 활성)
     <AdminThemeProvider>
-    <div className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-950 flex transition-colors">
+    <div
+      data-admin-dashboard
+      className="h-screen overflow-hidden bg-gray-50 dark:bg-gray-950 flex transition-colors"
+    >
       {/* 모바일 오버레이 */}
       {sidebarOpen && (
         <div

@@ -200,6 +200,101 @@
   height: 0;
 }
 
+/* ─── 어드민 라이트모드 보정 레이어 ───
+   기존 어드민 페이지에 박힌 bg-gray-900/text-white 등 다크 유틸리티를
+   라이트모드에서만 밝은 표면/검은 글씨로 치환한다.
+   각 페이지를 전부 갈아엎기 전까지 쓰는 안전망. */
+html.light [data-admin-dashboard] .bg-gray-950 {
+  background-color: #f3f4f6 !important;
+}
+html.light [data-admin-dashboard] .bg-gray-900,
+html.light [data-admin-dashboard] [class~="bg-gray-900/80"] {
+  background-color: #ffffff !important;
+}
+html.light [data-admin-dashboard] .bg-gray-800,
+html.light [data-admin-dashboard] [class~="bg-gray-800/50"] {
+  background-color: #f9fafb !important;
+}
+html.light [data-admin-dashboard] .bg-gray-700,
+html.light [data-admin-dashboard] [class~="bg-gray-700/50"] {
+  background-color: #e5e7eb !important;
+}
+html.light [data-admin-dashboard] .hover\:bg-gray-900:hover,
+html.light [data-admin-dashboard] .hover\:bg-gray-800:hover,
+html.light [data-admin-dashboard] [class~="hover:bg-gray-800/30"]:hover {
+  background-color: #f3f4f6 !important;
+}
+html.light [data-admin-dashboard] .hover\:bg-gray-700:hover {
+  background-color: #e5e7eb !important;
+}
+html.light [data-admin-dashboard] .border-gray-800,
+html.light [data-admin-dashboard] [class~="border-gray-800/50"],
+html.light [data-admin-dashboard] [class~="border-gray-800/30"] {
+  border-color: #e5e7eb !important;
+}
+html.light [data-admin-dashboard] .border-gray-700 {
+  border-color: #d1d5db !important;
+}
+html.light [data-admin-dashboard] .text-white {
+  color: #111827 !important;
+}
+html.light [data-admin-dashboard] .text-gray-300 {
+  color: #374151 !important;
+}
+html.light [data-admin-dashboard] .text-gray-400 {
+  color: #4b5563 !important;
+}
+html.light [data-admin-dashboard] .text-gray-500 {
+  color: #6b7280 !important;
+}
+html.light [data-admin-dashboard] .hover\:text-white:hover {
+  color: #111827 !important;
+}
+html.light [data-admin-dashboard] .placeholder-gray-600::placeholder,
+html.light [data-admin-dashboard] .placeholder-gray-500::placeholder {
+  color: #9ca3af !important;
+}
+html.light [data-admin-dashboard] .bg-blue-600.text-white,
+html.light [data-admin-dashboard] .bg-blue-500.text-white,
+html.light [data-admin-dashboard] .bg-red-600.text-white,
+html.light [data-admin-dashboard] .bg-emerald-600.text-white,
+html.light [data-admin-dashboard] .bg-amber-600.text-white,
+html.light [data-admin-dashboard] .bg-rose-600.text-white,
+html.light [data-admin-dashboard] .bg-purple-600.text-white,
+html.light [data-admin-dashboard] .bg-pink-600.text-white,
+html.light [data-admin-dashboard] .bg-indigo-600.text-white,
+html.light [data-admin-dashboard] .bg-slate-600.text-white,
+html.light [data-admin-dashboard] .bg-gray-600.text-white {
+  color: #ffffff !important;
+}
+html.light [data-admin-dashboard] .ProseMirror,
+html.light [data-admin-dashboard] .ProseMirror p,
+html.light [data-admin-dashboard] .ProseMirror li,
+html.light [data-admin-dashboard] .ProseMirror blockquote {
+  color: #111827 !important;
+}
+html.light [data-admin-dashboard] .ProseMirror h1,
+html.light [data-admin-dashboard] .ProseMirror h2,
+html.light [data-admin-dashboard] .ProseMirror h3,
+html.light [data-admin-dashboard] .ProseMirror h4 {
+  color: #111827 !important;
+}
+html.light [data-admin-dashboard] .ProseMirror blockquote {
+  border-left-color: #d1d5db !important;
+  color: #374151 !important;
+}
+html.light [data-admin-dashboard] .ProseMirror code {
+  background: #f3f4f6 !important;
+  color: #b45309 !important;
+}
+html.light [data-admin-dashboard] .ProseMirror pre {
+  background: #f3f4f6 !important;
+  color: #111827 !important;
+}
+html.light [data-admin-dashboard] .ProseMirror [data-resize-handle] {
+  background: #ffffff !important;
+}
+
 /* ─── TipTap 에디터 (어드민 꿀팁 작성용) ───
    다크 배경(bg-gray-800) 위에 검정 글씨로 안 보이는 문제 해결.
    .ProseMirror 는 TipTap 이 기본적으로 부여하는 root 클래스. */
