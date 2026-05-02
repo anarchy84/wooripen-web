@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import TipTapEditor from '@/components/admin/TipTapEditor'
 import SeoPanel from '@/components/admin/SeoPanel'
@@ -142,6 +142,9 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
   const isEdit = !!tipId
   const [saving, setSaving] = useState(false)
   const [loadingData, setLoadingData] = useState(isEdit)
+  // 대표이미지 파일 input ref + 업로드 진행 상태
+  const featuredFileRef = useRef<HTMLInputElement>(null)
+  const [featuredUploading, setFeaturedUploading] = useState(false)
 
   const [form, setForm] = useState({
     title: '',
@@ -157,6 +160,36 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
   })
 
   const [focusKeyword, setFocusKeyword] = useState('')
+
+  // 대표이미지 업로드 핸들러 — TipTap 본문 이미지와 동일 API 사용 (/api/admin/media)
+  const handleFeaturedImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // 같은 파일 재선택 가능하게
+    if (!file) return
+    setFeaturedUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('alt_text', file.name.replace(/\.[^/.]+$/, ''))
+      const res = await fetch('/api/admin/media', { method: 'POST', body: fd })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        const msg = (data && typeof data.error === 'string') ? data.error : `HTTP ${res.status}`
+        alert(`대표이미지 업로드 실패: ${msg}`)
+        console.error('[featured upload]', res.status, data)
+        return
+      }
+      // WebP 우선, 없으면 원본
+      const url = data.webp_path || data.storage_path
+      setForm((p) => ({ ...p, featured_image_url: url }))
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '네트워크 오류'
+      alert(`대표이미지 업로드 실패: ${msg}`)
+      console.error('[featured upload exception]', err)
+    } finally {
+      setFeaturedUploading(false)
+    }
+  }
 
   useEffect(() => {
     if (isEdit && tipId) {
@@ -351,13 +384,56 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">대표 이미지 URL</label>
+              <label className="block text-xs text-gray-500 mb-1">
+                대표 이미지 (목록 썸네일·OG 이미지)
+              </label>
+
+              {/* 미리보기 — 이미지가 설정된 경우만 */}
+              {form.featured_image_url && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={form.featured_image_url}
+                  alt="대표이미지 미리보기"
+                  className="w-full max-w-[240px] aspect-[16/9] object-cover rounded-md mb-2 border border-gray-700"
+                />
+              )}
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={form.featured_image_url}
+                  onChange={(e) => setForm({ ...form, featured_image_url: e.target.value })}
+                  placeholder="URL 직접 입력 또는 우측 ↗ 업로드"
+                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => featuredFileRef.current?.click()}
+                  disabled={featuredUploading}
+                  className="px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs rounded-lg whitespace-nowrap transition-colors"
+                  title="이미지 파일 업로드"
+                >
+                  {featuredUploading ? '업로드 중…' : '📁 업로드'}
+                </button>
+                {form.featured_image_url && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, featured_image_url: '' })}
+                    className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-xs rounded-lg whitespace-nowrap transition-colors"
+                    title="이미지 제거"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* 숨겨진 파일 인풋 — 업로드 버튼이 트리거 */}
               <input
-                type="text"
-                value={form.featured_image_url}
-                onChange={(e) => setForm({ ...form, featured_image_url: e.target.value })}
-                placeholder="https://..."
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                ref={featuredFileRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFeaturedImageChange}
+                className="hidden"
               />
             </div>
           </div>
