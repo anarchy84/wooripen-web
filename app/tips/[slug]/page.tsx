@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ArticleLd, BreadcrumbLd } from '@/lib/seo/structured-data'
 
 interface Props {
   params: { slug: string }
@@ -18,10 +19,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) return { title: '글을 찾을 수 없습니다' }
 
+  const canonical = `https://wooripen.co.kr/tips/${encodeURIComponent(params.slug)}`
   return {
     title: data.seo_title || data.title,
     description: data.seo_description || data.excerpt || '',
+    alternates: { canonical },
     openGraph: {
+      type: 'article',
+      title: data.seo_title || data.title,
+      description: data.seo_description || data.excerpt || '',
+      url: canonical,
+      images: data.featured_image_url ? [data.featured_image_url] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
       title: data.seo_title || data.title,
       description: data.seo_description || data.excerpt || '',
       images: data.featured_image_url ? [data.featured_image_url] : [],
@@ -48,8 +59,26 @@ export default async function TipDetailPage({ params }: Props) {
     .eq('id', tip.id)
     .then(() => {})
 
+  const canonical = `https://wooripen.co.kr/tips/${encodeURIComponent(params.slug)}`
+
   return (
     <div className="min-h-screen bg-gray-950">
+      {/* SERP 리치 결과용 — Article + Breadcrumb */}
+      <ArticleLd
+        title={tip.seo_title || tip.title}
+        description={tip.seo_description || tip.excerpt}
+        url={canonical}
+        image={tip.featured_image_url}
+        datePublished={tip.published_at}
+        dateModified={tip.updated_at}
+      />
+      <BreadcrumbLd
+        items={[
+          { name: '우리편', url: 'https://wooripen.co.kr/' },
+          { name: '꿀팁', url: 'https://wooripen.co.kr/tips' },
+          { name: tip.title, url: canonical },
+        ]}
+      />
       {/* 히어로 */}
       <section className="relative pt-32 pb-16 px-4">
         <div className="max-w-3xl mx-auto">

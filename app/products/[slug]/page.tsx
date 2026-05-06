@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Product, TrustBadge, DetailFeature, ComparisonTable } from '@/types/database'
 import { BgImageEditOverlay } from '@/components/editable/BgImageEditOverlay'
+import { ProductLd, BreadcrumbLd } from '@/lib/seo/structured-data'
 
 interface Props {
   params: { slug: string }
@@ -29,11 +30,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = data.seo_title || `${data.name} | 우리편`
   const description = data.seo_description || data.description || ''
   const ogImage = data.og_image_url || data.hero_image || data.image_url || ''
+  const canonical = `https://wooripen.co.kr/products/${encodeURIComponent(params.slug)}`
 
   return {
     title,
     description,
+    alternates: { canonical },
     openGraph: {
+      title,
+      description,
+      url: canonical,
+      images: ogImage ? [ogImage] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
       title,
       description,
       images: ogImage ? [ogImage] : [],
@@ -61,8 +71,25 @@ export default async function ProductDetailPage({ params }: Props) {
   const ctaPrimary = p.cta_primary_label || '무료 상담 신청'
   const ctaSecondary = p.cta_secondary_label || null
 
+  const canonical = `https://wooripen.co.kr/products/${encodeURIComponent(params.slug)}`
+
   return (
     <div className="min-h-screen bg-white">
+      {/* SERP 리치 결과용 — Product + Breadcrumb */}
+      <ProductLd
+        name={p.name}
+        description={p.seo_description || p.description}
+        image={p.og_image_url || p.hero_image || p.image_url}
+        url={canonical}
+        priceKRW={typeof p.price === 'number' ? p.price : null}
+      />
+      <BreadcrumbLd
+        items={[
+          { name: '우리편', url: 'https://wooripen.co.kr/' },
+          { name: '상품', url: 'https://wooripen.co.kr/packages' },
+          { name: p.name, url: canonical },
+        ]}
+      />
       {/* ─── 히어로 ─────────────────────────────────── */}
       <section
         className="relative pt-32 pb-20 px-4 overflow-hidden"

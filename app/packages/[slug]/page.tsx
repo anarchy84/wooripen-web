@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import type { Package, PackageItem, PackageSection } from '@/types/database'
 import { BgImageEditOverlay } from '@/components/editable/BgImageEditOverlay'
+import { ProductLd, BreadcrumbLd } from '@/lib/seo/structured-data'
 
 interface Props {
   params: { slug: string }
@@ -30,11 +31,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = data.seo_title || `${data.name} 패키지 | 우리편`
   const description = data.seo_description || data.hook_copy || data.hero_subtitle || ''
   const ogImage = data.og_image_url || data.hero_image || ''
+  const canonical = `https://wooripen.co.kr/packages/${encodeURIComponent(params.slug)}`
 
   return {
     title,
     description,
+    alternates: { canonical },
     openGraph: {
+      title,
+      description,
+      url: canonical,
+      images: ogImage ? [ogImage] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
       title,
       description,
       images: ogImage ? [ogImage] : [],
@@ -230,8 +240,24 @@ export default async function PackageDetailPage({ params }: Props) {
     return a.sort_order - b.sort_order
   })
 
+  const canonical = `https://wooripen.co.kr/packages/${encodeURIComponent(params.slug)}`
+
   return (
     <div className="min-h-screen bg-white">
+      {/* SERP 리치 결과용 — Product + Breadcrumb */}
+      <ProductLd
+        name={pkg.name}
+        description={pkg.seo_description || pkg.hook_copy || pkg.hero_subtitle}
+        image={pkg.og_image_url || pkg.hero_image}
+        url={canonical}
+      />
+      <BreadcrumbLd
+        items={[
+          { name: '우리편', url: 'https://wooripen.co.kr/' },
+          { name: '패키지', url: 'https://wooripen.co.kr/packages' },
+          { name: pkg.name, url: canonical },
+        ]}
+      />
       {/* ─── 히어로 ─────────────────────────────────── */}
       <section
         className="relative pt-32 pb-20 px-4 overflow-hidden"
