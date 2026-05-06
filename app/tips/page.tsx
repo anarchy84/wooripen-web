@@ -1,111 +1,93 @@
 'use client'
 
+// ─────────────────────────────────────────────
 // 꿀팁(블로그) 목록 페이지
-// - 카테고리 필터(useState) 실제 동작
-// - 카드에 "본문 준비 중" 라벨로 UX 명확화 (/tips/[slug] 페이지 생성 전까지)
-// - 뉴스레터 폼 client-side 동작 + 향후 /api/newsletter 연동 TODO
-// - 하단에 Q&A 보조 CTA 추가 (Action 강화)
-
-import { useState, type FormEvent } from 'react'
+//
+// 변경 이력 :
+//   - 2026-05-06: 하드코딩 posts 제거 → Supabase tips 테이블 SELECT
+//     · is_published=true 글만 노출 (RLS 도 동일 정책)
+//     · created_at desc 정렬
+//     · 카드 클릭 → /tips/[slug] 상세 페이지로 이동
+//     · 카테고리 필터(useState) 그대로 유지
+//     · 뉴스레터 폼 그대로 유지 (TODO: /api/newsletter 연동)
+// ─────────────────────────────────────────────
+import { useState, useEffect, type FormEvent } from 'react'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import FadeIn from '@/components/ui/FadeIn'
+import { createClient } from '@/lib/supabase/client'
 
-/* ── 블로그 카드 데이터 (추후 Supabase로 교체) ── */
-interface TipPost {
+// DB 컬럼 + UI 보조 (icon/color 는 카테고리별 매핑)
+interface TipRow {
+  id: string
   slug: string
   title: string
-  excerpt: string
+  excerpt: string | null
   category: string
-  categoryColor: string
-  icon: string
-  date: string
-  readMin: number
+  featured_image_url: string | null
+  published_at: string | null
+  created_at: string
 }
 
-const posts: TipPost[] = [
-  {
-    slug: 'card-terminal-fee-guide',
-    title: '카드 수수료 아끼는 5가지 방법 (2026년 최신)',
-    excerpt: '영세·중소 가맹점 우대 수수료부터 VAN사 비교까지, 실질적으로 수수료를 줄일 수 있는 방법을 정리했어요.',
-    category: '단말기',
-    categoryColor: 'bg-violet-50 text-violet-600',
-    icon: 'solar:card-recive-bold-duotone',
-    date: '2026.04.10',
-    readMin: 5,
-  },
-  {
-    slug: 'biz-internet-vs-home',
-    title: '사업자 인터넷 vs 가정용 인터넷, 뭐가 다를까?',
-    excerpt: '고정IP, 안정성, 세금계산서 발행 등 사업자 인터넷만의 차이점을 쉽게 설명해드려요.',
-    category: '인터넷',
-    categoryColor: 'bg-blue-50 text-blue-600',
-    icon: 'solar:global-bold-duotone',
-    date: '2026.04.08',
-    readMin: 4,
-  },
-  {
-    slug: 'cctv-channel-guide',
-    title: '우리 매장에 CCTV 몇 대가 필요할까? 채널 수 가이드',
-    excerpt: '매장 크기·구조별 추천 채널 수, 카메라 종류 선택 팁, 저장 기간 계산법까지 총정리.',
-    category: 'CCTV',
-    categoryColor: 'bg-emerald-50 text-emerald-600',
-    icon: 'solar:videocamera-record-bold-duotone',
-    date: '2026.04.05',
-    readMin: 6,
-  },
-  {
-    slug: 'kiosk-roi-calculation',
-    title: '키오스크 도입하면 정말 이득일까? ROI 계산법',
-    excerpt: '인건비 절감, 객단가 상승, 월 렌탈비를 고려한 실질 ROI를 업종별로 계산해봤어요.',
-    category: '키오스크',
-    categoryColor: 'bg-orange-50 text-orange-600',
-    icon: 'solar:tablet-bold-duotone',
-    date: '2026.04.02',
-    readMin: 7,
-  },
-  {
-    slug: 'new-store-checklist',
-    title: '신규 매장 오픈 체크리스트: 인프라편',
-    excerpt: '인터넷 개통, 카드단말기, CCTV, 키오스크까지 — 매장 오픈 전 꼭 챙겨야 할 인프라를 순서대로 정리했어요.',
-    category: '가이드',
-    categoryColor: 'bg-gray-100 text-gray-600',
-    icon: 'solar:checklist-bold-duotone',
-    date: '2026.03.28',
-    readMin: 8,
-  },
-  {
-    slug: 'van-company-comparison',
-    title: 'VAN사 비교: NICE vs KIS vs KICC, 어디가 좋을까?',
-    excerpt: '주요 VAN사별 수수료, 정산 주기, 부가서비스를 한눈에 비교해드려요.',
-    category: '단말기',
-    categoryColor: 'bg-violet-50 text-violet-600',
-    icon: 'solar:card-transfer-bold-duotone',
-    date: '2026.03.25',
-    readMin: 6,
-  },
-]
+// 카테고리 → 뱃지 색상 / 아이콘 매핑 (DB 에 메타로 두기엔 과해서 클라에서 룩업)
+const CATEGORY_META: Record<string, { color: string; icon: string }> = {
+  인터넷:    { color: 'bg-blue-50 text-blue-600',     icon: 'solar:global-bold-duotone' },
+  단말기:    { color: 'bg-violet-50 text-violet-600', icon: 'solar:card-recive-bold-duotone' },
+  CCTV:      { color: 'bg-emerald-50 text-emerald-600', icon: 'solar:videocamera-record-bold-duotone' },
+  키오스크:  { color: 'bg-orange-50 text-orange-600', icon: 'solar:tablet-bold-duotone' },
+  가이드:    { color: 'bg-gray-100 text-gray-600',    icon: 'solar:checklist-bold-duotone' },
+  프로모션:  { color: 'bg-rose-50 text-rose-600',     icon: 'solar:gift-bold-duotone' },
+  렌탈:      { color: 'bg-teal-50 text-teal-600',     icon: 'solar:refresh-bold-duotone' },
+}
+const FALLBACK_META = { color: 'bg-gray-100 text-gray-600', icon: 'solar:document-text-bold-duotone' }
 
-const categories = ['전체', '인터넷', '단말기', 'CCTV', '키오스크', '가이드']
+const CATEGORIES = ['전체', '인터넷', '단말기', 'CCTV', '키오스크', '가이드']
+
+// 읽는 시간 추정 (excerpt 길이 기반 — 글 본문 fetch 안 해도 대략 표시 가능)
+function estimateReadMin(excerpt: string | null): number {
+  // 평균 한국어 200자/분 가정. excerpt 길이 × 8 (본문 추정 배수) / 200
+  const n = (excerpt?.length ?? 0) * 8
+  return Math.max(2, Math.round(n / 200))
+}
 
 export default function TipsPage() {
-  // 카테고리 필터 상태
+  // 카테고리 필터
   const [activeCategory, setActiveCategory] = useState<string>('전체')
-  // 뉴스레터 폼 상태
+  // Supabase 글 데이터
+  const [tips, setTips] = useState<TipRow[] | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  // 뉴스레터 폼
   const [email, setEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
   >('idle')
 
-  // 현재 카테고리로 필터링된 포스트
-  const filteredPosts =
-    activeCategory === '전체'
-      ? posts
-      : posts.filter((p) => p.category === activeCategory)
+  // 마운트 시 1회 fetch — 발행된 글만, 최신순
+  useEffect(() => {
+    const run = async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('tips')
+        .select('id, slug, title, excerpt, category, featured_image_url, published_at, created_at')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(60)
+      if (error) {
+        setLoadError(error.message)
+        setTips([])
+        return
+      }
+      setTips((data ?? []) as TipRow[])
+    }
+    run()
+  }, [])
 
-  // 뉴스레터 구독 처리
-  // TODO: 백엔드 엔드포인트(/api/newsletter) 생성 후 fetch 연동
-  // 현재는 클라이언트 단에서 UX 피드백만 제공 — 실제 이메일은 저장되지 않음
+  // 카테고리 필터링
+  const filtered = (tips ?? []).filter(
+    (p) => activeCategory === '전체' || p.category === activeCategory
+  )
+
+  // 뉴스레터 (TODO: /api/newsletter 연동)
   async function handleNewsletterSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!email || !email.includes('@')) {
@@ -114,7 +96,6 @@ export default function TipsPage() {
     }
     setNewsletterStatus('loading')
     try {
-      // 추후 교체: await fetch('/api/newsletter', { method: 'POST', body: JSON.stringify({ email, source: 'tips' }) })
       await new Promise((r) => setTimeout(r, 600))
       setNewsletterStatus('success')
       setEmail('')
@@ -163,10 +144,10 @@ export default function TipsPage() {
 
       {/* ══════ 블로그 목록 ══════ */}
       <section className="section-container section-gap">
-        {/* 카테고리 필터 — 실제 작동(useState) */}
+        {/* 카테고리 필터 */}
         <FadeIn>
           <div className="flex flex-wrap gap-2 mb-10">
-            {categories.map((cat) => {
+            {CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat
               return (
                 <button
@@ -187,64 +168,118 @@ export default function TipsPage() {
         </FadeIn>
 
         {/* 카드 그리드 */}
-        {filteredPosts.length === 0 ? (
-          // 해당 카테고리 결과 없음
+        {tips === null ? (
+          // 로딩 중 — 스켈레톤
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rounded-3xl bg-gray-50 p-7 animate-pulse">
+                <div className="h-5 w-20 bg-gray-200 rounded-full mb-4" />
+                <div className="h-10 w-10 bg-gray-200 rounded mb-4" />
+                <div className="h-5 w-full bg-gray-200 rounded mb-2" />
+                <div className="h-5 w-3/4 bg-gray-200 rounded mb-4" />
+                <div className="h-4 w-full bg-gray-200 rounded mb-1" />
+                <div className="h-4 w-5/6 bg-gray-200 rounded" />
+              </div>
+            ))}
+          </div>
+        ) : loadError ? (
+          // 로드 실패
           <div className="py-16 text-center">
-            <p className="text-gray-400">이 카테고리는 곧 업데이트됩니다.</p>
+            <p className="text-red-500 text-sm">
+              데이터를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.
+            </p>
+            <p className="text-gray-400 text-xs mt-2">{loadError}</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          // 빈 결과
+          <div className="py-16 text-center">
+            <Icon
+              icon="solar:notebook-square-bold-duotone"
+              className="h-12 w-12 text-gray-300 mx-auto mb-3"
+            />
+            <p className="text-gray-400">
+              {activeCategory === '전체'
+                ? '아직 작성된 꿀팁이 없습니다. 곧 업데이트될 예정이에요.'
+                : `${activeCategory} 카테고리에 글이 없습니다. 다른 카테고리를 둘러보세요.`}
+            </p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredPosts.map((post, i) => (
-              <FadeIn key={post.slug} delay={i * 80}>
-                <article className="group relative rounded-3xl bg-gray-50 p-7 transition-all duration-400 ease-toss hover:bg-white hover:shadow-card-hover hover:-translate-y-1">
-                  {/* 준비중 라벨 (/tips/[slug] 페이지 생성 전까지 — 사용자 혼란 방지) */}
-                  <span className="absolute top-4 right-4 px-2 py-1 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-600">
-                    본문 준비중
-                  </span>
+            {filtered.map((tip, i) => {
+              const meta = CATEGORY_META[tip.category] ?? FALLBACK_META
+              const date = new Date(tip.published_at ?? tip.created_at).toLocaleDateString(
+                'ko-KR',
+                { year: 'numeric', month: '2-digit', day: '2-digit' }
+              )
+              const readMin = estimateReadMin(tip.excerpt)
+              return (
+                <FadeIn key={tip.id} delay={i * 80}>
+                  <Link
+                    href={`/tips/${encodeURIComponent(tip.slug)}`}
+                    className="group block rounded-3xl bg-gray-50 p-7 transition-all duration-400 ease-toss hover:bg-white hover:shadow-card-hover hover:-translate-y-1"
+                  >
+                    {/* 카테고리 + 읽기 시간 */}
+                    <div className="flex items-center gap-2 mb-4">
+                      <span
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${meta.color}`}
+                      >
+                        {tip.category}
+                      </span>
+                      <span className="text-xs text-gray-400">{readMin}분 읽기</span>
+                    </div>
 
-                  {/* 카테고리 + 읽기 시간 */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${post.categoryColor}`}>
-                      {post.category}
-                    </span>
-                    <span className="text-xs text-gray-400">{post.readMin}분 읽기</span>
-                  </div>
+                    {/* 대표이미지 또는 아이콘 */}
+                    {tip.featured_image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={tip.featured_image_url}
+                        alt={tip.title}
+                        className="w-full aspect-[16/9] object-cover rounded-xl mb-4 border border-gray-100"
+                      />
+                    ) : (
+                      <Icon
+                        icon={meta.icon}
+                        className="h-10 w-10 text-gray-300 mb-4 transition-colors duration-300 group-hover:text-primary"
+                      />
+                    )}
 
-                  {/* 아이콘 */}
-                  <Icon
-                    icon={post.icon}
-                    className="h-10 w-10 text-gray-300 mb-4 transition-colors duration-300 group-hover:text-primary"
-                  />
+                    {/* 제목 */}
+                    <h3 className="text-lg font-semibold text-gray-900 leading-snug break-keep line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                      {tip.title}
+                    </h3>
 
-                  {/* 제목 */}
-                  <h3 className="text-lg font-semibold text-gray-900 leading-snug break-keep line-clamp-2 group-hover:text-primary transition-colors duration-300">
-                    {post.title}
-                  </h3>
+                    {/* 요약 */}
+                    {tip.excerpt && (
+                      <p className="mt-3 text-sm text-gray-500 leading-relaxed break-keep line-clamp-3">
+                        {tip.excerpt}
+                      </p>
+                    )}
 
-                  {/* 요약 */}
-                  <p className="mt-3 text-sm text-gray-500 leading-relaxed break-keep line-clamp-3">
-                    {post.excerpt}
-                  </p>
-
-                  {/* 날짜 */}
-                  <div className="mt-5 flex items-center justify-between">
-                    <span className="text-xs text-gray-400">{post.date}</span>
-                    <span className="text-[11px] text-gray-400">오픈 예정</span>
-                  </div>
-                </article>
-              </FadeIn>
-            ))}
+                    {/* 날짜 + 화살표 */}
+                    <div className="mt-5 flex items-center justify-between">
+                      <span className="text-xs text-gray-400">{date}</span>
+                      <Icon
+                        icon="solar:arrow-right-linear"
+                        className="h-4 w-4 text-gray-300 group-hover:text-primary transition-colors"
+                      />
+                    </div>
+                  </Link>
+                </FadeIn>
+              )
+            })}
           </div>
         )}
 
         {/* 더보기 안내 */}
-        <FadeIn delay={500}>
-          <div className="mt-12 text-center">
-            <p className="text-sm text-gray-400 break-keep">
-              더 많은 꿀팁이 곧 업데이트됩니다.
-            </p>
-          </div>
-        </FadeIn>
+        {tips !== null && filtered.length > 0 && (
+          <FadeIn delay={500}>
+            <div className="mt-12 text-center">
+              <p className="text-sm text-gray-400 break-keep">
+                더 많은 꿀팁이 곧 업데이트됩니다.
+              </p>
+            </div>
+          </FadeIn>
+        )}
       </section>
 
       {/* ══════ 뉴스레터 CTA (작동) ══════ */}
@@ -279,7 +314,6 @@ export default function TipsPage() {
                 </button>
               </form>
 
-              {/* 상태 피드백 */}
               {newsletterStatus === 'success' && (
                 <p className="mt-4 text-sm text-emerald-600 font-medium">
                   ✓ 사전 신청이 접수되었습니다. 뉴스레터 시작 시 가장 먼저 안내드릴게요.
@@ -298,7 +332,7 @@ export default function TipsPage() {
         </div>
       </section>
 
-      {/* ══════ 보조 CTA — 급한 질문은 Q&A로 (Action 강화) ══════ */}
+      {/* ══════ 보조 CTA — 급한 질문은 Q&A로 ══════ */}
       <section className="bg-gray-900">
         <div className="section-container py-16">
           <FadeIn>
