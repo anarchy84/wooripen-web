@@ -7,15 +7,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import { FAQ_CATEGORIES } from '@/types/database'
+import { FaqLd, BreadcrumbLd } from '@/lib/seo/structured-data'
 
 export const metadata: Metadata = {
   title: '자주 묻는 질문 (FAQ) | 우리편',
   description:
     '우리편 서비스에 대해 자주 묻는 질문과 답변입니다. 인터넷, 결제단말기, CCTV, 키오스크, 렌탈 관련 궁금한 점을 확인하세요.',
+  alternates: { canonical: 'https://wooripen.co.kr/faq' },
   openGraph: {
     title: '자주 묻는 질문 (FAQ) | 우리편',
     description:
       '소상공인 사장님들이 자주 묻는 인터넷·단말기·CCTV·키오스크·렌탈 관련 질문과 답변.',
+    url: 'https://wooripen.co.kr/faq',
+    type: 'website',
   },
 }
 
@@ -64,8 +68,27 @@ export default async function FAQPage() {
   const categoryOrder = ['general', 'internet', 'terminal', 'cctv', 'torder', 'rental']
   const orderedCategories = categoryOrder.filter((cat) => grouped[cat])
 
+  // SERP 펼침형 카드용 FAQ JSON-LD
+  //   - HTML 태그 섞여 있으면 schema 권장은 plain text 라 간단히 strip
+  //   - 너무 긴 답은 800자로 잘라 spam 방지
+  const faqLdItems = faqs.map((f) => ({
+    question: f.question,
+    answer: f.answer
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 800),
+  }))
+
   return (
     <div className="min-h-screen bg-white">
+      <FaqLd items={faqLdItems} />
+      <BreadcrumbLd
+        items={[
+          { name: '우리편', url: 'https://wooripen.co.kr/' },
+          { name: '자주 묻는 질문', url: 'https://wooripen.co.kr/faq' },
+        ]}
+      />
       {/* ─── 히어로 ─────────────────────────────────── */}
       <section
         className="relative pt-32 pb-16 px-4 overflow-hidden"

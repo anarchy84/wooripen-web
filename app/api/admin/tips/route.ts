@@ -51,6 +51,10 @@ export async function POST(request: NextRequest) {
       featured_image_url: body.featured_image_url || null,
       is_published: body.is_published ?? false,
       published_at: body.is_published ? new Date().toISOString() : null,
+      // HowTo schema.org — 어드민 토글
+      is_howto: body.is_howto ?? false,
+      how_to_steps: Array.isArray(body.how_to_steps) ? body.how_to_steps : [],
+      how_to_total_time: body.how_to_total_time || null,
     })
     .select()
     .single()

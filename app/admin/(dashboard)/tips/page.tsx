@@ -160,6 +160,10 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
     seo_description: '',
     featured_image_url: '',
     is_published: false,
+    // 절차형 글 (HowTo schema.org) — 답변엔진(GEO/AEO) 가산 신호
+    is_howto: false,
+    how_to_total_time: '', // 'PT15M' 같은 ISO 8601 — 빈값이면 LD 에서 생략
+    how_to_steps: [] as { name: string; text: string; image?: string; url?: string }[],
   })
 
   const [focusKeyword, setFocusKeyword] = useState('')
@@ -185,6 +189,9 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
             seo_description: data.seo_description || '',
             featured_image_url: data.featured_image_url || '',
             is_published: data.is_published || false,
+            is_howto: data.is_howto || false,
+            how_to_total_time: data.how_to_total_time || '',
+            how_to_steps: Array.isArray(data.how_to_steps) ? data.how_to_steps : [],
           })
         }
         setLoadingData(false)
@@ -330,6 +337,102 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
                 className="w-full px-3 py-2 bg-gray-900 border border-gray-800 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+          </div>
+
+          {/* HowTo (절차형 글) — 답변엔진 GEO/AEO 가산 신호 */}
+          <div className="space-y-3 bg-gray-900 border border-gray-800 rounded-xl p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-medium text-gray-300">절차형 가이드 (HowTo)</h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  단계별 글이면 켜기 · ChatGPT·구글이 단계 그대로 인용함
+                </p>
+              </div>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.is_howto}
+                  onChange={(e) => setForm({ ...form, is_howto: e.target.checked })}
+                  className="w-4 h-4 accent-blue-500"
+                />
+                <span className="text-xs text-gray-400">{form.is_howto ? 'ON' : 'OFF'}</span>
+              </label>
+            </div>
+
+            {form.is_howto && (
+              <>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">총 소요 시간 (선택, ISO 8601)</label>
+                  <input
+                    type="text"
+                    value={form.how_to_total_time}
+                    onChange={(e) => setForm({ ...form, how_to_total_time: e.target.value })}
+                    placeholder="예: PT15M (15분), PT1H (1시간), PT1H30M"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs text-gray-500">단계 ({form.how_to_steps.length})</label>
+                    <button
+                      type="button"
+                      onClick={() => setForm({
+                        ...form,
+                        how_to_steps: [...form.how_to_steps, { name: '', text: '' }],
+                      })}
+                      className="text-xs px-2 py-1 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30"
+                    >
+                      + 단계 추가
+                    </button>
+                  </div>
+
+                  {form.how_to_steps.map((step, idx) => (
+                    <div key={idx} className="bg-gray-800 border border-gray-700 rounded-lg p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-400">Step {idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => setForm({
+                            ...form,
+                            how_to_steps: form.how_to_steps.filter((_, i) => i !== idx),
+                          })}
+                          className="text-xs text-red-400 hover:text-red-300"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={step.name}
+                        onChange={(e) => {
+                          const next = [...form.how_to_steps]
+                          next[idx] = { ...next[idx], name: e.target.value }
+                          setForm({ ...form, how_to_steps: next })
+                        }}
+                        placeholder="단계 제목 (예: 인터넷 회선 비교)"
+                        className="w-full px-2 py-1.5 bg-gray-900 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                      <textarea
+                        value={step.text}
+                        onChange={(e) => {
+                          const next = [...form.how_to_steps]
+                          next[idx] = { ...next[idx], text: e.target.value }
+                          setForm({ ...form, how_to_steps: next })
+                        }}
+                        rows={2}
+                        placeholder="이 단계에서 무엇을 해야 하는지 1~3문장으로"
+                        className="w-full px-2 py-1.5 bg-gray-900 border border-gray-700 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                      />
+                    </div>
+                  ))}
+
+                  {form.how_to_steps.length === 0 && (
+                    <p className="text-xs text-gray-500 italic">아직 단계가 없습니다. + 단계 추가 를 눌러 시작하세요.</p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           {/* SEO 메타 */}

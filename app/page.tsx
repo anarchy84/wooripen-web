@@ -20,7 +20,7 @@
 import { getBlocksForPage } from '@/lib/content-blocks-server'
 import { blocksMapToRecord } from '@/lib/content-blocks'
 import HomeClient from '@/components/pages/HomeClient'
-import { OrganizationLd, WebSiteLd } from '@/lib/seo/structured-data'
+import { OrganizationLd, WebSiteLd, LocalBusinessLd } from '@/lib/seo/structured-data'
 
 export default async function HomePage() {
   // 서버에서 홈 블록 일괄 조회 (1 쿼리)
@@ -32,9 +32,10 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* SERP 리치 결과용 구조화 데이터 — 검색엔진만 읽음 */}
+      {/* SERP·GEO·AEO 리치 결과용 구조화 데이터 — 검색엔진/LLM 만 읽음 */}
       <OrganizationLd />
       <WebSiteLd />
+      <LocalBusinessLd />
       <HomeClient blocks={blocks} />
     </>
   )

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArticleLd, BreadcrumbLd } from '@/lib/seo/structured-data'
+import { ArticleLd, BreadcrumbLd, HowToLd, type HowToStep } from '@/lib/seo/structured-data'
 
 interface Props {
   params: { slug: string }
@@ -79,6 +79,16 @@ export default async function TipDetailPage({ params }: Props) {
           { name: tip.title, url: canonical },
         ]}
       />
+      {/* 절차형 글이면 HowTo 도 같이 박음 — 답변엔진(GEO/AEO) 이 단계 그대로 인용 */}
+      {tip.is_howto && Array.isArray(tip.how_to_steps) && tip.how_to_steps.length > 0 && (
+        <HowToLd
+          name={tip.title}
+          description={tip.excerpt}
+          image={tip.featured_image_url}
+          totalTimeISO8601={tip.how_to_total_time}
+          steps={tip.how_to_steps as HowToStep[]}
+        />
+      )}
       {/* 히어로 */}
       <section className="relative pt-32 pb-16 px-4">
         <div className="max-w-3xl mx-auto">
