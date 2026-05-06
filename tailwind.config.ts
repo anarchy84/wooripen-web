@@ -114,7 +114,10 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // 본문(prose) 클래스 활성화 — /tips/[slug] 등 게시물 페이지 가독성용
+    require('@tailwindcss/typography'),
+  ],
 }
 
 export default config
