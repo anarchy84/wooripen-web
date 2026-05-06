@@ -54,7 +54,10 @@ const config: Config = {
         },
       },
       fontFamily: {
+        // next/font/local 이 주입한 CSS 변수 우선 → 자체 호스팅 Pretendard
+        // 변수 미설정 환경(예: 일부 어드민 라우트)에서도 안전하게 fallback
         sans: [
+          'var(--font-pretendard)',
           'Pretendard Variable',
           'Pretendard',
           '-apple-system',

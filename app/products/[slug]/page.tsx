@@ -72,9 +72,15 @@ export default async function ProductDetailPage({ params }: Props) {
   const ctaSecondary = p.cta_secondary_label || null
 
   const canonical = `https://wooripen.co.kr/products/${encodeURIComponent(params.slug)}`
+  const heroImg = p.hero_image || p.image_url
 
   return (
     <div className="min-h-screen bg-white">
+      {/* hero 가 LCP candidate — 가장 빨리 fetch 시작 */}
+      {heroImg && (
+        // eslint-disable-next-line @next/next/no-page-custom-font
+        <link rel="preload" as="image" href={heroImg} fetchPriority="high" />
+      )}
       {/* SERP 리치 결과용 — Product + Breadcrumb */}
       <ProductLd
         name={p.name}

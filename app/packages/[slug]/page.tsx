@@ -244,6 +244,11 @@ export default async function PackageDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* hero_image 가 LCP candidate 라 가장 빨리 다운로드 시작 */}
+      {pkg.hero_image && (
+        // eslint-disable-next-line @next/next/no-page-custom-font
+        <link rel="preload" as="image" href={pkg.hero_image} fetchPriority="high" />
+      )}
       {/* SERP 리치 결과용 — Product + Breadcrumb */}
       <ProductLd
         name={pkg.name}

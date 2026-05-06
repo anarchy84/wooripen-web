@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { pretendard } from '@/lib/fonts'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import FloatingCTA from '@/components/layout/FloatingCTA'
@@ -9,6 +10,8 @@ import { EditorProvider } from '@/components/editable/EditorProvider'
 import { EditorModal } from '@/components/editable/EditorModal'
 // 관리자 권한 체크 — 앱 전체에서 Supabase auth 호출을 1회로 축소 (NavigatorLock 경쟁 방지)
 import { AdminGuardProvider } from '@/components/editable/AdminGuardProvider'
+// Core Web Vitals 측정 (LCP/CLS/INP/FCP/TTFB) → /api/web-vitals → 어드민 대시보드
+import { WebVitalsReporter } from '@/components/WebVitalsReporter'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -92,21 +95,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko">
-      <head>
-        {/*
-          Pretendard Variable — jsdelivr 에서 로드.
-          @import 대신 <link> 로 박아 CSS 파싱과 폰트 다운로드를 병렬화.
-          - preconnect : DNS+TCP+TLS 핸드셰이크 미리 → 첫 폰트 패킷 빠르게
-          - stylesheet : font-display 가 swap 이라 폰트 로딩 중에도 텍스트 노출
-        */}
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
-      </head>
-      <body className="min-h-screen flex flex-col">
+    <html lang="ko" className={pretendard.variable}>
+      <body className="min-h-screen flex flex-col font-sans">
         {/*
           AdminGuardProvider : 앱 전체에서 Supabase auth 체크를 1회로 묶음
             - 바깥쪽에 둬서 EditorProvider/EditorModal/Header 등이 모두 같은 context 를 읽게 함
@@ -131,6 +121,8 @@ export default function RootLayout({
             <EditorModal />
           </EditorProvider>
         </AdminGuardProvider>
+        {/* Core Web Vitals 익명 측정 → 어드민 대시보드 */}
+        <WebVitalsReporter />
       </body>
     </html>
   )
