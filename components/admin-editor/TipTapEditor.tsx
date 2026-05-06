@@ -6,7 +6,7 @@ import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useCallback, useState } from 'react'
-import MediaLibraryPicker, { type MediaSelection } from '@/components/admin/MediaLibraryPicker'
+import MediaLibraryPicker, { type MediaSelection } from '@/components/admin-editor/MediaLibraryPicker'
 
 interface TipTapEditorProps {
   content: string
@@ -46,7 +46,10 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
     shouldRerenderOnTransaction: true,
     editorProps: {
       attributes: {
-        class: 'prose prose-invert prose-sm max-w-none min-h-[300px] px-4 py-3 focus:outline-none',
+        // prose : 라이트모드 기본 텍스트 / dark:prose-invert : 다크모드 흰색 계열
+        // tailwindcss/typography 플러그인이 색상·간격·줄높이 자동 처리
+        class:
+          'prose dark:prose-invert prose-sm max-w-none min-h-[300px] px-4 py-3 focus:outline-none',
       },
     },
   })

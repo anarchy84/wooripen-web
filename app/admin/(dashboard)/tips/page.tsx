@@ -2,9 +2,13 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import TipTapEditor from '@/components/admin/TipTapEditor'
-import SeoPanel from '@/components/admin/SeoPanel'
-import MediaLibraryPicker, { type MediaSelection } from '@/components/admin/MediaLibraryPicker'
+import { generateSlug, normalizeSlug } from '@/lib/slug'
+import {
+  TipTapEditor,
+  SeoPanel,
+  MediaLibraryPicker,
+  type MediaSelection,
+} from '@/components/admin-editor'
 
 interface TipListItem {
   id: string
@@ -189,15 +193,7 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
     }
   }, [isEdit, tipId])
 
-  // slug 자동 생성
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-zA-Z0-9가-힣\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .substring(0, 80)
-  }
+  // slug 자동 생성 — generateSlug() 는 lib/slug.ts (한글/이모지 → timestamp 폴백 처리)
 
   const handleTitleChange = (title: string) => {
     setForm((prev) => ({
@@ -282,13 +278,14 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
             className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white text-lg font-bold placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          {/* slug */}
+          {/* slug — normalizeSlug 로 한글/특수문자 자동 제거 */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">wooripen.co.kr/tips/</span>
             <input
               type="text"
               value={form.slug}
-              onChange={(e) => setForm({ ...form, slug: e.target.value })}
+              onChange={(e) => setForm({ ...form, slug: normalizeSlug(e.target.value) })}
+              placeholder="english-only-slug"
               className="flex-1 px-2 py-1 bg-gray-900 border border-gray-800 rounded text-gray-300 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
