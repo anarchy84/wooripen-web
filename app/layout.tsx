@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import FloatingCTA from '@/components/layout/FloatingCTA'
@@ -75,6 +75,17 @@ export const metadata: Metadata = {
   },
 }
 
+// 모바일 최적화 + 브라우저 UI 컬러 (Lighthouse 가산점 + 안드로이드 크롬 상단바)
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0F1114' },
+  ],
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -82,6 +93,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        {/*
+          Pretendard Variable — jsdelivr 에서 로드.
+          @import 대신 <link> 로 박아 CSS 파싱과 폰트 다운로드를 병렬화.
+          - preconnect : DNS+TCP+TLS 핸드셰이크 미리 → 첫 폰트 패킷 빠르게
+          - stylesheet : font-display 가 swap 이라 폰트 로딩 중에도 텍스트 노출
+        */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
       <body className="min-h-screen flex flex-col">
         {/*
           AdminGuardProvider : 앱 전체에서 Supabase auth 체크를 1회로 묶음
