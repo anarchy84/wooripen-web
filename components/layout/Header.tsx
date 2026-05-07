@@ -103,24 +103,15 @@ export default function Header() {
         <PromoBar />
       </div>
 
-      {/* 네비 영역 — scrolled 상태에 따라 배경 전환 */}
+      {/* 네비 영역 — 첫 화면에서도 항상 읽히도록 고정 배경 유지 */}
       <div
-        className={`
-          transition-all duration-300 ease-toss
-          ${scrolled
-            ? 'bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-soft'
-            : 'bg-transparent'
-          }
-        `}
+        className="transition-all duration-300 ease-toss bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-soft"
       >
         <div className="section-container">
           <div className="flex h-16 items-center justify-between">
           {/* 로고 */}
           <Link href="/" className="relative z-10">
-            <span className={`
-              text-xl font-bold tracking-tight transition-colors duration-300
-              ${scrolled ? 'text-gray-900' : 'text-white'}
-            `}>
+            <span className="text-xl font-bold tracking-tight transition-colors duration-300 text-gray-900">
               우리편
             </span>
           </Link>
@@ -132,10 +123,7 @@ export default function Header() {
               const baseClass = `
                 px-4 py-2 rounded-full text-caption font-medium inline-flex items-center
                 transition-all duration-200 ease-toss
-                ${scrolled
-                  ? 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-                }
+                text-gray-600 hover:text-gray-900 hover:bg-gray-100
               `
 
               if (!hasChildren) {
@@ -151,7 +139,7 @@ export default function Header() {
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
                   {renderLink(root, baseClass)}
-                  <ChevronDown className={`inline w-3 h-3 ml-0.5 -translate-y-1 transition-transform ${openDropdown === root.id ? 'rotate-180' : ''} ${scrolled ? 'text-gray-600' : 'text-white/70'}`} />
+                  <ChevronDown className={`inline w-3 h-3 ml-0.5 -translate-y-1 transition-transform text-gray-600 ${openDropdown === root.id ? 'rotate-180' : ''}`} />
                   {openDropdown === root.id && (
                     <div className="absolute top-full left-0 pt-1 min-w-[200px]">
                       <div className="bg-white rounded-xl shadow-lg border border-gray-100 py-2">
@@ -185,10 +173,7 @@ export default function Header() {
               className={`
                 rounded-full px-5 py-2 text-caption font-semibold
                 transition-all duration-300 ease-toss
-                ${scrolled
-                  ? 'bg-gray-900 text-white hover:bg-gray-800'
-                  : 'bg-white text-gray-900 hover:bg-gray-100'
-                }
+                bg-gray-900 text-white hover:bg-gray-800
               `}
             >
               무료 상담
@@ -203,7 +188,7 @@ export default function Header() {
               transition-colors duration-200
               ${mobileOpen
                 ? 'text-gray-900'
-                : scrolled ? 'text-gray-700' : 'text-white'
+                : 'text-gray-700'
               }
             `}
             aria-label="메뉴"
