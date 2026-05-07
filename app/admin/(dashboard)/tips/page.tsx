@@ -287,7 +287,7 @@ function TipEditor({ tipId, onClose }: { tipId: string | null; onClose: () => vo
 
           {/* slug — normalizeSlug 로 한글/특수문자 자동 제거 */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">wooripen.co.kr/tips/</span>
+            <span className="text-xs text-gray-500">ourteam.kr/tips/</span>
             <input
               type="text"
               value={form.slug}

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: '사업자 인터넷 | 우리편',
   description:
     'SKT · KT · LG U+ 사업자 인터넷 요금을 비교하고 매장에 맞는 회선 구성을 상담받으세요.',
-  alternates: { canonical: 'https://wooripen.co.kr/internet' },
+  alternates: { canonical: 'https://ourteam.kr/internet' },
 }
 
 export default async function InternetPage() {

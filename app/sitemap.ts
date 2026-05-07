@@ -20,7 +20,7 @@ import {
 // SEO 의 기준 도메인 — production canonical
 //   beta.ourteam.kr 은 현재 staging/production 양립 상태이므로
 //   루트 metadata 의 metadataBase 를 따라간다.
-const SITE_URL = 'https://wooripen.co.kr'
+const SITE_URL = 'https://ourteam.kr'
 
 // 매 요청 동적 생성 (글 발행/수정 즉시 반영)
 export const dynamic = 'force-dynamic'

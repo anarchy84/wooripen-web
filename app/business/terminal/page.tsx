@@ -12,7 +12,7 @@ export const revalidate = 0
 export const metadata: Metadata = {
   title: '결제단말기 | 우리편',
   description: '유선·무선·키인 단말기부터 POS까지 비교·상담해드립니다.',
-  alternates: { canonical: 'https://wooripen.co.kr/business/terminal' },
+  alternates: { canonical: 'https://ourteam.kr/business/terminal' },
 }
 
 export default async function TerminalPage() {

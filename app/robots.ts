@@ -9,7 +9,7 @@
 // ─────────────────────────────────────────────
 import type { MetadataRoute } from 'next'
 
-const SITE_URL = 'https://wooripen.co.kr'
+const SITE_URL = 'https://ourteam.kr'
 
 export default function robots(): MetadataRoute.Robots {
   return {

@@ -107,7 +107,7 @@ export default async function OgImage({ params }: Params) {
         {/* 하단 — 사이트 URL + 부제 */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 28, color: 'rgba(255,255,255,0.7)' }}>
-            wooripen.co.kr · 소상공인 편에 서는 유일한 파트너
+            ourteam.kr · 소상공인 편에 서는 유일한 파트너
           </div>
         </div>
       </div>

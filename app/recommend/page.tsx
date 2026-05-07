@@ -10,11 +10,11 @@ export const revalidate = 0
 export const metadata: Metadata = {
   title: '맞춤 추천 | 우리편',
   description: '업종별로 우리편이 추천하는 매장 인프라 패키지를 확인하고, 한 번에 상담받으세요.',
-  alternates: { canonical: 'https://wooripen.co.kr/recommend' },
+  alternates: { canonical: 'https://ourteam.kr/recommend' },
   openGraph: {
     title: '맞춤 추천 | 우리편',
     description: '업종별 매장 인프라 추천 + 원스톱 상담.',
-    url: 'https://wooripen.co.kr/recommend',
+    url: 'https://ourteam.kr/recommend',
     type: 'website',
   },
 }

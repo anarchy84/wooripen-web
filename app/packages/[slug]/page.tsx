@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = data.seo_title || `${data.name} 패키지 | 우리편`
   const description = data.seo_description || data.hook_copy || data.hero_subtitle || ''
   const ogImage = data.og_image_url || data.hero_image || ''
-  const canonical = `https://wooripen.co.kr/packages/${encodeURIComponent(params.slug)}`
+  const canonical = `https://ourteam.kr/packages/${encodeURIComponent(params.slug)}`
 
   return {
     title,
@@ -240,7 +240,7 @@ export default async function PackageDetailPage({ params }: Props) {
     return a.sort_order - b.sort_order
   })
 
-  const canonical = `https://wooripen.co.kr/packages/${encodeURIComponent(params.slug)}`
+  const canonical = `https://ourteam.kr/packages/${encodeURIComponent(params.slug)}`
 
   return (
     <div className="min-h-screen bg-white">
@@ -258,8 +258,8 @@ export default async function PackageDetailPage({ params }: Props) {
       />
       <BreadcrumbLd
         items={[
-          { name: '우리편', url: 'https://wooripen.co.kr/' },
-          { name: '패키지', url: 'https://wooripen.co.kr/packages' },
+          { name: '우리편', url: 'https://ourteam.kr/' },
+          { name: '패키지', url: 'https://ourteam.kr/packages' },
           { name: pkg.name, url: canonical },
         ]}
       />

@@ -13,12 +13,12 @@ export const metadata: Metadata = {
   title: '자주 묻는 질문 (FAQ) | 우리편',
   description:
     '우리편 서비스에 대해 자주 묻는 질문과 답변입니다. 인터넷, 결제단말기, CCTV, 키오스크, 렌탈 관련 궁금한 점을 확인하세요.',
-  alternates: { canonical: 'https://wooripen.co.kr/faq' },
+  alternates: { canonical: 'https://ourteam.kr/faq' },
   openGraph: {
     title: '자주 묻는 질문 (FAQ) | 우리편',
     description:
       '소상공인 사장님들이 자주 묻는 인터넷·단말기·CCTV·키오스크·렌탈 관련 질문과 답변.',
-    url: 'https://wooripen.co.kr/faq',
+    url: 'https://ourteam.kr/faq',
     type: 'website',
   },
 }
@@ -85,8 +85,8 @@ export default async function FAQPage() {
       <FaqLd items={faqLdItems} />
       <BreadcrumbLd
         items={[
-          { name: '우리편', url: 'https://wooripen.co.kr/' },
-          { name: '자주 묻는 질문', url: 'https://wooripen.co.kr/faq' },
+          { name: '우리편', url: 'https://ourteam.kr/' },
+          { name: '자주 묻는 질문', url: 'https://ourteam.kr/faq' },
         ]}
       />
       {/* ─── 히어로 ─────────────────────────────────── */}

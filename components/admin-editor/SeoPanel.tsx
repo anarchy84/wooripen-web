@@ -30,7 +30,7 @@ export default function SeoPanel({
   // 표시될 제목/설명
   const displayTitle = seoTitle || title || '제목 없음'
   const displayDesc = seoDescription || '설명을 입력하세요...'
-  const displayUrl = `wooripen.co.kr/tips/${slug || '...'}`
+  const displayUrl = `ourteam.kr/tips/${slug || '...'}`
 
   // 순수 텍스트 추출 (HTML 태그 제거)
   const plainContent = useMemo(() => content.replace(/<[^>]*>/g, ''), [content])
@@ -184,7 +184,7 @@ export default function SeoPanel({
             OG 이미지
           </div>
           <div className="p-2.5">
-            <p className="text-xs text-gray-500">wooripen.co.kr</p>
+            <p className="text-xs text-gray-500">ourteam.kr</p>
             <p className="text-sm text-white font-medium truncate">{displayTitle}</p>
             <p className="text-xs text-gray-400 line-clamp-1">{displayDesc}</p>
           </div>

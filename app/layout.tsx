@@ -15,7 +15,7 @@ import { WebVitalsReporter } from '@/components/WebVitalsReporter'
 import './globals.css'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://wooripen.co.kr'),
+  metadataBase: new URL('https://ourteam.kr'),
   title: {
     default: '우리편 | 소상공인 인터넷·결제단말기·CCTV 한번에',
     template: '%s | 우리편',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://wooripen.co.kr',
+    url: 'https://ourteam.kr',
     siteName: '우리편',
     title: '우리편 | 소상공인 인터넷·결제단말기·CCTV 한번에',
     description:

@@ -11,7 +11,7 @@
 // ─────────────────────────────────────────────
 import React from 'react'
 
-const SITE_URL = 'https://wooripen.co.kr'
+const SITE_URL = 'https://ourteam.kr'
 const SITE_NAME = '우리편'
 const LOGO_URL = `${SITE_URL}/og-image.png`
 const PHONE = '+82-1600-6116'

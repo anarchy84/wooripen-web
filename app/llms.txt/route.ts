@@ -13,7 +13,7 @@ import { createClient as createSupabase } from '@supabase/supabase-js'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-const SITE_URL = 'https://wooripen.co.kr'
+const SITE_URL = 'https://ourteam.kr'
 
 export async function GET() {
   // 발행된 tips 슬러그·제목 동적 수집 (LLM 인용 정확도 ↑)

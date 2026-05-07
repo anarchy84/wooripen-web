@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = data.seo_title || `${data.name} | 우리편`
   const description = data.seo_description || data.description || ''
   const ogImage = data.og_image_url || data.hero_image || data.image_url || ''
-  const canonical = `https://wooripen.co.kr/products/${encodeURIComponent(params.slug)}`
+  const canonical = `https://ourteam.kr/products/${encodeURIComponent(params.slug)}`
 
   return {
     title,
@@ -71,7 +71,7 @@ export default async function ProductDetailPage({ params }: Props) {
   const ctaPrimary = p.cta_primary_label || '무료 상담 신청'
   const ctaSecondary = p.cta_secondary_label || null
 
-  const canonical = `https://wooripen.co.kr/products/${encodeURIComponent(params.slug)}`
+  const canonical = `https://ourteam.kr/products/${encodeURIComponent(params.slug)}`
   const heroImg = p.hero_image || p.image_url
 
   return (
@@ -91,8 +91,8 @@ export default async function ProductDetailPage({ params }: Props) {
       />
       <BreadcrumbLd
         items={[
-          { name: '우리편', url: 'https://wooripen.co.kr/' },
-          { name: '상품', url: 'https://wooripen.co.kr/packages' },
+          { name: '우리편', url: 'https://ourteam.kr/' },
+          { name: '상품', url: 'https://ourteam.kr/packages' },
           { name: p.name, url: canonical },
         ]}
       />

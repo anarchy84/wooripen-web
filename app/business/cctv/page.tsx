@@ -12,7 +12,7 @@ export const revalidate = 0
 export const metadata: Metadata = {
   title: 'CCTV 설치 | 우리편',
   description: '매장 크기와 구조에 맞는 CCTV 구성을 추천해드립니다.',
-  alternates: { canonical: 'https://wooripen.co.kr/business/cctv' },
+  alternates: { canonical: 'https://ourteam.kr/business/cctv' },
 }
 
 export default async function CctvPage() {

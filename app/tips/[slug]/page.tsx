@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!data) return { title: '글을 찾을 수 없습니다' }
 
-  const canonical = `https://wooripen.co.kr/tips/${encodeURIComponent(params.slug)}`
+  const canonical = `https://ourteam.kr/tips/${encodeURIComponent(params.slug)}`
   return {
     title: data.seo_title || data.title,
     description: data.seo_description || data.excerpt || '',
@@ -59,7 +59,7 @@ export default async function TipDetailPage({ params }: Props) {
     .eq('id', tip.id)
     .then(() => {})
 
-  const canonical = `https://wooripen.co.kr/tips/${encodeURIComponent(params.slug)}`
+  const canonical = `https://ourteam.kr/tips/${encodeURIComponent(params.slug)}`
 
   return (
     <div className="min-h-screen bg-gray-950">
@@ -74,8 +74,8 @@ export default async function TipDetailPage({ params }: Props) {
       />
       <BreadcrumbLd
         items={[
-          { name: '우리편', url: 'https://wooripen.co.kr/' },
-          { name: '꿀팁', url: 'https://wooripen.co.kr/tips' },
+          { name: '우리편', url: 'https://ourteam.kr/' },
+          { name: '꿀팁', url: 'https://ourteam.kr/tips' },
           { name: tip.title, url: canonical },
         ]}
       />

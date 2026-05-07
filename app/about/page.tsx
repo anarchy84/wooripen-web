@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: '회사소개 | 우리편',
   description:
     '사장님 옆에 서서 같이 고민하는 팀 우리편. 매장 인프라를 가장 쉽고 합리적으로.',
-  alternates: { canonical: 'https://wooripen.co.kr/about' },
+  alternates: { canonical: 'https://ourteam.kr/about' },
 }
 
 export default async function AboutPage() {

@@ -18,7 +18,7 @@ const SETTING_FIELDS: SettingField[] = [
   { key: 'business_number', label: '사업자등록번호', type: 'text', placeholder: '000-00-00000', group: '기본 정보' },
   { key: 'phone', label: '대표 전화번호', type: 'tel', placeholder: '1800-0000', group: '연락처' },
   { key: 'mobile', label: '상담 연락처', type: 'tel', placeholder: '010-0000-0000', group: '연락처' },
-  { key: 'email', label: '이메일', type: 'text', placeholder: 'contact@wooripen.co.kr', group: '연락처' },
+  { key: 'email', label: '이메일', type: 'text', placeholder: 'contact@ourteam.kr', group: '연락처' },
   { key: 'kakao_channel', label: '카카오톡 채널', type: 'text', placeholder: '@우리편', group: '연락처' },
   { key: 'address', label: '사업장 주소', type: 'text', placeholder: '서울특별시 강남구...', group: '위치' },
   { key: 'business_hours', label: '운영시간', type: 'text', placeholder: '평일 09:00 ~ 18:00', group: '위치' },
