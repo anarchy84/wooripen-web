@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { normalizeSlug } from '@/lib/slug'
+import { findMediaUsage, extractStoragePath } from '@/lib/media-usage'
 
 // sharp 는 native 모듈 — Edge runtime 에서 안 됨. 명시적으로 nodejs 강제
 export const runtime = 'nodejs'
@@ -152,4 +153,89 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(mediaRecord, { status: 201 })
+}
+
+// DELETE: 전체 비우기
+//   /api/admin/media?all=1            — 미사용 미디어만 비움. 사용 중인 row 는 건드리지 않음.
+//   /api/admin/media?all=1&force=1    — 사용 여부 무시하고 전부 삭제 (콘텐츠 깨질 수 있음)
+//
+// 안전장치 :
+//   - all=1 쿼리 파라미터 명시 안 하면 거부 (실수로 호출되는 거 방지)
+//   - force=1 일 때만 사용 중 이미지도 삭제
+//   - 응답에 deleted_count / skipped_count 둘 다 반환
+export async function DELETE(request: NextRequest) {
+  const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const all = request.nextUrl.searchParams.get('all') === '1'
+  const force = request.nextUrl.searchParams.get('force') === '1'
+
+  if (!all) {
+    return NextResponse.json(
+      { error: 'Missing all=1 — bulk delete must be explicit' },
+      { status: 400 },
+    )
+  }
+
+  // 모든 미디어 fetch
+  const { data: allMedia, error: fetchErr } = await supabase
+    .from('media')
+    .select('*')
+  if (fetchErr) {
+    return NextResponse.json({ error: fetchErr.message }, { status: 500 })
+  }
+  if (!allMedia || allMedia.length === 0) {
+    return NextResponse.json({ deleted_count: 0, skipped_count: 0 })
+  }
+
+  // 사용 중인 URL 집합 — force=1 이면 검색 skip
+  const usedUrls = new Set<string>()
+  if (!force) {
+    const allUrls = allMedia.flatMap((m) => [m.storage_path, m.webp_path]).filter(Boolean) as string[]
+    const usage = await findMediaUsage(supabase, allUrls)
+    for (const u of usage) usedUrls.add(u.url)
+  }
+
+  // 삭제 대상 / 보존 대상 분리
+  const toDelete = allMedia.filter((m) => {
+    if (force) return true
+    return !usedUrls.has(m.storage_path) && !(m.webp_path && usedUrls.has(m.webp_path))
+  })
+  const skipped = allMedia.length - toDelete.length
+
+  if (toDelete.length === 0) {
+    return NextResponse.json({ deleted_count: 0, skipped_count: skipped })
+  }
+
+  // Storage 일괄 제거
+  const storagePaths = toDelete
+    .flatMap((m) => [extractStoragePath(m.storage_path), extractStoragePath(m.webp_path)])
+    .filter(Boolean) as string[]
+
+  if (storagePaths.length > 0) {
+    const { error: storageErr } = await supabase.storage
+      .from('media')
+      .remove(storagePaths)
+    if (storageErr) {
+      console.warn('[media bulk DELETE storage]', storageErr.message)
+    }
+  }
+
+  // DB 일괄 삭제
+  const ids = toDelete.map((m) => m.id)
+  const { error: dbErr } = await supabase
+    .from('media')
+    .delete()
+    .in('id', ids)
+
+  if (dbErr) {
+    return NextResponse.json({ error: dbErr.message }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    deleted_count: toDelete.length,
+    skipped_count: skipped,
+  })
 }
