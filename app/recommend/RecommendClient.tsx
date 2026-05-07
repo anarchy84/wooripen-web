@@ -223,36 +223,44 @@ export default function RecommendClient() {
                 }`}
               >
                 <Icon icon={bt.icon} className={`h-8 w-8 ${selected === bt.id ? 'text-primary' : 'text-gray-400'}`} />
-                <span className={`text-xs font-semibold break-keep ${selected === bt.id ? 'text-primary' : 'text-gray-600'}`}>
-                  {bt.label}
-                </span>
+                <EditableText as="span" blockKey={k(`bizType.${bt.id}.label`)} fallback={bt.label}
+                  value={pickTextOrUndef(blocks, k(`bizType.${bt.id}.label`))} pagePath={PAGE}
+                  className={`text-xs font-semibold break-keep ${selected === bt.id ? 'text-primary' : 'text-gray-600'}`} />
               </button>
             ))}
           </div>
         </FadeIn>
 
-        {/* 추천 결과 */}
+        {/* 추천 결과 — selected 가 바뀌면 blockKey 도 같이 동적으로 바뀜 */}
         <FadeIn delay={200}>
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <Icon icon={current.icon} className="h-8 w-8 text-primary" />
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{current.label} 추천 상품</h3>
-                <p className="text-sm text-gray-500">{current.desc}</p>
+                <h3 className="text-xl font-bold text-gray-900">
+                  <EditableText as="span" blockKey={k(`bizType.${current.id}.label`)} fallback={current.label}
+                    value={pickTextOrUndef(blocks, k(`bizType.${current.id}.label`))} pagePath={PAGE} />
+                  {' 추천 상품'}
+                </h3>
+                <EditableText as="p" blockKey={k(`bizType.${current.id}.desc`)} fallback={current.desc}
+                  value={pickTextOrUndef(blocks, k(`bizType.${current.id}.desc`))} pagePath={PAGE}
+                  className="text-sm text-gray-500" />
               </div>
             </div>
 
             <div className="space-y-3">
-              {current.recommended.map((item) => (
+              {current.recommended.map((item, i) => (
                 <Link
                   key={item.product}
                   href={item.link}
                   className="flex items-center gap-4 p-5 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-card transition-all duration-300 ease-toss group"
                 >
-                  <span className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold ${item.color}`}>
-                    {item.product}
-                  </span>
-                  <span className="text-base text-gray-600 break-keep">{item.reason}</span>
+                  <EditableText as="span" blockKey={k(`bizType.${current.id}.rec.${i}.product`)} fallback={item.product}
+                    value={pickTextOrUndef(blocks, k(`bizType.${current.id}.rec.${i}.product`))} pagePath={PAGE}
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold ${item.color}`} />
+                  <EditableText as="span" blockKey={k(`bizType.${current.id}.rec.${i}.reason`)} fallback={item.reason}
+                    value={pickTextOrUndef(blocks, k(`bizType.${current.id}.rec.${i}.reason`))} pagePath={PAGE}
+                    className="text-base text-gray-600 break-keep" />
                   <ArrowRight className="ml-auto h-4 w-4 text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 shrink-0" />
                 </Link>
               ))}
@@ -266,13 +274,15 @@ export default function RecommendClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-14">
-              <span className="text-sm font-semibold text-primary tracking-wider uppercase">One-Stop</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                하나하나 알아볼 필요 없어요
-              </h2>
-              <p className="mt-4 text-base text-gray-500 break-keep">
-                인터넷부터 단말기·CCTV·키오스크까지, 한 번의 상담으로 전부 해결돼요.
-              </p>
+              <EditableText as="span" blockKey={k('onestop.eyebrow')} fallback="One-Stop"
+                value={pickTextOrUndef(blocks, k('onestop.eyebrow'))} pagePath={PAGE}
+                className="text-sm font-semibold text-primary tracking-wider uppercase" />
+              <EditableText as="h2" blockKey={k('onestop.title')} fallback="하나하나 알아볼 필요 없어요"
+                value={pickTextOrUndef(blocks, k('onestop.title'))} pagePath={PAGE}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
+              <EditableText as="p" blockKey={k('onestop.subtitle')} fallback="인터넷부터 단말기·CCTV·키오스크까지, 한 번의 상담으로 전부 해결돼요."
+                value={pickTextOrUndef(blocks, k('onestop.subtitle'))} pagePath={PAGE}
+                className="mt-4 text-base text-gray-500 break-keep" />
             </div>
           </FadeIn>
 
@@ -286,8 +296,12 @@ export default function RecommendClient() {
               <FadeIn key={item.title} delay={i * 100}>
                 <div className="rounded-3xl bg-white p-7 text-center transition-all duration-400 ease-toss hover:shadow-card group">
                   <Icon icon={item.icon} className={`h-10 w-10 mx-auto mb-3 ${item.color} transition-transform duration-400 group-hover:scale-110`} />
-                  <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                  <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
+                  <EditableText as="h3" blockKey={k(`onestop.card.${i}.title`)} fallback={item.title}
+                    value={pickTextOrUndef(blocks, k(`onestop.card.${i}.title`))} pagePath={PAGE}
+                    className="text-lg font-semibold text-gray-900" />
+                  <EditableText as="p" blockKey={k(`onestop.card.${i}.desc`)} fallback={item.desc}
+                    value={pickTextOrUndef(blocks, k(`onestop.card.${i}.desc`))} pagePath={PAGE}
+                    className="mt-1 text-sm text-gray-500" />
                 </div>
               </FadeIn>
             ))}
@@ -306,16 +320,27 @@ export default function RecommendClient() {
               <div>
                 <Icon icon="solar:magic-stick-3-bold-duotone" className="h-14 w-14 text-indigo-400/40 mb-8" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight break-keep">
-                  업종만 알려주시면<br /><span className="text-gradient">최적의 조합</span>을<br />찾아드릴게요
+                  <EditableText as="span" blockKey={k('cta.title.line1')} fallback="업종만 알려주시면"
+                    value={pickTextOrUndef(blocks, k('cta.title.line1'))} pagePath={PAGE} /><br />
+                  <span className="text-gradient">
+                    <EditableText as="span" blockKey={k('cta.title.highlight')} fallback="최적의 조합"
+                      value={pickTextOrUndef(blocks, k('cta.title.highlight'))} pagePath={PAGE} />
+                  </span>
+                  <EditableText as="span" blockKey={k('cta.title.tail')} fallback="을"
+                    value={pickTextOrUndef(blocks, k('cta.title.tail'))} pagePath={PAGE} /><br />
+                  <EditableText as="span" blockKey={k('cta.title.line3')} fallback="찾아드릴게요"
+                    value={pickTextOrUndef(blocks, k('cta.title.line3'))} pagePath={PAGE} />
                 </h2>
-                <p className="mt-5 text-base text-gray-400 break-keep">
-                  인터넷·단말기·CCTV·키오스크, 필요한 것만 골라서 한 번에 상담받으세요.
-                </p>
+                <EditableText as="p" blockKey={k('cta.description')}
+                  fallback="인터넷·단말기·CCTV·키오스크, 필요한 것만 골라서 한 번에 상담받으세요."
+                  value={pickTextOrUndef(blocks, k('cta.description'))} pagePath={PAGE}
+                  className="mt-5 text-base text-gray-400 break-keep" />
                 <div className="mt-8 space-y-3">
-                  {['업종 맞춤 상품 조합', '3사 + 전 VAN사 비교', '설치까지 원스톱'].map((t) => (
+                  {['업종 맞춤 상품 조합', '3사 + 전 VAN사 비교', '설치까지 원스톱'].map((t, i) => (
                     <div key={t} className="flex items-center gap-2.5 text-sm text-gray-400">
                       <Icon icon="solar:check-circle-bold" className="h-5 w-5 text-indigo-400 shrink-0" />
-                      {t}
+                      <EditableText as="span" blockKey={k(`cta.benefit.${i}`)} fallback={t}
+                        value={pickTextOrUndef(blocks, k(`cta.benefit.${i}`))} pagePath={PAGE} />
                     </div>
                   ))}
                 </div>
