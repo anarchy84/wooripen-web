@@ -89,16 +89,23 @@ export default function AboutClient() {
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           <FadeIn>
             <div>
-              <span className="text-sm font-semibold text-primary tracking-wider uppercase">Our Mission</span>
+              <EditableText as="span" blockKey={k('mission.eyebrow')} fallback="Our Mission"
+                value={pickTextOrUndef(blocks, k('mission.eyebrow'))} pagePath={PAGE}
+                className="text-sm font-semibold text-primary tracking-wider uppercase" />
               <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight break-keep">
-                매장 인프라,<br />더 이상 어렵지 않게
+                <EditableText as="span" blockKey={k('mission.title.line1')} fallback="매장 인프라,"
+                  value={pickTextOrUndef(blocks, k('mission.title.line1'))} pagePath={PAGE} /><br />
+                <EditableText as="span" blockKey={k('mission.title.line2')} fallback="더 이상 어렵지 않게"
+                  value={pickTextOrUndef(blocks, k('mission.title.line2'))} pagePath={PAGE} />
               </h2>
-              <p className="mt-5 text-base text-gray-500 leading-relaxed break-keep">
-                신규 매장을 열든, 기존 장비를 교체하든, 사장님들은 인터넷·단말기·CCTV·키오스크를 각각 다른 곳에서 알아봐야 했어요. 가격 비교도 어렵고, 어디가 좋은지 판단하기도 힘들죠.
-              </p>
-              <p className="mt-4 text-base text-gray-500 leading-relaxed break-keep">
-                우리편은 이 과정을 하나로 합쳤어요. 한 번의 상담으로 필요한 인프라를 전부 비교하고, 업종과 매장 상황에 맞는 최적의 조합을 찾아드립니다.
-              </p>
+              <EditableText as="p" blockKey={k('mission.paragraph.0')}
+                fallback="신규 매장을 열든, 기존 장비를 교체하든, 사장님들은 인터넷·단말기·CCTV·키오스크를 각각 다른 곳에서 알아봐야 했어요. 가격 비교도 어렵고, 어디가 좋은지 판단하기도 힘들죠."
+                value={pickTextOrUndef(blocks, k('mission.paragraph.0'))} pagePath={PAGE}
+                className="mt-5 text-base text-gray-500 leading-relaxed break-keep" />
+              <EditableText as="p" blockKey={k('mission.paragraph.1')}
+                fallback="우리편은 이 과정을 하나로 합쳤어요. 한 번의 상담으로 필요한 인프라를 전부 비교하고, 업종과 매장 상황에 맞는 최적의 조합을 찾아드립니다."
+                value={pickTextOrUndef(blocks, k('mission.paragraph.1'))} pagePath={PAGE}
+                className="mt-4 text-base text-gray-500 leading-relaxed break-keep" />
             </div>
           </FadeIn>
 
@@ -109,11 +116,15 @@ export default function AboutClient() {
                 { value: '4.87', label: '고객 만족도', icon: 'solar:star-bold-duotone' },
                 { value: '3사+', label: '통신사 비교', icon: 'solar:global-bold-duotone' },
                 { value: '0원', label: '상담비용', icon: 'solar:wallet-money-bold-duotone' },
-              ].map((item) => (
+              ].map((item, i) => (
                 <div key={item.label} className="rounded-2xl bg-gray-50 p-6 text-center">
                   <Icon icon={item.icon} className="h-7 w-7 text-primary mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900 tracking-tight">{item.value}</p>
-                  <p className="text-xs text-gray-500 mt-1">{item.label}</p>
+                  <EditableText as="p" blockKey={k(`stats.${i}.value`)} fallback={item.value}
+                    value={pickTextOrUndef(blocks, k(`stats.${i}.value`))} pagePath={PAGE}
+                    className="text-2xl font-bold text-gray-900 tracking-tight" />
+                  <EditableText as="p" blockKey={k(`stats.${i}.label`)} fallback={item.label}
+                    value={pickTextOrUndef(blocks, k(`stats.${i}.label`))} pagePath={PAGE}
+                    className="text-xs text-gray-500 mt-1" />
                 </div>
               ))}
             </div>
@@ -126,36 +137,30 @@ export default function AboutClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-14">
-              <span className="text-sm font-semibold text-primary tracking-wider uppercase">Why Different</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                우리편이 다른 점
-              </h2>
+              <EditableText as="span" blockKey={k('different.eyebrow')} fallback="Why Different"
+                value={pickTextOrUndef(blocks, k('different.eyebrow'))} pagePath={PAGE}
+                className="text-sm font-semibold text-primary tracking-wider uppercase" />
+              <EditableText as="h2" blockKey={k('different.title')} fallback="우리편이 다른 점"
+                value={pickTextOrUndef(blocks, k('different.title'))} pagePath={PAGE}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
             </div>
           </FadeIn>
 
           <div className="grid md:grid-cols-3 gap-5">
             {[
-              {
-                icon: 'solar:scale-bold-duotone',
-                title: '중립적 비교',
-                desc: '특정 통신사·VAN사에 치우치지 않고 모든 옵션을 공정하게 비교해드려요. 사장님에게 유리한 조건이 우선입니다.',
-              },
-              {
-                icon: 'solar:hand-shake-bold-duotone',
-                title: '원스톱 상담',
-                desc: '인터넷·단말기·CCTV·키오스크를 여기저기 알아보실 필요 없어요. 한 번의 상담으로 필요한 인프라를 전부 해결합니다.',
-              },
-              {
-                icon: 'solar:heart-bold-duotone',
-                title: '설치 후 케어',
-                desc: '설치하고 끝이 아니에요. 장비 고장, 수수료 변경, 요금제 재검토까지 계속 챙겨드립니다.',
-              },
+              { icon: 'solar:scale-bold-duotone', title: '중립적 비교', desc: '특정 통신사·VAN사에 치우치지 않고 모든 옵션을 공정하게 비교해드려요. 사장님에게 유리한 조건이 우선입니다.' },
+              { icon: 'solar:hand-shake-bold-duotone', title: '원스톱 상담', desc: '인터넷·단말기·CCTV·키오스크를 여기저기 알아보실 필요 없어요. 한 번의 상담으로 필요한 인프라를 전부 해결합니다.' },
+              { icon: 'solar:heart-bold-duotone', title: '설치 후 케어', desc: '설치하고 끝이 아니에요. 장비 고장, 수수료 변경, 요금제 재검토까지 계속 챙겨드립니다.' },
             ].map((item, i) => (
               <FadeIn key={item.title} delay={i * 100}>
                 <div className="rounded-3xl bg-white p-8 md:p-10 transition-all duration-400 ease-toss hover:shadow-card">
                   <Icon icon={item.icon} className="h-10 w-10 text-primary mb-5" />
-                  <h3 className="text-xl font-semibold text-gray-900 break-keep">{item.title}</h3>
-                  <p className="mt-3 text-base text-gray-500 leading-relaxed break-keep">{item.desc}</p>
+                  <EditableText as="h3" blockKey={k(`different.card.${i}.title`)} fallback={item.title}
+                    value={pickTextOrUndef(blocks, k(`different.card.${i}.title`))} pagePath={PAGE}
+                    className="text-xl font-semibold text-gray-900 break-keep" />
+                  <EditableText as="p" blockKey={k(`different.card.${i}.desc`)} fallback={item.desc}
+                    value={pickTextOrUndef(blocks, k(`different.card.${i}.desc`))} pagePath={PAGE}
+                    className="mt-3 text-base text-gray-500 leading-relaxed break-keep" />
                 </div>
               </FadeIn>
             ))}
@@ -167,10 +172,12 @@ export default function AboutClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-sm font-semibold text-primary tracking-wider uppercase">Products</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-              매장에 필요한 건 다 있어요
-            </h2>
+            <EditableText as="span" blockKey={k('products.eyebrow')} fallback="Products"
+              value={pickTextOrUndef(blocks, k('products.eyebrow'))} pagePath={PAGE}
+              className="text-sm font-semibold text-primary tracking-wider uppercase" />
+            <EditableText as="h2" blockKey={k('products.title')} fallback="매장에 필요한 건 다 있어요"
+              value={pickTextOrUndef(blocks, k('products.title'))} pagePath={PAGE}
+              className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
           </div>
         </FadeIn>
 
@@ -185,8 +192,12 @@ export default function AboutClient() {
               <Link href={item.link}
                 className="group rounded-3xl bg-gray-50 p-7 flex flex-col items-center text-center transition-all duration-400 ease-toss hover:bg-white hover:shadow-card-hover hover:-translate-y-1">
                 <Icon icon={item.icon} className={`h-12 w-12 ${item.color} mb-4 transition-transform duration-400 group-hover:scale-110`} />
-                <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
+                <EditableText as="h3" blockKey={k(`products.card.${i}.title`)} fallback={item.title}
+                  value={pickTextOrUndef(blocks, k(`products.card.${i}.title`))} pagePath={PAGE}
+                  className="text-lg font-semibold text-gray-900" />
+                <EditableText as="p" blockKey={k(`products.card.${i}.desc`)} fallback={item.desc}
+                  value={pickTextOrUndef(blocks, k(`products.card.${i}.desc`))} pagePath={PAGE}
+                  className="mt-1 text-sm text-gray-500" />
                 <span className="mt-4 text-sm font-semibold text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   자세히 보기
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -202,10 +213,12 @@ export default function AboutClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-14">
-              <span className="text-sm font-semibold text-primary tracking-wider uppercase">History</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                우리편의 걸어온 길
-              </h2>
+              <EditableText as="span" blockKey={k('history.eyebrow')} fallback="History"
+                value={pickTextOrUndef(blocks, k('history.eyebrow'))} pagePath={PAGE}
+                className="text-sm font-semibold text-primary tracking-wider uppercase" />
+              <EditableText as="h2" blockKey={k('history.title')} fallback="우리편의 걸어온 길"
+                value={pickTextOrUndef(blocks, k('history.title'))} pagePath={PAGE}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
             </div>
           </FadeIn>
 
@@ -221,9 +234,15 @@ export default function AboutClient() {
                 <FadeIn key={i} delay={i * 100}>
                   <div className="relative">
                     <div className="absolute -left-[25px] top-1 w-4 h-4 rounded-full bg-white border-2 border-primary" />
-                    <span className="text-xs font-bold text-primary tracking-widest">{item.year}</span>
-                    <h3 className="mt-1 text-base font-semibold text-gray-900 break-keep">{item.title}</h3>
-                    <p className="mt-1 text-sm text-gray-500 break-keep">{item.desc}</p>
+                    <EditableText as="span" blockKey={k(`history.item.${i}.year`)} fallback={item.year}
+                      value={pickTextOrUndef(blocks, k(`history.item.${i}.year`))} pagePath={PAGE}
+                      className="text-xs font-bold text-primary tracking-widest" />
+                    <EditableText as="h3" blockKey={k(`history.item.${i}.title`)} fallback={item.title}
+                      value={pickTextOrUndef(blocks, k(`history.item.${i}.title`))} pagePath={PAGE}
+                      className="mt-1 text-base font-semibold text-gray-900 break-keep" />
+                    <EditableText as="p" blockKey={k(`history.item.${i}.desc`)} fallback={item.desc}
+                      value={pickTextOrUndef(blocks, k(`history.item.${i}.desc`))} pagePath={PAGE}
+                      className="mt-1 text-sm text-gray-500 break-keep" />
                   </div>
                 </FadeIn>
               ))}
@@ -241,11 +260,16 @@ export default function AboutClient() {
           <FadeIn>
             <div className="text-center max-w-xl mx-auto">
               <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight break-keep">
-                매장 인프라,<br /><span className="text-gradient">우리편에게 맡겨보세요</span>
+                <EditableText as="span" blockKey={k('cta.title.line1')} fallback="매장 인프라,"
+                  value={pickTextOrUndef(blocks, k('cta.title.line1'))} pagePath={PAGE} /><br />
+                <span className="text-gradient">
+                  <EditableText as="span" blockKey={k('cta.title.highlight')} fallback="우리편에게 맡겨보세요"
+                    value={pickTextOrUndef(blocks, k('cta.title.highlight'))} pagePath={PAGE} />
+                </span>
               </h2>
-              <p className="mt-5 text-base text-gray-400 break-keep">
-                한 번의 전화로 인터넷·단말기·CCTV·키오스크까지 전부 상담받을 수 있어요.
-              </p>
+              <EditableText as="p" blockKey={k('cta.description')} fallback="한 번의 전화로 인터넷·단말기·CCTV·키오스크까지 전부 상담받을 수 있어요."
+                value={pickTextOrUndef(blocks, k('cta.description'))} pagePath={PAGE}
+                className="mt-5 text-base text-gray-400 break-keep" />
               <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3">
                 <Link href="/recommend"
                   className="btn-primary group">

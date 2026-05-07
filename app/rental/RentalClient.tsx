@@ -239,10 +239,12 @@ export default function RentalClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-sm font-semibold text-cyan-500 tracking-wider uppercase">Why Rental</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-              구매보다 렌탈이 유리한 이유
-            </h2>
+            <EditableText as="span" blockKey={kr('why.eyebrow')} fallback="Why Rental"
+              value={pickTextOrUndef(blocks, kr('why.eyebrow'))} pagePath={PAGE_RENT}
+              className="text-sm font-semibold text-cyan-500 tracking-wider uppercase" />
+            <EditableText as="h2" blockKey={kr('why.title')} fallback="구매보다 렌탈이 유리한 이유"
+              value={pickTextOrUndef(blocks, kr('why.title'))} pagePath={PAGE_RENT}
+              className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
           </div>
         </FadeIn>
 
@@ -255,8 +257,12 @@ export default function RentalClient() {
             <FadeIn key={item.title} delay={i * 100}>
               <div className="rounded-3xl bg-gray-50 p-8 md:p-10 transition-all duration-400 ease-toss hover:bg-white hover:shadow-card">
                 <Icon icon={item.icon} className="h-10 w-10 text-cyan-500 mb-5" />
-                <h3 className="text-xl font-semibold text-gray-900 break-keep">{item.title}</h3>
-                <p className="mt-3 text-base text-gray-500 leading-relaxed break-keep">{item.desc}</p>
+                <EditableText as="h3" blockKey={kr(`why.card.${i}.title`)} fallback={item.title}
+                  value={pickTextOrUndef(blocks, kr(`why.card.${i}.title`))} pagePath={PAGE_RENT}
+                  className="text-xl font-semibold text-gray-900 break-keep" />
+                <EditableText as="p" blockKey={kr(`why.card.${i}.desc`)} fallback={item.desc}
+                  value={pickTextOrUndef(blocks, kr(`why.card.${i}.desc`))} pagePath={PAGE_RENT}
+                  className="mt-3 text-base text-gray-500 leading-relaxed break-keep" />
               </div>
             </FadeIn>
           ))}
@@ -268,13 +274,15 @@ export default function RentalClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-10">
-              <span className="text-sm font-semibold text-cyan-500 tracking-wider uppercase">Products</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                매장 렌탈 상품
-              </h2>
-              <p className="mt-4 text-base text-gray-500 break-keep">
-                카테고리별로 필요한 장비를 확인해보세요.
-              </p>
+              <EditableText as="span" blockKey={kr('products.eyebrow')} fallback="Products"
+                value={pickTextOrUndef(blocks, kr('products.eyebrow'))} pagePath={PAGE_RENT}
+                className="text-sm font-semibold text-cyan-500 tracking-wider uppercase" />
+              <EditableText as="h2" blockKey={kr('products.title')} fallback="매장 렌탈 상품"
+                value={pickTextOrUndef(blocks, kr('products.title'))} pagePath={PAGE_RENT}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
+              <EditableText as="p" blockKey={kr('products.subtitle')} fallback="카테고리별로 필요한 장비를 확인해보세요."
+                value={pickTextOrUndef(blocks, kr('products.subtitle'))} pagePath={PAGE_RENT}
+                className="mt-4 text-base text-gray-500 break-keep" />
             </div>
           </FadeIn>
 
@@ -300,26 +308,31 @@ export default function RentalClient() {
 
           {/* 상품 카드 */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filtered.map((product, i) => (
+            {filtered.map((product, i) => {
+              // products 배열 원본 인덱스 — 카테고리 필터 후에도 안정적인 blockKey
+              const originalIdx = products.findIndex(
+                (p) => p.title === product.title && p.category === product.category
+              )
+              return (
               <FadeIn key={`${product.category}-${product.title}`} delay={i * 60}>
                 <div className={`relative rounded-3xl bg-white p-8 transition-all duration-400 ease-toss hover:shadow-card-hover hover:-translate-y-1 ${product.popular ? 'ring-2 ring-cyan-400/30' : ''}`}>
-                  {product.popular && (
-                    <span className="absolute -top-3 left-8 text-[11px] font-bold text-white bg-cyan-500 px-3 py-1 rounded-full shadow-sm">
-                      {product.tag}
-                    </span>
-                  )}
-                  {!product.popular && (
-                    <span className="absolute top-6 right-6 text-[11px] font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                      {product.tag}
-                    </span>
-                  )}
+                  <span className={`absolute ${product.popular ? '-top-3 left-8 text-[11px] font-bold text-white bg-cyan-500 shadow-sm' : 'top-6 right-6 text-[11px] font-semibold text-gray-500 bg-gray-100'} px-3 py-1 rounded-full`}>
+                    <EditableText as="span" blockKey={kr(`products.card.${originalIdx}.tag`)} fallback={product.tag}
+                      value={pickTextOrUndef(blocks, kr(`products.card.${originalIdx}.tag`))} pagePath={PAGE_RENT} />
+                  </span>
 
                   <Icon icon={product.icon} className={`h-10 w-10 mb-5 ${accentColor[product.category]}`} />
-                  <h3 className="text-lg font-semibold text-gray-900 break-keep">{product.title}</h3>
-                  <p className="mt-2 text-sm text-gray-500 leading-relaxed break-keep line-clamp-2">{product.desc}</p>
+                  <EditableText as="h3" blockKey={kr(`products.card.${originalIdx}.title`)} fallback={product.title}
+                    value={pickTextOrUndef(blocks, kr(`products.card.${originalIdx}.title`))} pagePath={PAGE_RENT}
+                    className="text-lg font-semibold text-gray-900 break-keep" />
+                  <EditableText as="p" blockKey={kr(`products.card.${originalIdx}.desc`)} fallback={product.desc}
+                    value={pickTextOrUndef(blocks, kr(`products.card.${originalIdx}.desc`))} pagePath={PAGE_RENT}
+                    className="mt-2 text-sm text-gray-500 leading-relaxed break-keep line-clamp-2" />
 
                   <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-gray-900 tracking-tight">월 {product.monthlyPrice}</span>
+                    <EditableText as="span" blockKey={kr(`products.card.${originalIdx}.price`)} fallback={`월 ${product.monthlyPrice}`}
+                      value={pickTextOrUndef(blocks, kr(`products.card.${originalIdx}.price`))} pagePath={PAGE_RENT}
+                      className="text-2xl font-bold text-gray-900 tracking-tight" />
                     <span className="text-sm text-gray-400">원~</span>
                   </div>
 
@@ -342,13 +355,15 @@ export default function RentalClient() {
                   </a>
                 </div>
               </FadeIn>
-            ))}
+              )
+            })}
           </div>
 
           <FadeIn delay={400}>
-            <p className="mt-8 text-center text-sm text-gray-400 break-keep">
-              * 렌탈료는 약정 기간·모델에 따라 달라질 수 있습니다. 정확한 금액은 상담 시 안내해드려요.
-            </p>
+            <EditableText as="p" blockKey={kr('products.disclaimer')}
+              fallback="* 렌탈료는 약정 기간·모델에 따라 달라질 수 있습니다. 정확한 금액은 상담 시 안내해드려요."
+              value={pickTextOrUndef(blocks, kr('products.disclaimer'))} pagePath={PAGE_RENT}
+              className="mt-8 text-center text-sm text-gray-400 break-keep" />
           </FadeIn>
         </div>
       </section>
@@ -357,10 +372,12 @@ export default function RentalClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-sm font-semibold text-cyan-500 tracking-wider uppercase">Process</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-              렌탈 신청, 이렇게 쉬워요
-            </h2>
+            <EditableText as="span" blockKey={kr('process.eyebrow')} fallback="Process"
+              value={pickTextOrUndef(blocks, kr('process.eyebrow'))} pagePath={PAGE_RENT}
+              className="text-sm font-semibold text-cyan-500 tracking-wider uppercase" />
+            <EditableText as="h2" blockKey={kr('process.title')} fallback="렌탈 신청, 이렇게 쉬워요"
+              value={pickTextOrUndef(blocks, kr('process.title'))} pagePath={PAGE_RENT}
+              className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
           </div>
         </FadeIn>
 
@@ -378,8 +395,12 @@ export default function RentalClient() {
                     <Icon icon={item.icon} className="h-9 w-9 text-cyan-500" />
                   </div>
                   <span className="text-xs font-bold text-cyan-500 tracking-widest">STEP {item.step}</span>
-                  <h3 className="mt-2 text-lg font-semibold text-gray-900">{item.title}</h3>
-                  <p className="mt-2 text-sm text-gray-500 break-keep">{item.desc}</p>
+                  <EditableText as="h3" blockKey={kr(`process.step.${i}.title`)} fallback={item.title}
+                    value={pickTextOrUndef(blocks, kr(`process.step.${i}.title`))} pagePath={PAGE_RENT}
+                    className="mt-2 text-lg font-semibold text-gray-900" />
+                  <EditableText as="p" blockKey={kr(`process.step.${i}.desc`)} fallback={item.desc}
+                    value={pickTextOrUndef(blocks, kr(`process.step.${i}.desc`))} pagePath={PAGE_RENT}
+                    className="mt-2 text-sm text-gray-500 break-keep" />
                 </div>
               </FadeIn>
             ))}
@@ -393,8 +414,12 @@ export default function RentalClient() {
           <div className="max-w-2xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
-                <span className="text-sm font-semibold text-cyan-500 tracking-wider uppercase">FAQ</span>
-                <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">자주 묻는 질문</h2>
+                <EditableText as="span" blockKey={kr('faq.eyebrow')} fallback="FAQ"
+                  value={pickTextOrUndef(blocks, kr('faq.eyebrow'))} pagePath={PAGE_RENT}
+                  className="text-sm font-semibold text-cyan-500 tracking-wider uppercase" />
+                <EditableText as="h2" blockKey={kr('faq.title')} fallback="자주 묻는 질문"
+                  value={pickTextOrUndef(blocks, kr('faq.title'))} pagePath={PAGE_RENT}
+                  className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
               </div>
             </FadeIn>
             <div className="space-y-3">
@@ -408,12 +433,15 @@ export default function RentalClient() {
                 <FadeIn key={faq.q} delay={i * 60}>
                   <details className="group rounded-2xl bg-white transition-all duration-300 ease-toss hover:shadow-soft">
                     <summary className="flex items-center justify-between cursor-pointer p-6 text-base font-semibold text-gray-900 select-none list-none [&::-webkit-details-marker]:hidden break-keep">
-                      {faq.q}
+                      <EditableText as="span" blockKey={kr(`faq.item.${i}.q`)} fallback={faq.q}
+                        value={pickTextOrUndef(blocks, kr(`faq.item.${i}.q`))} pagePath={PAGE_RENT} />
                       <span className="ml-6 flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-open:bg-cyan-500 group-open:text-white transition-all duration-300">
                         <svg className="w-3 h-3 transition-transform duration-300 group-open:rotate-45" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2.5"><path d="M6 1v10M1 6h10" /></svg>
                       </span>
                     </summary>
-                    <p className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep">{faq.a}</p>
+                    <EditableText as="p" blockKey={kr(`faq.item.${i}.a`)} fallback={faq.a}
+                      value={pickTextOrUndef(blocks, kr(`faq.item.${i}.a`))} pagePath={PAGE_RENT}
+                      className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep" />
                   </details>
                 </FadeIn>
               ))}
@@ -433,16 +461,24 @@ export default function RentalClient() {
               <div>
                 <Icon icon="solar:hand-money-bold-duotone" className="h-14 w-14 text-cyan-400/40 mb-8" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight break-keep">
-                  매장에 필요한 장비,<br /><span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-400">부담 없이 렌탈</span>하세요
+                  <EditableText as="span" blockKey={kr('cta.title.line1')} fallback="매장에 필요한 장비,"
+                    value={pickTextOrUndef(blocks, kr('cta.title.line1'))} pagePath={PAGE_RENT} /><br />
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-teal-400">
+                    <EditableText as="span" blockKey={kr('cta.title.highlight')} fallback="부담 없이 렌탈"
+                      value={pickTextOrUndef(blocks, kr('cta.title.highlight'))} pagePath={PAGE_RENT} />
+                  </span>
+                  <EditableText as="span" blockKey={kr('cta.title.tail')} fallback="하세요"
+                    value={pickTextOrUndef(blocks, kr('cta.title.tail'))} pagePath={PAGE_RENT} />
                 </h2>
-                <p className="mt-5 text-base text-gray-400 break-keep">
-                  정수기·공기청정기·복합기·제빙기, 매장에 딱 맞는 장비를 추천해드려요.
-                </p>
+                <EditableText as="p" blockKey={kr('cta.description')} fallback="정수기·공기청정기·복합기·제빙기, 매장에 딱 맞는 장비를 추천해드려요."
+                  value={pickTextOrUndef(blocks, kr('cta.description'))} pagePath={PAGE_RENT}
+                  className="mt-5 text-base text-gray-400 break-keep" />
                 <div className="mt-8 space-y-3">
-                  {['초기 비용 0원', '무상 A/S + 필터 교체', '약정 만료 시 최신 모델 교체'].map((t) => (
+                  {['초기 비용 0원', '무상 A/S + 필터 교체', '약정 만료 시 최신 모델 교체'].map((t, i) => (
                     <div key={t} className="flex items-center gap-2.5 text-sm text-gray-400">
                       <Icon icon="solar:check-circle-bold" className="h-5 w-5 text-cyan-400 shrink-0" />
-                      {t}
+                      <EditableText as="span" blockKey={kr(`cta.benefit.${i}`)} fallback={t}
+                        value={pickTextOrUndef(blocks, kr(`cta.benefit.${i}`))} pagePath={PAGE_RENT} />
                     </div>
                   ))}
                 </div>
