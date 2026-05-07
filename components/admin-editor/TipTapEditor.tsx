@@ -41,8 +41,6 @@ async function uploadImageFile(file: File): Promise<string | null> {
 
 export default function TipTapEditor({ content, onChange, placeholder = '내용을 입력하세요...' }: TipTapEditorProps) {
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false)
-  // 직통 업로드 버튼용 input
-  const directUploadRef = useRef<HTMLInputElement>(null)
   // 본문 drop/paste 업로드 진행 상태
   const [uploadingInline, setUploadingInline] = useState(false)
   // editorProps 안에서 클로저로 직접 editor 변수를 못 잡으므로 ref 로 전달.
@@ -168,34 +166,22 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
     editorRef.current = editor
   }, [editor])
 
+  // 모달에서 선택/업로드한 이미지 → 본문 삽입.
+  // setImage 가 아닌 insertContent 사용 — drag/paste 와 동일 경로 (schema-safe)
   const addImage = useCallback((selection: MediaSelection) => {
     if (!editor) return
 
     editor
       .chain()
       .focus()
-      .setImage({ src: selection.url, alt: selection.altText })
+      .insertContent({
+        type: 'image',
+        attrs: { src: selection.url, alt: selection.altText },
+      })
       .run()
   }, [editor])
 
   const handleImageClick = () => setMediaPickerOpen(true)
-
-  // 직통 업로드 — 파일 input 으로 선택한 이미지를 바로 본문에 삽입
-  // (모달 안 거치고 가장 빠른 경로)
-  const handleDirectUploadClick = () => directUploadRef.current?.click()
-  const handleDirectUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    event.target.value = ''
-    if (!files || files.length === 0 || !editor) return
-    setUploadingInline(true)
-    for (const file of Array.from(files)) {
-      const url = await uploadImageFile(file)
-      if (url) {
-        editor.chain().focus().setImage({ src: url, alt: file.name }).run()
-      }
-    }
-    setUploadingInline(false)
-  }
 
   const imageAttrs = editor?.isActive('image') ? editor.getAttributes('image') : null
   const imageWidth = getImageWidth(imageAttrs?.width)
@@ -305,17 +291,9 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         />
         <div className="w-px bg-gray-700 mx-1" />
         <ToolBtn active={editor.isActive('link')} onClick={addLink} label="링크" />
-        <ToolBtn active={false} onClick={handleImageClick} label="이미지" />
-        {/* 직통 업로드 — 모달 안 거치고 파일 → 본문 삽입 */}
-        <ToolBtn active={false} onClick={handleDirectUploadClick} label="↥ 업로드" />
-        <input
-          ref={directUploadRef}
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleDirectUpload}
-          className="hidden"
-        />
+        {/* 이미지 — 모달 하나로 통합. 모달 안에서 라이브러리 선택 + 새로 업로드 둘 다 가능.
+            업로드하면 즉시 본문에 삽입 + 모달 자동 닫힘 (autoSelectOnUpload). */}
+        <ToolBtn active={false} onClick={handleImageClick} label="🖼 이미지" />
         {editor.isActive('image') && (
           <>
             <div className="w-px bg-gray-700 mx-1" />
@@ -359,9 +337,9 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         )}
       </div>
 
-      {/* 본문에 끌어다 놓기·붙여넣기 안내 */}
+      {/* 본문 이미지 삽입 안내 — 3가지 경로 */}
       <p className="border-t border-gray-700 px-3 py-1.5 text-[11px] text-gray-500">
-        💡 본문에 이미지를 <strong>드래그</strong>하거나 <strong>Cmd/Ctrl+V</strong>로 붙여넣으면 바로 업로드돼.
+        💡 본문에 이미지 <strong>드래그</strong>·<strong>Cmd/Ctrl+V</strong> 붙여넣기·툴바 <strong>🖼 이미지</strong> 버튼 — 셋 다 즉시 업로드 + 삽입.
       </p>
 
       <MediaLibraryPicker
