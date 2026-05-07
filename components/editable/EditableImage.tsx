@@ -57,6 +57,10 @@ export function EditableImage({
 
   const loading = priority ? 'eager' : 'lazy'
 
+  // url 도 fallback_url 도 비어 있으면 이미지 자체를 안 그림 (broken img 방지).
+  // 어드민은 EditOverlay 만 보이고, 방문자에게는 아무것도 노출되지 않음.
+  const hasSource = !!(current.url || current.fallback_url)
+
   return (
     <EditOverlay
       as="div"
@@ -69,7 +73,7 @@ export function EditableImage({
         pagePath:     pagePath ?? null,
       }}
     >
-      {current.fallback_url ? (
+      {!hasSource ? null : current.fallback_url ? (
         // 투명 PNG : WebP + PNG 병행 제공
         <picture>
           <source srcSet={current.url} type="image/webp" />
