@@ -180,10 +180,22 @@ export default function InternetClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-sm font-semibold text-primary tracking-wider uppercase">Why Biz Internet</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-              가정용과 뭐가 다른가요?
-            </h2>
+            <EditableText
+              as="span"
+              blockKey={k('why.eyebrow')}
+              fallback="Why Biz Internet"
+              value={pickTextOrUndef(blocks, k('why.eyebrow'))}
+              pagePath={PAGE}
+              className="text-sm font-semibold text-primary tracking-wider uppercase"
+            />
+            <EditableText
+              as="h2"
+              blockKey={k('why.title')}
+              fallback="가정용과 뭐가 다른가요?"
+              value={pickTextOrUndef(blocks, k('why.title'))}
+              pagePath={PAGE}
+              className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep"
+            />
           </div>
         </FadeIn>
 
@@ -208,8 +220,22 @@ export default function InternetClient() {
             <FadeIn key={item.title} delay={i * 100}>
               <div className="rounded-3xl bg-gray-50 p-8 md:p-10 transition-all duration-400 ease-toss hover:bg-white hover:shadow-card">
                 <Icon icon={item.icon} className="h-10 w-10 text-primary mb-5" />
-                <h3 className="text-xl font-semibold text-gray-900 break-keep">{item.title}</h3>
-                <p className="mt-3 text-base text-gray-500 leading-relaxed break-keep">{item.desc}</p>
+                <EditableText
+                  as="h3"
+                  blockKey={k(`why.card.${i}.title`)}
+                  fallback={item.title}
+                  value={pickTextOrUndef(blocks, k(`why.card.${i}.title`))}
+                  pagePath={PAGE}
+                  className="text-xl font-semibold text-gray-900 break-keep"
+                />
+                <EditableText
+                  as="p"
+                  blockKey={k(`why.card.${i}.desc`)}
+                  fallback={item.desc}
+                  value={pickTextOrUndef(blocks, k(`why.card.${i}.desc`))}
+                  pagePath={PAGE}
+                  className="mt-3 text-base text-gray-500 leading-relaxed break-keep"
+                />
               </div>
             </FadeIn>
           ))}
@@ -221,13 +247,30 @@ export default function InternetClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-10">
-              <span className="text-sm font-semibold text-primary tracking-wider uppercase">Plans</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                3사 요금제 비교
-              </h2>
-              <p className="mt-4 text-base text-gray-500 break-keep">
-                통신사별 사업자 인터넷 요금을 한눈에 비교해보세요.
-              </p>
+              <EditableText
+                as="span"
+                blockKey={k('plans.eyebrow')}
+                fallback="Plans"
+                value={pickTextOrUndef(blocks, k('plans.eyebrow'))}
+                pagePath={PAGE}
+                className="text-sm font-semibold text-primary tracking-wider uppercase"
+              />
+              <EditableText
+                as="h2"
+                blockKey={k('plans.title')}
+                fallback="3사 요금제 비교"
+                value={pickTextOrUndef(blocks, k('plans.title'))}
+                pagePath={PAGE}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep"
+              />
+              <EditableText
+                as="p"
+                blockKey={k('plans.subtitle')}
+                fallback="통신사별 사업자 인터넷 요금을 한눈에 비교해보세요."
+                value={pickTextOrUndef(blocks, k('plans.subtitle'))}
+                pagePath={PAGE}
+                className="mt-4 text-base text-gray-500 break-keep"
+              />
             </div>
           </FadeIn>
 
@@ -316,9 +359,14 @@ export default function InternetClient() {
           </div>
 
           <FadeIn delay={400}>
-            <p className="mt-8 text-center text-sm text-gray-400 break-keep">
-              * 요금은 부가세 별도 기준이며, 약정·결합·프로모션에 따라 달라질 수 있습니다.
-            </p>
+            <EditableText
+              as="p"
+              blockKey={k('plans.disclaimer')}
+              fallback="* 요금은 부가세 별도 기준이며, 약정·결합·프로모션에 따라 달라질 수 있습니다."
+              value={pickTextOrUndef(blocks, k('plans.disclaimer'))}
+              pagePath={PAGE}
+              className="mt-8 text-center text-sm text-gray-400 break-keep"
+            />
           </FadeIn>
         </div>
       </section>
@@ -327,10 +375,22 @@ export default function InternetClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-sm font-semibold text-primary tracking-wider uppercase">Recommend</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-              우리 매장엔 어떤 속도가 맞을까?
-            </h2>
+            <EditableText
+              as="span"
+              blockKey={k('recommend.eyebrow')}
+              fallback="Recommend"
+              value={pickTextOrUndef(blocks, k('recommend.eyebrow'))}
+              pagePath={PAGE}
+              className="text-sm font-semibold text-primary tracking-wider uppercase"
+            />
+            <EditableText
+              as="h2"
+              blockKey={k('recommend.title')}
+              fallback="우리 매장엔 어떤 속도가 맞을까?"
+              value={pickTextOrUndef(blocks, k('recommend.title'))}
+              pagePath={PAGE}
+              className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep"
+            />
           </div>
         </FadeIn>
 
@@ -358,9 +418,30 @@ export default function InternetClient() {
             <FadeIn key={item.title} delay={i * 100}>
               <div className="rounded-3xl bg-gray-50 p-8 transition-all duration-400 ease-toss hover:bg-white hover:shadow-card group">
                 <Icon icon={item.icon} className="h-10 w-10 text-primary mb-4 transition-transform duration-400 group-hover:scale-110" />
-                <h3 className="text-lg font-semibold text-gray-900 break-keep">{item.title}</h3>
-                <p className="mt-1 text-2xl font-bold text-primary tracking-tight">{item.speed}</p>
-                <p className="mt-3 text-sm text-gray-500 leading-relaxed break-keep">{item.reason}</p>
+                <EditableText
+                  as="h3"
+                  blockKey={k(`recommend.card.${i}.title`)}
+                  fallback={item.title}
+                  value={pickTextOrUndef(blocks, k(`recommend.card.${i}.title`))}
+                  pagePath={PAGE}
+                  className="text-lg font-semibold text-gray-900 break-keep"
+                />
+                <EditableText
+                  as="p"
+                  blockKey={k(`recommend.card.${i}.speed`)}
+                  fallback={item.speed}
+                  value={pickTextOrUndef(blocks, k(`recommend.card.${i}.speed`))}
+                  pagePath={PAGE}
+                  className="mt-1 text-2xl font-bold text-primary tracking-tight"
+                />
+                <EditableText
+                  as="p"
+                  blockKey={k(`recommend.card.${i}.reason`)}
+                  fallback={item.reason}
+                  value={pickTextOrUndef(blocks, k(`recommend.card.${i}.reason`))}
+                  pagePath={PAGE}
+                  className="mt-3 text-sm text-gray-500 leading-relaxed break-keep"
+                />
               </div>
             </FadeIn>
           ))}
@@ -372,10 +453,22 @@ export default function InternetClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-14">
-              <span className="text-sm font-semibold text-primary tracking-wider uppercase">Process</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                신청부터 개통까지, 3일이면 끝
-              </h2>
+              <EditableText
+                as="span"
+                blockKey={k('process.eyebrow')}
+                fallback="Process"
+                value={pickTextOrUndef(blocks, k('process.eyebrow'))}
+                pagePath={PAGE}
+                className="text-sm font-semibold text-primary tracking-wider uppercase"
+              />
+              <EditableText
+                as="h2"
+                blockKey={k('process.title')}
+                fallback="신청부터 개통까지, 3일이면 끝"
+                value={pickTextOrUndef(blocks, k('process.title'))}
+                pagePath={PAGE}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep"
+              />
             </div>
           </FadeIn>
 
@@ -393,8 +486,22 @@ export default function InternetClient() {
                       <Icon icon={item.icon} className="h-9 w-9 text-primary" />
                     </div>
                     <span className="text-xs font-bold text-primary tracking-widest">STEP {item.step}</span>
-                    <h3 className="mt-2 text-lg font-semibold text-gray-900">{item.title}</h3>
-                    <p className="mt-2 text-sm text-gray-500 break-keep">{item.desc}</p>
+                    <EditableText
+                      as="h3"
+                      blockKey={k(`process.step.${i}.title`)}
+                      fallback={item.title}
+                      value={pickTextOrUndef(blocks, k(`process.step.${i}.title`))}
+                      pagePath={PAGE}
+                      className="mt-2 text-lg font-semibold text-gray-900"
+                    />
+                    <EditableText
+                      as="p"
+                      blockKey={k(`process.step.${i}.desc`)}
+                      fallback={item.desc}
+                      value={pickTextOrUndef(blocks, k(`process.step.${i}.desc`))}
+                      pagePath={PAGE}
+                      className="mt-2 text-sm text-gray-500 break-keep"
+                    />
                   </div>
                 </FadeIn>
               ))}
@@ -408,8 +515,22 @@ export default function InternetClient() {
         <div className="max-w-2xl mx-auto">
           <FadeIn>
             <div className="text-center mb-14">
-              <span className="text-sm font-semibold text-primary tracking-wider uppercase">FAQ</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">자주 묻는 질문</h2>
+              <EditableText
+                as="span"
+                blockKey={k('faq.eyebrow')}
+                fallback="FAQ"
+                value={pickTextOrUndef(blocks, k('faq.eyebrow'))}
+                pagePath={PAGE}
+                className="text-sm font-semibold text-primary tracking-wider uppercase"
+              />
+              <EditableText
+                as="h2"
+                blockKey={k('faq.title')}
+                fallback="자주 묻는 질문"
+                value={pickTextOrUndef(blocks, k('faq.title'))}
+                pagePath={PAGE}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep"
+              />
             </div>
           </FadeIn>
           <div className="space-y-3">
@@ -423,12 +544,25 @@ export default function InternetClient() {
               <FadeIn key={faq.q} delay={i * 60}>
                 <details className="group rounded-2xl bg-gray-50 transition-all duration-300 ease-toss hover:shadow-soft">
                   <summary className="flex items-center justify-between cursor-pointer p-6 text-base font-semibold text-gray-900 select-none list-none [&::-webkit-details-marker]:hidden break-keep">
-                    {faq.q}
+                    <EditableText
+                      as="span"
+                      blockKey={k(`faq.item.${i}.q`)}
+                      fallback={faq.q}
+                      value={pickTextOrUndef(blocks, k(`faq.item.${i}.q`))}
+                      pagePath={PAGE}
+                    />
                     <span className="ml-6 flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-open:bg-primary group-open:text-white transition-all duration-300">
                       <svg className="w-3 h-3 transition-transform duration-300 group-open:rotate-45" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2.5"><path d="M6 1v10M1 6h10" /></svg>
                     </span>
                   </summary>
-                  <p className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep">{faq.a}</p>
+                  <EditableText
+                    as="p"
+                    blockKey={k(`faq.item.${i}.a`)}
+                    fallback={faq.a}
+                    value={pickTextOrUndef(blocks, k(`faq.item.${i}.a`))}
+                    pagePath={PAGE}
+                    className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep"
+                  />
                 </details>
               </FadeIn>
             ))}
@@ -447,16 +581,49 @@ export default function InternetClient() {
               <div>
                 <Icon icon="solar:global-bold-duotone" className="h-14 w-14 text-sky-400/40 mb-8" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight break-keep">
-                  3사 비교해서<br /><span className="text-gradient">가장 유리한 요금제</span><br />찾아드릴게요
+                  <EditableText
+                    as="span"
+                    blockKey={k('cta.title.line1')}
+                    fallback="3사 비교해서"
+                    value={pickTextOrUndef(blocks, k('cta.title.line1'))}
+                    pagePath={PAGE}
+                  /><br />
+                  <span className="text-gradient">
+                    <EditableText
+                      as="span"
+                      blockKey={k('cta.title.highlight')}
+                      fallback="가장 유리한 요금제"
+                      value={pickTextOrUndef(blocks, k('cta.title.highlight'))}
+                      pagePath={PAGE}
+                    />
+                  </span><br />
+                  <EditableText
+                    as="span"
+                    blockKey={k('cta.title.line3')}
+                    fallback="찾아드릴게요"
+                    value={pickTextOrUndef(blocks, k('cta.title.line3'))}
+                    pagePath={PAGE}
+                  />
                 </h2>
-                <p className="mt-5 text-base text-gray-400 break-keep">
-                  매장 위치, 사용량, 기존 통신사를 고려해서 최적의 요금제를 추천해드려요.
-                </p>
+                <EditableText
+                  as="p"
+                  blockKey={k('cta.description')}
+                  fallback="매장 위치, 사용량, 기존 통신사를 고려해서 최적의 요금제를 추천해드려요."
+                  value={pickTextOrUndef(blocks, k('cta.description'))}
+                  pagePath={PAGE}
+                  className="mt-5 text-base text-gray-400 break-keep"
+                />
                 <div className="mt-8 space-y-3">
-                  {['SKT · KT · LG U+ 3사 비교', '결합 할인 최적화', '설치비 무료 프로모션'].map((t) => (
+                  {['SKT · KT · LG U+ 3사 비교', '결합 할인 최적화', '설치비 무료 프로모션'].map((t, i) => (
                     <div key={t} className="flex items-center gap-2.5 text-sm text-gray-400">
                       <Icon icon="solar:check-circle-bold" className="h-5 w-5 text-sky-400 shrink-0" />
-                      {t}
+                      <EditableText
+                        as="span"
+                        blockKey={k(`cta.benefit.${i}`)}
+                        fallback={t}
+                        value={pickTextOrUndef(blocks, k(`cta.benefit.${i}`))}
+                        pagePath={PAGE}
+                      />
                     </div>
                   ))}
                 </div>
