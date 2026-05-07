@@ -108,73 +108,38 @@ export default function TorderClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="max-w-xl mb-14">
-            <span className="text-sm font-semibold text-orange-500 tracking-wider uppercase">Products</span>
+            <EditableText as="span" blockKey={ko('products.eyebrow')} fallback="Products"
+              value={pickTextOrUndef(blocks, ko('products.eyebrow'))} pagePath={PAGE_TO}
+              className="text-sm font-semibold text-orange-500 tracking-wider uppercase" />
             <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight break-keep">
-              매장에 맞는<br />주문 시스템을 선택하세요
+              <EditableText as="span" blockKey={ko('products.title.line1')} fallback="매장에 맞는"
+                value={pickTextOrUndef(blocks, ko('products.title.line1'))} pagePath={PAGE_TO} /><br />
+              <EditableText as="span" blockKey={ko('products.title.line2')} fallback="주문 시스템을 선택하세요"
+                value={pickTextOrUndef(blocks, ko('products.title.line2'))} pagePath={PAGE_TO} />
             </h2>
           </div>
         </FadeIn>
 
         <div className="grid md:grid-cols-2 gap-5">
           {[
-            {
-              icon: 'solar:monitor-bold-duotone',
-              title: '스탠드형 키오스크',
-              desc: '입구·카운터에 설치하는 대형 터치 스크린. 고객이 직접 메뉴를 선택하고 결제까지 완료할 수 있어요.',
-              features: ['21.5~27인치 터치 디스플레이', '카드·QR·간편결제 통합', '프린터 내장형'],
-              tag: '가장 인기',
-              highlight: true,
-            },
-            {
-              icon: 'solar:tablet-bold-duotone',
-              title: '테이블 오더 (티오더)',
-              desc: '각 테이블에 놓인 태블릿이나 QR코드로 주문. 직원 호출 없이 추가 주문도 편하게 할 수 있어요.',
-              features: ['QR코드 / 태블릿 선택', '추가 주문 자유', '주방 자동 연동'],
-              tag: '비대면',
-              highlight: false,
-            },
-            {
-              icon: 'solar:widget-6-bold-duotone',
-              title: '벽걸이형 키오스크',
-              desc: '공간이 좁은 매장에 적합한 벽부착형. 별도 스탠드 없이 콤팩트하게 설치할 수 있어요.',
-              features: ['공간 절약형', '벽면 고정 설치', '15.6인치 터치'],
-              tag: '소형매장',
-              highlight: false,
-            },
-            {
-              icon: 'solar:smartphone-bold-duotone',
-              title: '모바일 오더',
-              desc: '고객 스마트폰에서 바로 주문·결제. 앱 설치 없이 QR코드 하나로 시작할 수 있어 진입장벽이 낮아요.',
-              features: ['앱 설치 불필요', 'QR코드 스캔 주문', '원격 사전 주문'],
-              tag: '초간편',
-              highlight: false,
-            },
+            { icon: 'solar:monitor-bold-duotone', title: '스탠드형 키오스크', desc: '입구·카운터에 설치하는 대형 터치 스크린. 고객이 직접 메뉴를 선택하고 결제까지 완료할 수 있어요.', tag: '가장 인기', highlight: true },
+            { icon: 'solar:tablet-bold-duotone', title: '테이블 오더 (티오더)', desc: '각 테이블에 놓인 태블릿이나 QR코드로 주문. 직원 호출 없이 추가 주문도 편하게 할 수 있어요.', tag: '비대면', highlight: false },
+            { icon: 'solar:widget-6-bold-duotone', title: '벽걸이형 키오스크', desc: '공간이 좁은 매장에 적합한 벽부착형. 별도 스탠드 없이 콤팩트하게 설치할 수 있어요.', tag: '소형매장', highlight: false },
+            { icon: 'solar:smartphone-bold-duotone', title: '모바일 오더', desc: '고객 스마트폰에서 바로 주문·결제. 앱 설치 없이 QR코드 하나로 시작할 수 있어 진입장벽이 낮아요.', tag: '초간편', highlight: false },
           ].map((item, i) => (
             <FadeIn key={item.title} delay={i * 100}>
-              <div className={`relative rounded-3xl p-8 md:p-10 transition-all duration-400 ease-toss
-                              hover:shadow-card-hover hover:-translate-y-1
-                              ${item.highlight ? 'bg-orange-50 gradient-border' : 'bg-gray-50'}`}>
-                {item.highlight && (
-                  <span className="absolute top-6 right-6 text-[11px] font-bold text-white bg-orange-500 px-3 py-1 rounded-full">
-                    {item.tag}
-                  </span>
-                )}
-                {!item.highlight && (
-                  <span className="absolute top-6 right-6 text-[11px] font-semibold text-gray-500 bg-gray-200 px-3 py-1 rounded-full">
-                    {item.tag}
-                  </span>
-                )}
+              <div className={`relative rounded-3xl p-8 md:p-10 transition-all duration-400 ease-toss hover:shadow-card-hover hover:-translate-y-1 ${item.highlight ? 'bg-orange-50 gradient-border' : 'bg-gray-50'}`}>
+                <span className={`absolute top-6 right-6 text-[11px] font-${item.highlight ? 'bold' : 'semibold'} ${item.highlight ? 'text-white bg-orange-500' : 'text-gray-500 bg-gray-200'} px-3 py-1 rounded-full`}>
+                  <EditableText as="span" blockKey={ko(`products.card.${i}.tag`)} fallback={item.tag}
+                    value={pickTextOrUndef(blocks, ko(`products.card.${i}.tag`))} pagePath={PAGE_TO} />
+                </span>
                 <Icon icon={item.icon} className="h-10 w-10 text-orange-500 mb-5" />
-                <h3 className="text-xl font-semibold text-gray-900 break-keep">{item.title}</h3>
-                <p className="mt-3 text-base text-gray-600 leading-relaxed break-keep">{item.desc}</p>
-                <ul className="mt-5 space-y-2">
-                  {item.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
-                      <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-orange-400 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+                <EditableText as="h3" blockKey={ko(`products.card.${i}.title`)} fallback={item.title}
+                  value={pickTextOrUndef(blocks, ko(`products.card.${i}.title`))} pagePath={PAGE_TO}
+                  className="text-xl font-semibold text-gray-900 break-keep" />
+                <EditableText as="p" blockKey={ko(`products.card.${i}.desc`)} fallback={item.desc}
+                  value={pickTextOrUndef(blocks, ko(`products.card.${i}.desc`))} pagePath={PAGE_TO}
+                  className="mt-3 text-base text-gray-600 leading-relaxed break-keep" />
               </div>
             </FadeIn>
           ))}
@@ -186,13 +151,15 @@ export default function TorderClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-14">
-              <span className="text-sm font-semibold text-orange-500 tracking-wider uppercase">Effect</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                도입하면 이렇게 달라져요
-              </h2>
-              <p className="mt-4 text-base text-gray-500 break-keep">
-                실제 도입 매장의 평균 효과예요.
-              </p>
+              <EditableText as="span" blockKey={ko('effect.eyebrow')} fallback="Effect"
+                value={pickTextOrUndef(blocks, ko('effect.eyebrow'))} pagePath={PAGE_TO}
+                className="text-sm font-semibold text-orange-500 tracking-wider uppercase" />
+              <EditableText as="h2" blockKey={ko('effect.title')} fallback="도입하면 이렇게 달라져요"
+                value={pickTextOrUndef(blocks, ko('effect.title'))} pagePath={PAGE_TO}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
+              <EditableText as="p" blockKey={ko('effect.subtitle')} fallback="실제 도입 매장의 평균 효과예요."
+                value={pickTextOrUndef(blocks, ko('effect.subtitle'))} pagePath={PAGE_TO}
+                className="mt-4 text-base text-gray-500 break-keep" />
             </div>
           </FadeIn>
 
@@ -206,17 +173,21 @@ export default function TorderClient() {
               <FadeIn key={item.label} delay={i * 100}>
                 <div className="rounded-3xl bg-white p-6 md:p-8 text-center transition-all duration-400 ease-toss hover:shadow-card group">
                   <Icon icon={item.icon} className="h-8 w-8 text-orange-400 mx-auto mb-3 transition-transform duration-400 group-hover:scale-110" />
-                  <p className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">{item.value}</p>
-                  <p className="mt-1 text-sm text-gray-500 break-keep">{item.label}</p>
+                  <EditableText as="p" blockKey={ko(`effect.metric.${i}.value`)} fallback={item.value}
+                    value={pickTextOrUndef(blocks, ko(`effect.metric.${i}.value`))} pagePath={PAGE_TO}
+                    className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight" />
+                  <EditableText as="p" blockKey={ko(`effect.metric.${i}.label`)} fallback={item.label}
+                    value={pickTextOrUndef(blocks, ko(`effect.metric.${i}.label`))} pagePath={PAGE_TO}
+                    className="mt-1 text-sm text-gray-500 break-keep" />
                 </div>
               </FadeIn>
             ))}
           </div>
 
           <FadeIn delay={400}>
-            <p className="mt-8 text-center text-sm text-gray-400 break-keep">
-              * 업종, 매장 규모에 따라 효과는 달라질 수 있습니다.
-            </p>
+            <EditableText as="p" blockKey={ko('effect.disclaimer')} fallback="* 업종, 매장 규모에 따라 효과는 달라질 수 있습니다."
+              value={pickTextOrUndef(blocks, ko('effect.disclaimer'))} pagePath={PAGE_TO}
+              className="mt-8 text-center text-sm text-gray-400 break-keep" />
           </FadeIn>
         </div>
       </section>
@@ -225,10 +196,12 @@ export default function TorderClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-sm font-semibold text-orange-500 tracking-wider uppercase">Why Us</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-              키오스크, 제대로 도입하세요
-            </h2>
+            <EditableText as="span" blockKey={ko('why.eyebrow')} fallback="Why Us"
+              value={pickTextOrUndef(blocks, ko('why.eyebrow'))} pagePath={PAGE_TO}
+              className="text-sm font-semibold text-orange-500 tracking-wider uppercase" />
+            <EditableText as="h2" blockKey={ko('why.title')} fallback="키오스크, 제대로 도입하세요"
+              value={pickTextOrUndef(blocks, ko('why.title'))} pagePath={PAGE_TO}
+              className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
           </div>
         </FadeIn>
 
@@ -241,8 +214,12 @@ export default function TorderClient() {
             <FadeIn key={item.title} delay={i * 100}>
               <div className="rounded-3xl bg-gray-50 p-8 md:p-10 transition-all duration-400 ease-toss hover:bg-white hover:shadow-card">
                 <Icon icon={item.icon} className="h-10 w-10 text-orange-500 mb-5" />
-                <h3 className="text-xl font-semibold text-gray-900 break-keep">{item.title}</h3>
-                <p className="mt-3 text-base text-gray-500 leading-relaxed break-keep">{item.desc}</p>
+                <EditableText as="h3" blockKey={ko(`why.card.${i}.title`)} fallback={item.title}
+                  value={pickTextOrUndef(blocks, ko(`why.card.${i}.title`))} pagePath={PAGE_TO}
+                  className="text-xl font-semibold text-gray-900 break-keep" />
+                <EditableText as="p" blockKey={ko(`why.card.${i}.desc`)} fallback={item.desc}
+                  value={pickTextOrUndef(blocks, ko(`why.card.${i}.desc`))} pagePath={PAGE_TO}
+                  className="mt-3 text-base text-gray-500 leading-relaxed break-keep" />
               </div>
             </FadeIn>
           ))}
@@ -255,8 +232,12 @@ export default function TorderClient() {
           <div className="max-w-2xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
-                <span className="text-sm font-semibold text-orange-500 tracking-wider uppercase">FAQ</span>
-                <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">자주 묻는 질문</h2>
+                <EditableText as="span" blockKey={ko('faq.eyebrow')} fallback="FAQ"
+                  value={pickTextOrUndef(blocks, ko('faq.eyebrow'))} pagePath={PAGE_TO}
+                  className="text-sm font-semibold text-orange-500 tracking-wider uppercase" />
+                <EditableText as="h2" blockKey={ko('faq.title')} fallback="자주 묻는 질문"
+                  value={pickTextOrUndef(blocks, ko('faq.title'))} pagePath={PAGE_TO}
+                  className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
               </div>
             </FadeIn>
             <div className="space-y-3">
@@ -270,12 +251,15 @@ export default function TorderClient() {
                 <FadeIn key={faq.q} delay={i * 60}>
                   <details className="group rounded-2xl bg-white transition-all duration-300 ease-toss hover:shadow-soft">
                     <summary className="flex items-center justify-between cursor-pointer p-6 text-base font-semibold text-gray-900 select-none list-none [&::-webkit-details-marker]:hidden break-keep">
-                      {faq.q}
+                      <EditableText as="span" blockKey={ko(`faq.item.${i}.q`)} fallback={faq.q}
+                        value={pickTextOrUndef(blocks, ko(`faq.item.${i}.q`))} pagePath={PAGE_TO} />
                       <span className="ml-6 flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-open:bg-orange-500 group-open:text-white transition-all duration-300">
                         <svg className="w-3 h-3 transition-transform duration-300 group-open:rotate-45" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2.5"><path d="M6 1v10M1 6h10" /></svg>
                       </span>
                     </summary>
-                    <p className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep">{faq.a}</p>
+                    <EditableText as="p" blockKey={ko(`faq.item.${i}.a`)} fallback={faq.a}
+                      value={pickTextOrUndef(blocks, ko(`faq.item.${i}.a`))} pagePath={PAGE_TO}
+                      className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep" />
                   </details>
                 </FadeIn>
               ))}
@@ -295,16 +279,24 @@ export default function TorderClient() {
               <div>
                 <Icon icon="solar:tablet-bold-duotone" className="h-14 w-14 text-orange-400/40 mb-8" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight break-keep">
-                  매장 효율을 높이는<br /><span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-amber-400">스마트 주문</span> 시작하세요
+                  <EditableText as="span" blockKey={ko('cta.title.line1')} fallback="매장 효율을 높이는"
+                    value={pickTextOrUndef(blocks, ko('cta.title.line1'))} pagePath={PAGE_TO} /><br />
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-amber-400">
+                    <EditableText as="span" blockKey={ko('cta.title.highlight')} fallback="스마트 주문"
+                      value={pickTextOrUndef(blocks, ko('cta.title.highlight'))} pagePath={PAGE_TO} />
+                  </span>{' '}
+                  <EditableText as="span" blockKey={ko('cta.title.tail')} fallback="시작하세요"
+                    value={pickTextOrUndef(blocks, ko('cta.title.tail'))} pagePath={PAGE_TO} />
                 </h2>
-                <p className="mt-5 text-base text-gray-400 break-keep">
-                  업종과 매장 구조에 맞는 최적의 주문 시스템을 제안해드려요.
-                </p>
+                <EditableText as="p" blockKey={ko('cta.description')} fallback="업종과 매장 구조에 맞는 최적의 주문 시스템을 제안해드려요."
+                  value={pickTextOrUndef(blocks, ko('cta.description'))} pagePath={PAGE_TO}
+                  className="mt-5 text-base text-gray-400 break-keep" />
                 <div className="mt-8 space-y-3">
-                  {['메뉴 디자인 무료 세팅', 'POS 연동 지원', '설치비 0원 프로모션'].map((t) => (
+                  {['메뉴 디자인 무료 세팅', 'POS 연동 지원', '설치비 0원 프로모션'].map((t, i) => (
                     <div key={t} className="flex items-center gap-2.5 text-sm text-gray-400">
                       <Icon icon="solar:check-circle-bold" className="h-5 w-5 text-orange-400 shrink-0" />
-                      {t}
+                      <EditableText as="span" blockKey={ko(`cta.benefit.${i}`)} fallback={t}
+                        value={pickTextOrUndef(blocks, ko(`cta.benefit.${i}`))} pagePath={PAGE_TO} />
                     </div>
                   ))}
                 </div>

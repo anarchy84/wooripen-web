@@ -108,73 +108,38 @@ export default function TerminalClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="max-w-xl mb-14">
-            <span className="text-sm font-semibold text-violet-500 tracking-wider uppercase">Products</span>
+            <EditableText as="span" blockKey={kt('products.eyebrow')} fallback="Products"
+              value={pickTextOrUndef(blocks, kt('products.eyebrow'))} pagePath={PAGE_TERM}
+              className="text-sm font-semibold text-violet-500 tracking-wider uppercase" />
             <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight break-keep">
-              매장에 딱 맞는<br />단말기를 찾아드려요
+              <EditableText as="span" blockKey={kt('products.title.line1')} fallback="매장에 딱 맞는"
+                value={pickTextOrUndef(blocks, kt('products.title.line1'))} pagePath={PAGE_TERM} /><br />
+              <EditableText as="span" blockKey={kt('products.title.line2')} fallback="단말기를 찾아드려요"
+                value={pickTextOrUndef(blocks, kt('products.title.line2'))} pagePath={PAGE_TERM} />
             </h2>
           </div>
         </FadeIn>
 
         <div className="grid md:grid-cols-2 gap-5">
           {[
-            {
-              icon: 'solar:smartphone-bold-duotone',
-              title: '무선 단말기',
-              desc: '배터리 내장, Wi-Fi/LTE 지원. 테이블 결제나 배달 매장에 최적. 이동하면서 결제할 수 있어 활용도가 높아요.',
-              features: ['Wi-Fi + LTE 듀얼', '배터리 8시간+', 'NFC / QR / IC칩'],
-              tag: '가장 인기',
-              highlight: true,
-            },
-            {
-              icon: 'solar:monitor-bold-duotone',
-              title: '유선 단말기',
-              desc: '유선 인터넷 연결 방식. 고정 카운터 매장에 적합하고 안정적인 연결을 보장합니다.',
-              features: ['유선 연결 안정성', '설치 간편', '저렴한 렌탈비'],
-              tag: '가성비',
-              highlight: false,
-            },
-            {
-              icon: 'solar:card-transfer-bold-duotone',
-              title: '키인(수기) 단말기',
-              desc: '카드번호 직접 입력 방식. 전화 주문이나 배달 매장에서 비대면 결제에 활용돼요.',
-              features: ['비대면 결제', '전화주문 처리', '소형 경량'],
-              tag: '비대면',
-              highlight: false,
-            },
-            {
-              icon: 'solar:laptop-bold-duotone',
-              title: 'POS 시스템',
-              desc: '주문·결제·재고·매출 관리 통합 시스템. 프랜차이즈나 여러 메뉴를 관리하는 매장에 추천합니다.',
-              features: ['올인원 매장관리', '매출 리포트', '메뉴/재고 연동'],
-              tag: '올인원',
-              highlight: false,
-            },
+            { icon: 'solar:smartphone-bold-duotone', title: '무선 단말기', desc: '배터리 내장, Wi-Fi/LTE 지원. 테이블 결제나 배달 매장에 최적. 이동하면서 결제할 수 있어 활용도가 높아요.', tag: '가장 인기', highlight: true },
+            { icon: 'solar:monitor-bold-duotone', title: '유선 단말기', desc: '유선 인터넷 연결 방식. 고정 카운터 매장에 적합하고 안정적인 연결을 보장합니다.', tag: '가성비', highlight: false },
+            { icon: 'solar:card-transfer-bold-duotone', title: '키인(수기) 단말기', desc: '카드번호 직접 입력 방식. 전화 주문이나 배달 매장에서 비대면 결제에 활용돼요.', tag: '비대면', highlight: false },
+            { icon: 'solar:laptop-bold-duotone', title: 'POS 시스템', desc: '주문·결제·재고·매출 관리 통합 시스템. 프랜차이즈나 여러 메뉴를 관리하는 매장에 추천합니다.', tag: '올인원', highlight: false },
           ].map((item, i) => (
             <FadeIn key={item.title} delay={i * 100}>
-              <div className={`relative rounded-3xl p-8 md:p-10 transition-all duration-400 ease-toss
-                              hover:shadow-card-hover hover:-translate-y-1
-                              ${item.highlight ? 'bg-violet-50 gradient-border' : 'bg-gray-50'}`}>
-                {item.highlight && (
-                  <span className="absolute top-6 right-6 text-[11px] font-bold text-white bg-violet-500 px-3 py-1 rounded-full">
-                    {item.tag}
-                  </span>
-                )}
-                {!item.highlight && (
-                  <span className="absolute top-6 right-6 text-[11px] font-semibold text-gray-500 bg-gray-200 px-3 py-1 rounded-full">
-                    {item.tag}
-                  </span>
-                )}
+              <div className={`relative rounded-3xl p-8 md:p-10 transition-all duration-400 ease-toss hover:shadow-card-hover hover:-translate-y-1 ${item.highlight ? 'bg-violet-50 gradient-border' : 'bg-gray-50'}`}>
+                <span className={`absolute top-6 right-6 text-[11px] font-${item.highlight ? 'bold' : 'semibold'} ${item.highlight ? 'text-white bg-violet-500' : 'text-gray-500 bg-gray-200'} px-3 py-1 rounded-full`}>
+                  <EditableText as="span" blockKey={kt(`products.card.${i}.tag`)} fallback={item.tag}
+                    value={pickTextOrUndef(blocks, kt(`products.card.${i}.tag`))} pagePath={PAGE_TERM} />
+                </span>
                 <Icon icon={item.icon} className="h-10 w-10 text-violet-500 mb-5" />
-                <h3 className="text-xl font-semibold text-gray-900 break-keep">{item.title}</h3>
-                <p className="mt-3 text-base text-gray-600 leading-relaxed break-keep">{item.desc}</p>
-                <ul className="mt-5 space-y-2">
-                  {item.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
-                      <Icon icon="solar:check-circle-bold" className="h-4 w-4 text-violet-400 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+                <EditableText as="h3" blockKey={kt(`products.card.${i}.title`)} fallback={item.title}
+                  value={pickTextOrUndef(blocks, kt(`products.card.${i}.title`))} pagePath={PAGE_TERM}
+                  className="text-xl font-semibold text-gray-900 break-keep" />
+                <EditableText as="p" blockKey={kt(`products.card.${i}.desc`)} fallback={item.desc}
+                  value={pickTextOrUndef(blocks, kt(`products.card.${i}.desc`))} pagePath={PAGE_TERM}
+                  className="mt-3 text-base text-gray-600 leading-relaxed break-keep" />
               </div>
             </FadeIn>
           ))}
@@ -186,13 +151,15 @@ export default function TerminalClient() {
         <div className="section-container section-gap">
           <FadeIn>
             <div className="text-center max-w-xl mx-auto mb-14">
-              <span className="text-sm font-semibold text-violet-500 tracking-wider uppercase">Fee</span>
-              <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-                투명한 수수료, 숨은 비용 없이
-              </h2>
-              <p className="mt-4 text-base text-gray-500 break-keep">
-                매출 규모에 따라 우대 수수료가 적용돼요.
-              </p>
+              <EditableText as="span" blockKey={kt('fee.eyebrow')} fallback="Fee"
+                value={pickTextOrUndef(blocks, kt('fee.eyebrow'))} pagePath={PAGE_TERM}
+                className="text-sm font-semibold text-violet-500 tracking-wider uppercase" />
+              <EditableText as="h2" blockKey={kt('fee.title')} fallback="투명한 수수료, 숨은 비용 없이"
+                value={pickTextOrUndef(blocks, kt('fee.title'))} pagePath={PAGE_TERM}
+                className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
+              <EditableText as="p" blockKey={kt('fee.subtitle')} fallback="매출 규모에 따라 우대 수수료가 적용돼요."
+                value={pickTextOrUndef(blocks, kt('fee.subtitle'))} pagePath={PAGE_TERM}
+                className="mt-4 text-base text-gray-500 break-keep" />
             </div>
           </FadeIn>
 
@@ -205,18 +172,24 @@ export default function TerminalClient() {
               <FadeIn key={item.label} delay={i * 100}>
                 <div className="rounded-3xl bg-white p-8 text-center transition-all duration-400 ease-toss hover:shadow-card group">
                   <Icon icon={item.icon} className="h-10 w-10 text-violet-400 mx-auto mb-4 transition-transform duration-400 group-hover:scale-110" />
-                  <p className="text-sm font-semibold text-gray-500 mb-1">{item.label}</p>
-                  <p className="text-4xl font-bold text-gray-900 tracking-tight">{item.rate}</p>
-                  <p className="mt-1 text-sm text-gray-400">{item.note}</p>
+                  <EditableText as="p" blockKey={kt(`fee.tier.${i}.label`)} fallback={item.label}
+                    value={pickTextOrUndef(blocks, kt(`fee.tier.${i}.label`))} pagePath={PAGE_TERM}
+                    className="text-sm font-semibold text-gray-500 mb-1" />
+                  <EditableText as="p" blockKey={kt(`fee.tier.${i}.rate`)} fallback={item.rate}
+                    value={pickTextOrUndef(blocks, kt(`fee.tier.${i}.rate`))} pagePath={PAGE_TERM}
+                    className="text-4xl font-bold text-gray-900 tracking-tight" />
+                  <EditableText as="p" blockKey={kt(`fee.tier.${i}.note`)} fallback={item.note}
+                    value={pickTextOrUndef(blocks, kt(`fee.tier.${i}.note`))} pagePath={PAGE_TERM}
+                    className="mt-1 text-sm text-gray-400" />
                 </div>
               </FadeIn>
             ))}
           </div>
 
           <FadeIn delay={300}>
-            <p className="mt-8 text-center text-sm text-gray-400 break-keep">
-              * 카드 수수료는 여신금융협회 기준이며, VAN사·카드사에 따라 달라질 수 있습니다.
-            </p>
+            <EditableText as="p" blockKey={kt('fee.disclaimer')} fallback="* 카드 수수료는 여신금융협회 기준이며, VAN사·카드사에 따라 달라질 수 있습니다."
+              value={pickTextOrUndef(blocks, kt('fee.disclaimer'))} pagePath={PAGE_TERM}
+              className="mt-8 text-center text-sm text-gray-400 break-keep" />
           </FadeIn>
         </div>
       </section>
@@ -225,10 +198,12 @@ export default function TerminalClient() {
       <section className="section-container section-gap">
         <FadeIn>
           <div className="text-center max-w-xl mx-auto mb-14">
-            <span className="text-sm font-semibold text-violet-500 tracking-wider uppercase">Why Us</span>
-            <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">
-              단말기, 아무데서나 받지 마세요
-            </h2>
+            <EditableText as="span" blockKey={kt('why.eyebrow')} fallback="Why Us"
+              value={pickTextOrUndef(blocks, kt('why.eyebrow'))} pagePath={PAGE_TERM}
+              className="text-sm font-semibold text-violet-500 tracking-wider uppercase" />
+            <EditableText as="h2" blockKey={kt('why.title')} fallback="단말기, 아무데서나 받지 마세요"
+              value={pickTextOrUndef(blocks, kt('why.title'))} pagePath={PAGE_TERM}
+              className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
           </div>
         </FadeIn>
 
@@ -241,8 +216,12 @@ export default function TerminalClient() {
             <FadeIn key={item.title} delay={i * 100}>
               <div className="rounded-3xl bg-gray-50 p-8 md:p-10 transition-all duration-400 ease-toss hover:bg-white hover:shadow-card">
                 <Icon icon={item.icon} className="h-10 w-10 text-violet-500 mb-5" />
-                <h3 className="text-xl font-semibold text-gray-900 break-keep">{item.title}</h3>
-                <p className="mt-3 text-base text-gray-500 leading-relaxed break-keep">{item.desc}</p>
+                <EditableText as="h3" blockKey={kt(`why.card.${i}.title`)} fallback={item.title}
+                  value={pickTextOrUndef(blocks, kt(`why.card.${i}.title`))} pagePath={PAGE_TERM}
+                  className="text-xl font-semibold text-gray-900 break-keep" />
+                <EditableText as="p" blockKey={kt(`why.card.${i}.desc`)} fallback={item.desc}
+                  value={pickTextOrUndef(blocks, kt(`why.card.${i}.desc`))} pagePath={PAGE_TERM}
+                  className="mt-3 text-base text-gray-500 leading-relaxed break-keep" />
               </div>
             </FadeIn>
           ))}
@@ -255,8 +234,12 @@ export default function TerminalClient() {
           <div className="max-w-2xl mx-auto">
             <FadeIn>
               <div className="text-center mb-14">
-                <span className="text-sm font-semibold text-violet-500 tracking-wider uppercase">FAQ</span>
-                <h2 className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep">자주 묻는 질문</h2>
+                <EditableText as="span" blockKey={kt('faq.eyebrow')} fallback="FAQ"
+                  value={pickTextOrUndef(blocks, kt('faq.eyebrow'))} pagePath={PAGE_TERM}
+                  className="text-sm font-semibold text-violet-500 tracking-wider uppercase" />
+                <EditableText as="h2" blockKey={kt('faq.title')} fallback="자주 묻는 질문"
+                  value={pickTextOrUndef(blocks, kt('faq.title'))} pagePath={PAGE_TERM}
+                  className="mt-3 text-3xl md:text-4xl font-bold text-gray-900 tracking-tight break-keep" />
               </div>
             </FadeIn>
             <div className="space-y-3">
@@ -269,12 +252,15 @@ export default function TerminalClient() {
                 <FadeIn key={faq.q} delay={i * 60}>
                   <details className="group rounded-2xl bg-white transition-all duration-300 ease-toss hover:shadow-soft">
                     <summary className="flex items-center justify-between cursor-pointer p-6 text-base font-semibold text-gray-900 select-none list-none [&::-webkit-details-marker]:hidden break-keep">
-                      {faq.q}
+                      <EditableText as="span" blockKey={kt(`faq.item.${i}.q`)} fallback={faq.q}
+                        value={pickTextOrUndef(blocks, kt(`faq.item.${i}.q`))} pagePath={PAGE_TERM} />
                       <span className="ml-6 flex-shrink-0 w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center group-open:bg-violet-500 group-open:text-white transition-all duration-300">
                         <svg className="w-3 h-3 transition-transform duration-300 group-open:rotate-45" fill="none" viewBox="0 0 12 12" stroke="currentColor" strokeWidth="2.5"><path d="M6 1v10M1 6h10" /></svg>
                       </span>
                     </summary>
-                    <p className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep">{faq.a}</p>
+                    <EditableText as="p" blockKey={kt(`faq.item.${i}.a`)} fallback={faq.a}
+                      value={pickTextOrUndef(blocks, kt(`faq.item.${i}.a`))} pagePath={PAGE_TERM}
+                      className="px-6 pb-6 text-base text-gray-500 leading-relaxed break-keep" />
                   </details>
                 </FadeIn>
               ))}
@@ -294,16 +280,24 @@ export default function TerminalClient() {
               <div>
                 <Icon icon="solar:card-recive-bold-duotone" className="h-14 w-14 text-violet-400/40 mb-8" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight leading-tight break-keep">
-                  매장에 딱 맞는<br /><span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-purple-400">단말기 추천</span> 받으세요
+                  <EditableText as="span" blockKey={kt('cta.title.line1')} fallback="매장에 딱 맞는"
+                    value={pickTextOrUndef(blocks, kt('cta.title.line1'))} pagePath={PAGE_TERM} /><br />
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-purple-400">
+                    <EditableText as="span" blockKey={kt('cta.title.highlight')} fallback="단말기 추천"
+                      value={pickTextOrUndef(blocks, kt('cta.title.highlight'))} pagePath={PAGE_TERM} />
+                  </span>{' '}
+                  <EditableText as="span" blockKey={kt('cta.title.tail')} fallback="받으세요"
+                    value={pickTextOrUndef(blocks, kt('cta.title.tail'))} pagePath={PAGE_TERM} />
                 </h2>
-                <p className="mt-5 text-base text-gray-400 break-keep">
-                  업종, 매출, 결제 방식에 맞는 최적의 단말기를 찾아드려요.
-                </p>
+                <EditableText as="p" blockKey={kt('cta.description')} fallback="업종, 매출, 결제 방식에 맞는 최적의 단말기를 찾아드려요."
+                  value={pickTextOrUndef(blocks, kt('cta.description'))} pagePath={PAGE_TERM}
+                  className="mt-5 text-base text-gray-400 break-keep" />
                 <div className="mt-8 space-y-3">
-                  {['VAN사 수수료 비교 분석', '렌탈 vs 구매 견적 제공', '당일 설치 가능'].map((t) => (
+                  {['VAN사 수수료 비교 분석', '렌탈 vs 구매 견적 제공', '당일 설치 가능'].map((t, i) => (
                     <div key={t} className="flex items-center gap-2.5 text-sm text-gray-400">
                       <Icon icon="solar:check-circle-bold" className="h-5 w-5 text-violet-400 shrink-0" />
-                      {t}
+                      <EditableText as="span" blockKey={kt(`cta.benefit.${i}`)} fallback={t}
+                        value={pickTextOrUndef(blocks, kt(`cta.benefit.${i}`))} pagePath={PAGE_TERM} />
                     </div>
                   ))}
                 </div>
