@@ -1,12 +1,12 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import TextAlign from '@tiptap/extension-text-align'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import MediaLibraryPicker, { type MediaSelection } from '@/components/admin-editor/MediaLibraryPicker'
 
 interface TipTapEditorProps {
@@ -45,6 +45,9 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
   const directUploadRef = useRef<HTMLInputElement>(null)
   // 본문 drop/paste 업로드 진행 상태
   const [uploadingInline, setUploadingInline] = useState(false)
+  // editorProps 안에서 클로저로 직접 editor 변수를 못 잡으므로 ref 로 전달.
+  // schema-safe 한 chain().insertContent() 호출에 필요.
+  const editorRef = useRef<Editor | null>(null)
 
   const editor = useEditor({
     extensions: [
@@ -88,6 +91,8 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
           'prose dark:prose-invert prose-sm max-w-none min-h-[300px] px-4 py-3 focus:outline-none',
       },
       // 본문에 이미지 끌어다 놓으면 자동 업로드 + 삽입
+      // ⚠️ view.state.tr.insert(pos, node) 직접 조작은 schema 위반(paragraph 안에 block image)
+      //    상황에서 노드가 무시될 수 있음 → editor.chain().insertContent() 로 schema-safe 처리.
       handleDrop(view, event, _slice, moved) {
         if (moved) return false
         const dt = (event as DragEvent).dataTransfer
@@ -99,21 +104,29 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         const dropPos = coords?.pos ?? view.state.selection.from
         ;(async () => {
           setUploadingInline(true)
-          for (const file of imageFiles) {
-            const url = await uploadImageFile(file)
-            if (url && view) {
-              const { schema } = view.state
-              const node = schema.nodes.image.create({ src: url, alt: file.name })
-              const tr = view.state.tr.insert(dropPos, node)
-              view.dispatch(tr)
+          const ed = editorRef.current
+          if (ed) {
+            // 드롭 위치에 selection 박고 그 자리부터 순차 삽입
+            ed.commands.setTextSelection(dropPos)
+            for (const file of imageFiles) {
+              const url = await uploadImageFile(file)
+              if (url) {
+                ed.chain()
+                  .focus()
+                  .insertContent({
+                    type: 'image',
+                    attrs: { src: url, alt: file.name },
+                  })
+                  .run()
+              }
             }
           }
           setUploadingInline(false)
         })()
         return true
       },
-      // 클립보드 이미지(스크린샷·복사된 이미지) 붙여넣기
-      handlePaste(view, event) {
+      // 클립보드 이미지(스크린샷·복사된 이미지) 붙여넣기 — schema-safe insertContent 사용
+      handlePaste(_view, event) {
         const items = event.clipboardData?.items
         if (!items) return false
         const imageFiles: File[] = []
@@ -127,13 +140,19 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         event.preventDefault()
         ;(async () => {
           setUploadingInline(true)
-          for (const file of imageFiles) {
-            const url = await uploadImageFile(file)
-            if (url && view) {
-              const { schema } = view.state
-              const node = schema.nodes.image.create({ src: url, alt: file.name })
-              const tr = view.state.tr.replaceSelectionWith(node)
-              view.dispatch(tr)
+          const ed = editorRef.current
+          if (ed) {
+            for (const file of imageFiles) {
+              const url = await uploadImageFile(file)
+              if (url) {
+                ed.chain()
+                  .focus()
+                  .insertContent({
+                    type: 'image',
+                    attrs: { src: url, alt: file.name },
+                  })
+                  .run()
+              }
             }
           }
           setUploadingInline(false)
@@ -142,6 +161,12 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
       },
     },
   })
+
+  // editor 인스턴스를 ref 에도 저장 — editorProps 핸들러에서 사용.
+  // (useEditor 의 editorProps 는 정의 시점 클로저라 editor 변수를 직접 못 잡음)
+  useEffect(() => {
+    editorRef.current = editor
+  }, [editor])
 
   const addImage = useCallback((selection: MediaSelection) => {
     if (!editor) return
