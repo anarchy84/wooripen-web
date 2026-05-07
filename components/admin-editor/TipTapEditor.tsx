@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
+import TextAlign from '@tiptap/extension-text-align'
 import { useCallback, useRef, useState } from 'react'
 import MediaLibraryPicker, { type MediaSelection } from '@/components/admin-editor/MediaLibraryPicker'
 
@@ -66,6 +67,13 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         HTMLAttributes: { class: 'text-blue-400 underline' },
       }),
       Placeholder.configure({ placeholder }),
+      // 정렬 — paragraph/heading 에 text-align style 박음.
+      // 게시물 페이지 prose CSS 가 [&_p[style*='text-align:_center']] 등으로 매칭해서 적용.
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+        alignments: ['left', 'center', 'right'],
+        defaultAlignment: 'left',
+      }),
     ],
     content,
     onUpdate: ({ editor: e }) => {
@@ -247,6 +255,23 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
           active={editor.isActive('blockquote')}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           label="인용"
+        />
+        <div className="w-px bg-gray-700 mx-1" />
+        {/* 정렬 — 본문 paragraph/heading 에 적용. 게시물에서도 그대로 보임 */}
+        <ToolBtn
+          active={editor.isActive({ textAlign: 'left' })}
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          label="⇤"
+        />
+        <ToolBtn
+          active={editor.isActive({ textAlign: 'center' })}
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          label="↔"
+        />
+        <ToolBtn
+          active={editor.isActive({ textAlign: 'right' })}
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          label="⇥"
         />
         <ToolBtn
           active={editor.isActive('codeBlock')}

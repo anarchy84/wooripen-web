@@ -133,10 +133,13 @@ export default async function TipDetailPage({ params }: Props) {
             prose-p:text-gray-300 prose-p:leading-relaxed
             prose-a:text-teal-400 prose-a:no-underline hover:prose-a:underline
             prose-img:rounded-xl prose-img:border prose-img:border-gray-800
-            [&_img]:mx-auto [&_img]:h-auto [&_img]:!max-w-full sm:[&_img]:!max-w-[600px]
+            [&_img]:h-auto [&_img]:max-w-full
             prose-blockquote:border-teal-500 prose-blockquote:text-gray-400
             prose-code:text-teal-300 prose-code:bg-gray-900 prose-code:px-1 prose-code:rounded
-            prose-pre:bg-gray-900 prose-pre:border prose-pre:border-gray-800"
+            prose-pre:bg-gray-900 prose-pre:border prose-pre:border-gray-800
+            [&_p[style*='text-align:_center']]:text-center
+            [&_p[style*='text-align:_right']]:text-right
+            [&_p[style*='text-align:_left']]:text-left"
           dangerouslySetInnerHTML={{ __html: tip.content }}
         />
 

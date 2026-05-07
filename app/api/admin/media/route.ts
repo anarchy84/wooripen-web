@@ -1,10 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
+import { normalizeSlug } from '@/lib/slug'
 
 // sharp 는 native 모듈 — Edge runtime 에서 안 됨. 명시적으로 nodejs 강제
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+// Vercel function body 기본 4.5MB. Pro 플랜은 100MB 까지 풀 수 있음.
+// 큰 파일도 받을 수 있게 maxDuration 도 늘려 놓음 (sharp 처리 시간 여유)
+export const maxDuration = 60
 
 // GET: 미디어 목록
 export async function GET() {
@@ -37,9 +41,10 @@ export async function POST(request: NextRequest) {
 
   if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
 
-  // 파일 크기 제한 (5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 })
+  // 파일 크기 제한 (30MB) — Vercel body limit (Pro 100MB) 안에서 여유
+  // sharp 가 메모리에서 처리 가능한 일반적인 사진 사이즈 한도
+  if (file.size > 30 * 1024 * 1024) {
+    return NextResponse.json({ error: 'File too large (max 30MB)' }, { status: 400 })
   }
 
   // 허용 타입
@@ -50,13 +55,14 @@ export async function POST(request: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  // 파일명 정리 (한글 → slug)
-  const baseName = file.name
-    .replace(/\.[^/.]+$/, '')
-    .replace(/[^a-zA-Z0-9가-힣]/g, '-')
-    .replace(/-+/g, '-')
-    .toLowerCase()
+  // 파일명 정리 — Storage path 는 ASCII 안전이 핵심.
+  // 한글/특수문자가 들어가면 일부 CDN·브라우저에서 URL 인코딩이 깨질 수 있으므로
+  // normalizeSlug 로 한글 제거 + 소문자·하이픈만 남긴다.
+  // 결과가 비면 'image' 폴백.
+  const rawBase = file.name.replace(/\.[^/.]+$/, '')
+  const safeName = normalizeSlug(rawBase) || 'image'
   const timestamp = Date.now()
+  const baseName = safeName
 
   // preset → sharp resize 옵션 매핑
   //   - content : 너비 1600 캡 (큰 이미지만 줄임)
