@@ -1,8 +1,10 @@
-// /rental — server wrapper
+// /rental — server wrapper + 자동 카탈로그
 import { getBlocksForPage } from '@/lib/content-blocks-server'
 import { blocksMapToRecord } from '@/lib/content-blocks'
 import { BlocksProvider } from '@/components/editable/BlocksProvider'
 import RentalClient from './RentalClient'
+import CategoryProductGrid from '@/components/sections/CategoryProductGrid'
+import { getProductsByCategory } from '@/lib/category-products'
 import type { Metadata } from 'next'
 
 export const revalidate = 0
@@ -14,11 +16,21 @@ export const metadata: Metadata = {
 }
 
 export default async function RentalPage() {
-  const blocksMap = await getBlocksForPage('/rental')
+  const [blocksMap, products] = await Promise.all([
+    getBlocksForPage('/rental'),
+    getProductsByCategory('rental'),
+  ])
   const blocks = blocksMapToRecord(blocksMap)
   return (
     <BlocksProvider blocks={blocks}>
       <RentalClient />
+      <CategoryProductGrid
+        products={products}
+        accent="cyan"
+        eyebrow="Catalog"
+        title="등록된 렌탈 상품"
+        subtitle="실시간 등록된 정수기·공기청정기·복합기. 클릭하면 상세로."
+      />
     </BlocksProvider>
   )
 }

@@ -32,6 +32,7 @@
 // ─────────────────────────────────────────────
 
 import { Icon } from '@iconify/react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils/cn'
 import type { ImageValue } from '@/lib/content-blocks'
 import { EditOverlay } from '@/components/editable/EditOverlay'
@@ -135,6 +136,11 @@ export default function MediaSlot({
   // value.fallback_url 이 있으면 <picture> 로 WebP+PNG 병행
   const hasImage = !!(value && value.url)
 
+  // next/image 마이그레이션 (2026-05-07)
+  //   - priority=true : LCP 후보 (히어로) 자동 preload + fetchPriority=high
+  //   - sizes 미지정 시 기본값으로 viewport 100% (안전)
+  //   - fallback_url 케이스(WebP+원본 병행) 는 <picture> 가 필요해 raw <img> 유지
+  //     이건 거의 없는 패턴 — 대부분은 storage_path(WebP) 단일 URL
   const imageNode = hasImage && value ? (
     value.fallback_url ? (
       <picture>
@@ -146,6 +152,7 @@ export default function MediaSlot({
           width={value.width}
           height={value.height}
           loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           sizes={sizes}
           className={cn(
@@ -156,17 +163,13 @@ export default function MediaSlot({
         />
       </picture>
     ) : (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={value.url}
         alt={value.alt ?? label}
-        width={value.width}
-        height={value.height}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding="async"
-        sizes={sizes}
+        fill
+        priority={priority}
+        sizes={sizes ?? '100vw'}
         className={cn(
-          'absolute inset-0 w-full h-full',
           fit === 'cover' ? 'object-cover' : 'object-contain',
           imgClassName,
         )}

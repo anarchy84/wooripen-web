@@ -1,8 +1,10 @@
-// /business/terminal — server wrapper
+// /business/terminal — server wrapper + 자동 카탈로그
 import { getBlocksForPage } from '@/lib/content-blocks-server'
 import { blocksMapToRecord } from '@/lib/content-blocks'
 import { BlocksProvider } from '@/components/editable/BlocksProvider'
 import TerminalClient from './TerminalClient'
+import CategoryProductGrid from '@/components/sections/CategoryProductGrid'
+import { getProductsByCategory } from '@/lib/category-products'
 import type { Metadata } from 'next'
 
 export const revalidate = 0
@@ -14,11 +16,21 @@ export const metadata: Metadata = {
 }
 
 export default async function TerminalPage() {
-  const blocksMap = await getBlocksForPage('/business/terminal')
+  const [blocksMap, products] = await Promise.all([
+    getBlocksForPage('/business/terminal'),
+    getProductsByCategory('terminal'),
+  ])
   const blocks = blocksMapToRecord(blocksMap)
   return (
     <BlocksProvider blocks={blocks}>
       <TerminalClient />
+      <CategoryProductGrid
+        products={products}
+        accent="violet"
+        eyebrow="Catalog"
+        title="등록된 단말기 라인업"
+        subtitle="실시간 등록된 단말기. 클릭하면 상세 페이지로."
+      />
     </BlocksProvider>
   )
 }
