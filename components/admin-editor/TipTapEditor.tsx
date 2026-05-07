@@ -317,6 +317,7 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
       <MediaLibraryPicker
         isOpen={mediaPickerOpen}
         title="본문 이미지 선택"
+        autoSelectOnUpload
         onClose={() => setMediaPickerOpen(false)}
         onSelect={addImage}
       />

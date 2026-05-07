@@ -13,6 +13,7 @@ export interface MediaSelection {
 interface MediaLibraryPickerProps {
   isOpen: boolean
   title?: string
+  autoSelectOnUpload?: boolean
   onClose: () => void
   onSelect: (selection: MediaSelection) => void
 }
@@ -20,6 +21,7 @@ interface MediaLibraryPickerProps {
 export default function MediaLibraryPicker({
   isOpen,
   title = '이미지 선택',
+  autoSelectOnUpload = false,
   onClose,
   onSelect,
 }: MediaLibraryPickerProps) {
@@ -87,6 +89,14 @@ export default function MediaLibraryPicker({
     [media, selectedId],
   )
 
+  const selectMedia = useCallback((item: Media) => {
+    onSelect({
+      url: getMediaUrl(item),
+      altText: item.alt_text || item.file_name,
+      media: item,
+    })
+  }, [onSelect])
+
   // 파일 업로드 공통 처리 — input·드래그앤드롭 둘 다 사용
   const uploadFiles = useCallback(async (files: FileList | File[]) => {
     const list = Array.from(files).filter((f) => f.type.startsWith('image/'))
@@ -120,6 +130,10 @@ export default function MediaLibraryPicker({
       if (uploaded.length > 0) {
         setMedia((prev) => [...uploaded, ...prev])
         setSelectedId(uploaded[0].id)
+        if (autoSelectOnUpload) {
+          uploaded.forEach(selectMedia)
+          onClose()
+        }
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : '네트워크 오류'
@@ -127,7 +141,7 @@ export default function MediaLibraryPicker({
     } finally {
       setUploading(false)
     }
-  }, [])
+  }, [autoSelectOnUpload, onClose, selectMedia])
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -174,11 +188,7 @@ export default function MediaLibraryPicker({
   const handleConfirm = () => {
     if (!selectedMedia) return
 
-    onSelect({
-      url: getMediaUrl(selectedMedia),
-      altText: selectedMedia.alt_text || selectedMedia.file_name,
-      media: selectedMedia,
-    })
+    selectMedia(selectedMedia)
     onClose()
   }
 
