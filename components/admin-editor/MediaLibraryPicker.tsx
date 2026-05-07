@@ -29,6 +29,9 @@ export default function MediaLibraryPicker({
   const [error, setError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // 드래그 앤 드롭 — 모달 위에 파일 끌어다 놓기 가능
+  const [isDragging, setIsDragging] = useState(false)
+  const dragCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const fetchMedia = useCallback(async () => {
@@ -84,20 +87,25 @@ export default function MediaLibraryPicker({
     [media, selectedId],
   )
 
-  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files
-    event.target.value = ''
-    if (!files || files.length === 0) return
+  // 파일 업로드 공통 처리 — input·드래그앤드롭 둘 다 사용
+  const uploadFiles = useCallback(async (files: FileList | File[]) => {
+    const list = Array.from(files).filter((f) => f.type.startsWith('image/'))
+    if (list.length === 0) {
+      setError('이미지 파일만 업로드 가능해.')
+      return
+    }
 
     setUploading(true)
     setError(null)
 
     const uploaded: Media[] = []
     try {
-      for (const file of Array.from(files)) {
+      for (const file of list) {
         const formData = new FormData()
         formData.append('file', file)
         formData.append('alt_text', file.name.replace(/\.[^/.]+$/, ''))
+        // 본문 일반 업로드 — content preset (max 1600px·종횡비 유지)
+        formData.append('preset', 'content')
 
         const res = await fetch('/api/admin/media', { method: 'POST', body: formData })
         const data = await res.json().catch(() => ({}))
@@ -119,6 +127,48 @@ export default function MediaLibraryPicker({
     } finally {
       setUploading(false)
     }
+  }, [])
+
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    event.target.value = ''
+    if (!files || files.length === 0) return
+    await uploadFiles(files)
+  }
+
+  // ── 드래그 앤 드롭 핸들러 ─────────────────────────────
+  // dragenter/leave 이벤트는 자식 요소에서 자주 fire 되므로 카운터로 안정화
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.dataTransfer.types.includes('Files')) {
+      dragCounter.current += 1
+      setIsDragging(true)
+    }
+  }
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current -= 1
+    if (dragCounter.current <= 0) {
+      dragCounter.current = 0
+      setIsDragging(false)
+    }
+  }
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = 'copy'
+  }
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter.current = 0
+    setIsDragging(false)
+    const files = e.dataTransfer.files
+    if (files && files.length > 0) {
+      await uploadFiles(files)
+    }
   }
 
   const handleConfirm = () => {
@@ -136,7 +186,25 @@ export default function MediaLibraryPicker({
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 px-4 py-6">
-      <div className="flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-gray-700 bg-gray-900 shadow-2xl">
+      <div
+        className={`relative flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border bg-gray-900 shadow-2xl transition-colors ${
+          isDragging
+            ? 'border-blue-500 ring-2 ring-blue-500/50'
+            : 'border-gray-700'
+        }`}
+        onDragEnter={handleDragEnter}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        {/* 드래그 중 오버레이 — 모달 위에 안내 문구 */}
+        {isDragging && (
+          <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center bg-blue-500/15 backdrop-blur-sm">
+            <Upload className="mb-3 h-12 w-12 text-blue-300" />
+            <p className="text-base font-semibold text-white">여기에 떨어뜨리면 업로드돼</p>
+            <p className="mt-1 text-sm text-blue-200">이미지 파일 (jpg·png·webp·gif)</p>
+          </div>
+        )}
         <div className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
           <div>
             <h2 className="text-sm font-bold text-white">{title}</h2>

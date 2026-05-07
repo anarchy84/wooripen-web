@@ -28,6 +28,12 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData()
   const file = formData.get('file') as File | null
   const altText = formData.get('alt_text') as string || ''
+  // ── preset : 용도별 표준 사이즈 ────────────────────────
+  //   'content'  (default) : 본문 — 최대 1600px·종횡비 유지·webp
+  //   'featured'           : 대표/OG — 1200x630 fit:cover·webp
+  //   'thumb'              : 썸네일 — 800x450 fit:cover·webp
+  //   'raw'                : 원본 그대로 (resize 안 함)
+  const preset = (formData.get('preset') as string || 'content').toLowerCase()
 
   if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
 
@@ -52,7 +58,26 @@ export async function POST(request: NextRequest) {
     .toLowerCase()
   const timestamp = Date.now()
 
-  // sharp로 WebP 변환 + 리사이즈 (최대 1200px)
+  // preset → sharp resize 옵션 매핑
+  //   - content : 너비 1600 캡 (큰 이미지만 줄임)
+  //   - featured : 1200x630 cover (OG 표준)
+  //   - thumb : 800x450 cover (16:9 카드 그리드 일관)
+  //   - raw : resize 안 함 (관리자 직접 지정)
+  function resizeOptionsFor(p: string): sharp.ResizeOptions | null {
+    switch (p) {
+      case 'featured':
+        return { width: 1200, height: 630, fit: 'cover', position: 'attention' }
+      case 'thumb':
+        return { width: 800, height: 450, fit: 'cover', position: 'attention' }
+      case 'raw':
+        return null
+      case 'content':
+      default:
+        return { width: 1600, withoutEnlargement: true }
+    }
+  }
+
+  // sharp로 WebP 변환 + 리사이즈
   let webpBuffer: Buffer
   let metadata: sharp.Metadata
 
@@ -60,12 +85,14 @@ export async function POST(request: NextRequest) {
     const sharpInstance = sharp(buffer)
     metadata = await sharpInstance.metadata()
 
-    webpBuffer = await sharpInstance
-      .resize({ width: 1200, withoutEnlargement: true })
+    const resizeOpts = resizeOptionsFor(preset)
+    let pipeline = sharpInstance
+    if (resizeOpts) pipeline = pipeline.resize(resizeOpts)
+
+    webpBuffer = await pipeline
       .webp({ quality: 82 })
       .toBuffer()
   } catch (err) {
-    // sharp 모듈 자체 누락 / 변환 실패 — 에러 메시지 정확히 응답에 포함
     const msg = err instanceof Error ? err.message : 'Image processing failed'
     console.error('[media sharp]', err)
     return NextResponse.json(

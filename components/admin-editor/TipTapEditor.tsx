@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import MediaLibraryPicker, { type MediaSelection } from '@/components/admin-editor/MediaLibraryPicker'
 
 interface TipTapEditorProps {
@@ -14,8 +14,36 @@ interface TipTapEditorProps {
   placeholder?: string
 }
 
+// ── 본문 직접 업로드 헬퍼 ────────────────────────────────
+// 클립보드/드래그한 File 을 /api/admin/media 에 보내서 URL 받기
+async function uploadImageFile(file: File): Promise<string | null> {
+  if (!file.type.startsWith('image/')) return null
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('alt_text', file.name.replace(/\.[^/.]+$/, ''))
+  formData.append('preset', 'content')   // 본문용 — max 1600 종횡비 유지
+
+  try {
+    const res = await fetch('/api/admin/media', { method: 'POST', body: formData })
+    if (!res.ok) {
+      console.error('[TipTap upload]', await res.text())
+      return null
+    }
+    const data = await res.json()
+    // webp_path 우선, 없으면 storage_path
+    return (data.webp_path as string) || (data.storage_path as string) || null
+  } catch (err) {
+    console.error('[TipTap upload]', err)
+    return null
+  }
+}
+
 export default function TipTapEditor({ content, onChange, placeholder = '내용을 입력하세요...' }: TipTapEditorProps) {
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false)
+  // 직통 업로드 버튼용 input
+  const directUploadRef = useRef<HTMLInputElement>(null)
+  // 본문 drop/paste 업로드 진행 상태
+  const [uploadingInline, setUploadingInline] = useState(false)
 
   const editor = useEditor({
     extensions: [
@@ -51,6 +79,59 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         class:
           'prose dark:prose-invert prose-sm max-w-none min-h-[300px] px-4 py-3 focus:outline-none',
       },
+      // 본문에 이미지 끌어다 놓으면 자동 업로드 + 삽입
+      handleDrop(view, event, _slice, moved) {
+        if (moved) return false
+        const dt = (event as DragEvent).dataTransfer
+        if (!dt || !dt.files || dt.files.length === 0) return false
+        const imageFiles = Array.from(dt.files).filter((f) => f.type.startsWith('image/'))
+        if (imageFiles.length === 0) return false
+        event.preventDefault()
+        const coords = view.posAtCoords({ left: (event as DragEvent).clientX, top: (event as DragEvent).clientY })
+        const dropPos = coords?.pos ?? view.state.selection.from
+        ;(async () => {
+          setUploadingInline(true)
+          for (const file of imageFiles) {
+            const url = await uploadImageFile(file)
+            if (url && view) {
+              const { schema } = view.state
+              const node = schema.nodes.image.create({ src: url, alt: file.name })
+              const tr = view.state.tr.insert(dropPos, node)
+              view.dispatch(tr)
+            }
+          }
+          setUploadingInline(false)
+        })()
+        return true
+      },
+      // 클립보드 이미지(스크린샷·복사된 이미지) 붙여넣기
+      handlePaste(view, event) {
+        const items = event.clipboardData?.items
+        if (!items) return false
+        const imageFiles: File[] = []
+        for (const item of Array.from(items)) {
+          if (item.kind === 'file' && item.type.startsWith('image/')) {
+            const file = item.getAsFile()
+            if (file) imageFiles.push(file)
+          }
+        }
+        if (imageFiles.length === 0) return false
+        event.preventDefault()
+        ;(async () => {
+          setUploadingInline(true)
+          for (const file of imageFiles) {
+            const url = await uploadImageFile(file)
+            if (url && view) {
+              const { schema } = view.state
+              const node = schema.nodes.image.create({ src: url, alt: file.name })
+              const tr = view.state.tr.replaceSelectionWith(node)
+              view.dispatch(tr)
+            }
+          }
+          setUploadingInline(false)
+        })()
+        return true
+      },
     },
   })
 
@@ -65,6 +146,23 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
   }, [editor])
 
   const handleImageClick = () => setMediaPickerOpen(true)
+
+  // 직통 업로드 — 파일 input 으로 선택한 이미지를 바로 본문에 삽입
+  // (모달 안 거치고 가장 빠른 경로)
+  const handleDirectUploadClick = () => directUploadRef.current?.click()
+  const handleDirectUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    event.target.value = ''
+    if (!files || files.length === 0 || !editor) return
+    setUploadingInline(true)
+    for (const file of Array.from(files)) {
+      const url = await uploadImageFile(file)
+      if (url) {
+        editor.chain().focus().setImage({ src: url, alt: file.name }).run()
+      }
+    }
+    setUploadingInline(false)
+  }
 
   const imageAttrs = editor?.isActive('image') ? editor.getAttributes('image') : null
   const imageWidth = getImageWidth(imageAttrs?.width)
@@ -158,6 +256,16 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         <div className="w-px bg-gray-700 mx-1" />
         <ToolBtn active={editor.isActive('link')} onClick={addLink} label="링크" />
         <ToolBtn active={false} onClick={handleImageClick} label="이미지" />
+        {/* 직통 업로드 — 모달 안 거치고 파일 → 본문 삽입 */}
+        <ToolBtn active={false} onClick={handleDirectUploadClick} label="↥ 업로드" />
+        <input
+          ref={directUploadRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleDirectUpload}
+          className="hidden"
+        />
         {editor.isActive('image') && (
           <>
             <div className="w-px bg-gray-700 mx-1" />
@@ -189,8 +297,22 @@ export default function TipTapEditor({ content, onChange, placeholder = '내용�
         />
       </div>
 
-      {/* 에디터 본문 */}
-      <EditorContent editor={editor} />
+      {/* 에디터 본문 — drop/paste 업로드 시 오버레이 표시 */}
+      <div className="relative">
+        <EditorContent editor={editor} />
+        {uploadingInline && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-blue-500/10 backdrop-blur-[1px]">
+            <div className="rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg">
+              이미지 업로드 중…
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 본문에 끌어다 놓기·붙여넣기 안내 */}
+      <p className="border-t border-gray-700 px-3 py-1.5 text-[11px] text-gray-500">
+        💡 본문에 이미지를 <strong>드래그</strong>하거나 <strong>Cmd/Ctrl+V</strong>로 붙여넣으면 바로 업로드돼.
+      </p>
 
       <MediaLibraryPicker
         isOpen={mediaPickerOpen}
