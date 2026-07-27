@@ -2,6 +2,7 @@
 // 폼에서 수집한 기본 정보 + 어트리뷰션 데이터를 consultations 테이블에 INSERT
 // anon RLS INSERT 정책으로 인증 없이 저장 가능
 
+import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
@@ -29,8 +30,20 @@ export async function POST(request: Request) {
 
     const supabase = createClient()
 
+    // ⚠️ id·created_at 을 서버에서 미리 만든다.
+    // consultations 는 개인정보라 SELECT 정책이 authenticated 전용이다.
+    // 비로그인(anon) 방문자가 INSERT 뒤 .select() 로 값을 되받으면 그 RETURNING 이
+    // SELECT 정책에 막혀 저장 전체가 롤백된다("저장 중 문제가 발생했습니다").
+    // → 되받지 않고, 여기서 만든 값을 그대로 응답에 쓴다.
+    const id = randomUUID()
+    const createdAt = new Date().toISOString()
+
     // INSERT 데이터 구성
     const insertData: Record<string, unknown> = {
+      // 식별자·생성시각 (서버 주입 — DB default 대신 명시)
+      id,
+      created_at: createdAt,
+
       // 기본 정보
       name: body.name,
       phone: cleanPhone,
@@ -90,11 +103,10 @@ export async function POST(request: Request) {
       status: 'pending',
     }
 
-    const { data, error } = await supabase
+    // ⚠️ .select() 되받기 없이 순수 INSERT 만 실행 (anon SELECT 정책에 막히지 않도록)
+    const { error } = await supabase
       .from('consultations')
       .insert(insertData)
-      .select('id, created_at')
-      .single()
 
     if (error) {
       console.error('Consultation insert error:', error)
@@ -106,8 +118,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      id: data.id,
-      created_at: data.created_at,
+      id,
+      created_at: createdAt,
     })
   } catch (err) {
     console.error('Consultation API error:', err)
