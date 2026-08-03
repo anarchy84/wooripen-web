@@ -12,6 +12,10 @@ import { EditorModal } from '@/components/editable/EditorModal'
 import { AdminGuardProvider } from '@/components/editable/AdminGuardProvider'
 // Core Web Vitals 측정 (LCP/CLS/INP/FCP/TTFB) → /api/web-vitals → 어드민 대시보드
 import { WebVitalsReporter } from '@/components/WebVitalsReporter'
+// 어드민 > 스크립트 등록분(GTM 등) 주입 — /admin 경로는 ScriptsGate 가 차단
+import { getActiveScripts } from '@/lib/scripts-server'
+import InjectedScripts from '@/components/layout/InjectedScripts'
+import ScriptsGate from '@/components/layout/ScriptsGate'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -89,14 +93,27 @@ export const viewport: Viewport = {
   ],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // 어드민 등록 활성 스크립트 (5분 캐시 + 어드민 저장 시 revalidateTag 즉시 반영)
+  const injectedScripts = await getActiveScripts()
+
   return (
     <html lang="ko" className={pretendard.variable}>
       <body className="min-h-screen flex flex-col font-sans">
+        {/*
+          주입 스크립트 (GTM 등) :
+          - head/body_start 포지션은 body 최상단에서 처리 —
+            <script> 는 next/script(afterInteractive)라 물리 위치 무관,
+            <noscript> 조각(GTM iframe)은 body 시작이 표준 위치
+          - /admin 경로는 ScriptsGate 가 렌더 자체를 차단 (GA 오염 방지)
+        */}
+        <ScriptsGate>
+          <InjectedScripts scripts={injectedScripts} positions={['head', 'body_start']} />
+        </ScriptsGate>
         {/*
           AdminGuardProvider : 앱 전체에서 Supabase auth 체크를 1회로 묶음
             - 바깥쪽에 둬서 EditorProvider/EditorModal/Header 등이 모두 같은 context 를 읽게 함
@@ -123,6 +140,10 @@ export default function RootLayout({
         </AdminGuardProvider>
         {/* Core Web Vitals 익명 측정 → 어드민 대시보드 */}
         <WebVitalsReporter />
+        {/* body 끝 포지션 주입 스크립트 */}
+        <ScriptsGate>
+          <InjectedScripts scripts={injectedScripts} positions={['body_end']} />
+        </ScriptsGate>
       </body>
     </html>
   )

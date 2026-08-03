@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getAttribution } from '@/lib/attribution'
+import { gtmPush } from '@/lib/gtm'
 
 interface ConsultationForm {
   name: string
@@ -57,6 +58,16 @@ export function useConsultation(): UseConsultationReturn {
         setSubmitting(false)
         return
       }
+
+      // 전환 이벤트 — 서버 저장 성공 시에만 발화 (마케팅팀 요청 2026-08-03)
+      // GTM 컨테이너에서 이 이벤트에 네이버 전환태그를 연결한다.
+      // 실패 응답은 위 가드에서 이미 return 하므로 "성공 후에만 실행" 조건 자동 충족.
+      // 폼 버튼이 disabled={submitting} 이고 성공 즉시 완료 페이지로 이탈하므로 중복 발화 없음.
+      gtmPush({
+        event: 'consultation_submit',
+        lead_id: data.id,
+        lead_source: source,
+      })
 
       // 완료 페이지로 이동
       const params = new URLSearchParams({

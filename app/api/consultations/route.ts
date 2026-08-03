@@ -5,6 +5,7 @@
 import { randomUUID } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { sendCrmProLead } from '@/lib/integrations/crmpro'
 
 export async function POST(request: Request) {
   try {
@@ -38,6 +39,9 @@ export async function POST(request: Request) {
     const id = randomUUID()
     const createdAt = new Date().toISOString()
 
+    // 고객 IP — consent_ip 저장과 CRM X-Forwarded-For 전달에 공용
+    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null
+
     // INSERT 데이터 구성
     const insertData: Record<string, unknown> = {
       // 식별자·생성시각 (서버 주입 — DB default 대신 명시)
@@ -58,7 +62,7 @@ export async function POST(request: Request) {
       third_party_consent: body.third_party_consent ?? true,
       marketing_agreed: body.marketing_consent ?? true,
       marketing_agreed_at: body.marketing_consent ? new Date().toISOString() : null,
-      consent_ip: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null,
+      consent_ip: clientIp,
 
       // 어트리뷰션 — first touch
       first_utm_source: body.first_utm_source || null,
@@ -115,6 +119,25 @@ export async function POST(request: Request) {
         { status: 500 }
       )
     }
+
+    // CRM(crmpro.kr) 전송 — Supabase 저장 성공 후에만.
+    // CRM_PRO_API_KEY 미설정 시 자동 스킵(no-op), 실패해도 접수 응답은 success 유지.
+    // Vercel 서버리스는 응답 후 백그라운드가 중단되므로 반드시 await (내부 5초 타임아웃).
+    await sendCrmProLead({
+      name: body.name,
+      phone: cleanPhone,
+      productCategory: body.product_category,
+      interestedProducts: body.interested_products,
+      businessType: body.business_type,
+      businessAddress: body.business_address,
+      message: body.memo,
+      createdAt,
+      clientIp,
+      landingPagePath: body.last_landing_page || body.first_landing_page,
+      utmSource: body.last_utm_source || body.first_utm_source,
+      utmMedium: body.last_utm_medium || body.first_utm_medium,
+      utmCampaign: body.last_utm_campaign || body.first_utm_campaign,
+    })
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
+import { SCRIPTS_CACHE_TAG } from '@/lib/scripts-server'
 
 export async function GET() {
   const supabase = createClient()
@@ -29,5 +31,7 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  // 공개 페이지 주입 캐시 즉시 무효화 (lib/scripts-server.ts)
+  revalidateTag(SCRIPTS_CACHE_TAG)
   return NextResponse.json(data, { status: 201 })
 }
