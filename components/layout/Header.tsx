@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Menu, X, ChevronDown } from 'lucide-react'
@@ -126,10 +127,18 @@ export default function Header() {
         <div className="section-container">
           <div className="flex h-16 items-center justify-between">
           {/* 로고 */}
+          {/* 로고 — 원본 480x160(3:1), 헤더 높이 28px 기준 폭 84px.
+              width/height 를 명시해 CLS 방지, above-the-fold 라 priority 지정.
+              alt 이 이 링크의 접근성 이름이 되므로 비우지 말 것. */}
           <Link href="/" className="relative z-10">
-            <span className="text-xl font-bold tracking-tight transition-colors duration-300 text-gray-900">
-              우리편
-            </span>
+            <Image
+              src="/images/logo.png"
+              alt="우리편"
+              width={84}
+              height={28}
+              priority
+              className="h-7 w-auto"
+            />
           </Link>
 
           {/* 데스크톱 네비 — 하위 메뉴 있으면 hover 드롭다운 */}

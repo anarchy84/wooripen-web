@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 
 // ─────────────────────────────────────────────
@@ -12,10 +13,13 @@ import { createClient } from '@/lib/supabase/server'
 // 값 우선순위 : site_settings(어드민 입력) > 아래 상수(structured-data 와 동일 출처)
 // 대표자명(ceo_name)은 코드·DB 어디에도 없어 어드민 입력 전까지 표시하지 않는다.
 // ─────────────────────────────────────────────
+// 실값 출처 : 마케팅팀 확인 (2026-08-03)
 const BUSINESS_DEFAULTS: Record<string, string> = {
   company_name: '우리편',
+  ceo_name: '구본청',
   business_number: '197-86-03789',
-  address: '서울특별시 강서구 공항대로 209, 507-509호',
+  ecommerce_license: '제 2025-서울강서-1939호',
+  address: '서울특별시 강서구 공항대로 209, 507, 508, 509호',
   phone: '1600-6116',
   email: 'ourteam.kr@gmail.com',
 }
@@ -84,7 +88,14 @@ export default async function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 md:gap-12">
           {/* 브랜드 */}
           <div className="col-span-2">
-            <span className="text-xl font-bold text-gray-900 tracking-tight">우리편</span>
+            {/* 로고 — 원본 480x160(3:1), 푸터 높이 26px 기준 폭 78px */}
+            <Image
+              src="/images/logo.png"
+              alt="우리편"
+              width={78}
+              height={26}
+              className="h-[26px] w-auto"
+            />
             <p className="mt-4 text-caption text-gray-500 leading-relaxed max-w-xs">
               소상공인 편에 서는 유일한 파트너.
               <br />

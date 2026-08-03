@@ -226,7 +226,8 @@ const LOCAL_DEFAULTS: Required<Omit<LocalBusinessProps, 'taxId' | 'email'>> & {
   taxId: string
   email: string
 } = {
-  streetAddress: '공항대로 209, 507-509호',
+  // 마케팅팀 확인 (2026-08-03) — 푸터 사업자정보 표기와 동일하게 유지할 것
+  streetAddress: '공항대로 209, 507, 508, 509호',
   addressLocality: '강서구',
   addressRegion: '서울특별시',
   postalCode: '07505',                // 강서구 공항대로 209 일대 우편번호
