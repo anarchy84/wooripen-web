@@ -29,6 +29,8 @@ const SETTING_FIELDS: SettingField[] = [
   { key: 'privacy_policy', label: '개인정보처리방침 전문', type: 'textarea', placeholder: '개인정보 수집·이용 관련 전문...', group: '법적 고지' },
   { key: 'third_party_consent_text', label: '제3자 제공 동의문', type: 'textarea', placeholder: '제공 받는 자, 제공 목적, 제공 항목...', group: '법적 고지' },
   { key: 'marketing_consent_text', label: '마케팅 수신 동의문', type: 'textarea', placeholder: '수신 내용, 수신 수단, 보유 기간...', group: '법적 고지' },
+  // /terms 페이지에서 SSR 렌더링 (2026-08-03 신설). 비어 있으면 안내 문구만 노출.
+  { key: 'terms_of_service', label: '이용약관 전문', type: 'textarea', placeholder: '제1조(목적), 제2조(정의)...', group: '법적 고지' },
 ]
 
 export default function AdminSettingsPage() {

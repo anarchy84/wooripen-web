@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import type { NavMenu } from '@/types/database'
@@ -35,6 +36,7 @@ const BADGE_BG: Record<string, string> = {
 }
 
 export default function Header() {
+  const pathname = usePathname() ?? ''
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [nav, setNav] = useState<NavNode[]>(FALLBACK_NAV)
@@ -66,6 +68,18 @@ export default function Header() {
     return () => { cancelled = true }
   }, [])
 
+  // ─── 현재 페이지 판정 (2026-08-03 추가) ───────────────
+  // 어드민에서 url 을 '#'·빈값·외부주소로 넣을 수 있으므로 방어가 필요하다.
+  // 하위 경로도 활성 처리 : /tips/[slug] → '꿀팁' 메뉴 활성
+  const isActive = (item: NavMenu): boolean => {
+    if (item.is_external || !item.url || !item.url.startsWith('/')) return false
+    if (item.url === '/') return pathname === '/'
+    return pathname === item.url || pathname.startsWith(`${item.url}/`)
+  }
+  // 드롭다운 부모용 — 자신 또는 자식이 활성이면 true (스타일 전용, aria-current 아님)
+  const isBranchActive = (root: NavNode): boolean =>
+    isActive(root) || (root.children ?? []).some(isActive)
+
   // 링크 렌더링 — 외부 링크면 새 창
   const renderLink = (item: NavMenu, extraClass = '', onClick?: () => void) => {
     const targetProps = item.is_external ? { target: '_blank', rel: 'noopener noreferrer' } : {}
@@ -81,6 +95,8 @@ export default function Header() {
         href={item.url}
         onClick={onClick}
         {...targetProps}
+        // 스크린리더에 현재 페이지 알림 — 정확히 일치할 때만 부여
+        aria-current={isActive(item) ? 'page' : undefined}
         className={extraClass}
       >
         {item.label}
@@ -120,10 +136,13 @@ export default function Header() {
           <nav className="hidden lg:flex items-center gap-1">
             {nav.map((root) => {
               const hasChildren = root.children && root.children.length > 0
+              const active = isBranchActive(root)
               const baseClass = `
                 px-4 py-2 rounded-full text-caption font-medium inline-flex items-center
                 transition-all duration-200 ease-toss
-                text-gray-600 hover:text-gray-900 hover:bg-gray-100
+                ${active
+                  ? 'text-gray-900 bg-gray-100 font-semibold'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}
               `
 
               if (!hasChildren) {
@@ -148,7 +167,12 @@ export default function Header() {
                             key={child.id}
                             href={child.url}
                             {...(child.is_external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                            className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                            aria-current={isActive(child) ? 'page' : undefined}
+                            className={`flex items-center justify-between px-4 py-2 text-sm ${
+                              isActive(child)
+                                ? 'bg-gray-50 text-gray-900 font-medium'
+                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                            }`}
                           >
                             <span>{child.label}</span>
                             {child.badge_label && (
@@ -218,7 +242,10 @@ export default function Header() {
                 href={root.url}
                 onClick={() => setMobileOpen(false)}
                 {...(root.is_external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                className="flex items-center text-2xl font-bold text-gray-900 hover:text-primary transition-colors py-2"
+                aria-current={isActive(root) ? 'page' : undefined}
+                className={`flex items-center text-2xl font-bold transition-colors py-2 ${
+                  isBranchActive(root) ? 'text-primary' : 'text-gray-900 hover:text-primary'
+                }`}
               >
                 {root.label}
                 {root.badge_label && (
@@ -235,7 +262,10 @@ export default function Header() {
                       href={child.url}
                       onClick={() => setMobileOpen(false)}
                       {...(child.is_external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                      className="block text-sm text-gray-500 hover:text-gray-900 py-1"
+                      aria-current={isActive(child) ? 'page' : undefined}
+                      className={`block text-sm py-1 ${
+                        isActive(child) ? 'text-primary font-medium' : 'text-gray-500 hover:text-gray-900'
+                      }`}
                     >
                       {child.label}
                     </Link>

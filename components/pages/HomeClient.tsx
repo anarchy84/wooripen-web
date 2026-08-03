@@ -151,7 +151,14 @@ function CountUp({ value, suffix = '', decimals = 0 }: { value: number; suffix?:
         }
         requestAnimationFrame(animate)
       }
-    }, { threshold: 0.3 })
+      // 발화 타이밍 수정 (2026-08-03) :
+      //   기존 threshold 0.3 은 관찰 대상이 숫자 span 자체(섹션 상단에서 110~170px 아래,
+      //   FadeIn 의 translateY(32px) 만큼 더 아래)라서 사용자가 '섹션에 진입했다'고
+      //   느끼는 시점보다 한참 늦게 교차했다. 그 사이 FadeIn 의 투명 구간(최대 1s)이
+      //   겹쳐 카운팅의 가장 빠른 구간(quartic ease-out 초반)이 안 보이는 채로 소모돼
+      //   '효과가 없다'는 체감으로 이어졌다.
+      //   → threshold 0 + rootMargin 으로 FadeIn 오프셋을 보상해 조기 발화시킨다.
+    }, { threshold: 0, rootMargin: '0px 0px 48px 0px' })
     observer.observe(el)
     return () => observer.disconnect()
   }, [value])
@@ -320,7 +327,7 @@ export default function HomeClient({ blocks }: HomeClientProps) {
           { keyBase: 'support',  label: 'A/S 24시간',   value: '원격 대응' },
         ]}
         ctaLabel="키오스크 상담"
-        ctaHref="/business/kiosk"
+        ctaHref="/business/torder"
         bgClass="bg-gray-50"
         reverse
       />
@@ -381,7 +388,14 @@ export default function HomeClient({ blocks }: HomeClientProps) {
       <IndustryTiles />
 
       {/* 10. 뉴스룸 카드 그리드 */}
-      <NewsroomCards />
+      {/*
+        뉴스룸 섹션 임시 숨김 (2026-08-03) :
+          - 카드 5개 + 전체보기 링크가 전부 404 (뉴스 상세 페이지 미존재)
+          - 썸네일은 MediaSlot 에 blockKey 가 없어 어드민이 올릴 방법도 없는 구조
+        Phase 3 에서 Supabase news 테이블 + 실제 콘텐츠 확보 후 복원할 것.
+        (컴포넌트 파일은 남겨둠 — components/sections/home/NewsroomCards.tsx)
+      */}
+      {/* <NewsroomCards /> */}
 
       {/* 11. 숫자 배너 (카운트업) — 편집 가능 (value·label) */}
       <section className="bg-gray-950 relative overflow-hidden">
@@ -402,7 +416,9 @@ export default function HomeClient({ blocks }: HomeClientProps) {
               const safeValue = Number.isFinite(numValue) ? numValue : item.defaultValue
 
               return (
-                <FadeIn key={item.keyBase} delay={i * 100}>
+                // direction="none" : 기본 translateY(32px) 를 없애 카운팅 시작 지연을 제거하고,
+                // duration 을 줄여 숫자가 투명한 채로 흘러가는 구간을 최소화 (#13, 2026-08-03)
+                <FadeIn key={item.keyBase} delay={i * 100} direction="none" duration={400}>
                   <div className="text-center">
                     <Icon icon={item.icon} className="h-8 w-8 text-primary-400 mx-auto mb-4" />
 

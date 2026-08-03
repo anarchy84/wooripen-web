@@ -96,18 +96,10 @@ export interface PackageItem {
   product?: Pick<Product, 'id' | 'name' | 'category' | 'image_url' | 'description' | 'slug' | 'price'> | null
 }
 
-// Phase 2-A #3 메인페이지 숫자 카드
-export interface SiteStat {
-  id: string
-  label: string
-  value: string
-  suffix: string
-  icon: string | null
-  description: string | null
-  is_visible: boolean
-  sort_order: number
-  updated_at: string
-}
+// (제거됨 2026-08-03) SiteStat — /admin/site-stats 데드 메뉴와 함께 삭제.
+//   어느 공개 페이지에서도 렌더링되지 않았고, 홈·회사소개의 숫자는
+//   home.stats.* / about.stats.* 인라인 편집 블록이 담당한다(기능 중복).
+//   테이블(site_stats)은 데이터 보존을 위해 drop 하지 않았다.
 
 // Phase 2-A #4 GNB
 export interface NavMenu {

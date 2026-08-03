@@ -73,7 +73,9 @@ const CARDS: CategoryCard[] = [
     defaultTitle: '키오스크',
     defaultSubtitle: '무인 주문 도입, 인건비 평균 35% 절감',
     defaultCta: '키오스크 상담',
-    href: '/business/kiosk',
+    // /business/kiosk 는 아직 없는 페이지라 404 였다 (2026-08-03 수정).
+    // 키오스크 전용 페이지 신설 전까지 무인주문 라인업이 있는 티오더로 임시 연결.
+    href: '/business/torder',
     vendor: 'tossplace',
     subject: 'kiosk',
     slotLabel: '키오스크 대표컷',

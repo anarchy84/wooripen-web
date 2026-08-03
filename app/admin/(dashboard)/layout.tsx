@@ -16,7 +16,6 @@ const navItems = [
   { name: 'Q&A 관리', href: '/admin/qna', icon: '💬' },
   { name: '상담 신청', href: '/admin/consultations', icon: '📞' },
   { name: '미디어', href: '/admin/media', icon: '🖼️' },
-  { name: '숫자 카드', href: '/admin/site-stats', icon: '🔢' },
   { name: 'GNB 메뉴', href: '/admin/nav-menus', icon: '🧭' },
   { name: 'SEO 관리', href: '/admin/seo', icon: '🔍' },
   { name: '스크립트', href: '/admin/scripts', icon: '⚙️' },

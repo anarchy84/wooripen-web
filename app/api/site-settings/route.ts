@@ -14,7 +14,9 @@ export async function GET(request: Request) {
   }
 
   // 허용된 키만 공개 (보안: 민감 설정은 차단)
-  const PUBLIC_KEYS = ['phone', 'privacy_policy', 'third_party_consent_text', 'marketing_consent_text']
+  // kakao_channel : 플로팅 CTA 의 카톡 링크 (2026-08-03 추가 — 기존엔 코드 하드코딩이라
+  //                  어드민에서 바꿔도 반영되지 않았고, 값이 한글 ID 라 실제로 404 였음)
+  const PUBLIC_KEYS = ['phone', 'privacy_policy', 'third_party_consent_text', 'marketing_consent_text', 'kakao_channel']
   if (!PUBLIC_KEYS.includes(key)) {
     return NextResponse.json({ error: '허용되지 않은 키입니다.' }, { status: 403 })
   }
