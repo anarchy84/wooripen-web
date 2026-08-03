@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/auth-admin'
 
 // 숫자 카드 수정
 export async function PUT(
@@ -9,7 +10,7 @@ export async function PUT(
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -45,7 +46,7 @@ export async function DELETE(
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

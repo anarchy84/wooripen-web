@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isAdmin } from '@/lib/auth-admin'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -34,7 +35,10 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/admin') &&
     !request.nextUrl.pathname.startsWith('/admin/login')
   ) {
-    if (!user) {
+    // 로그인 여부가 아니라 어드민 allowlist 로 판정 (lib/auth-admin.ts).
+    // 어드민 대시보드에는 상담 리드의 이름·연락처(개인정보)가 있으므로
+    // "로그인한 아무 계정" 이 열람하지 못하게 한다.
+    if (!isAdmin(user)) {
       const url = request.nextUrl.clone()
       url.pathname = '/admin/login'
       url.searchParams.set('redirect', request.nextUrl.pathname)
@@ -43,7 +47,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // 이미 로그인한 상태에서 로그인 페이지 접근 시 어드민으로 리다이렉트
-  if (request.nextUrl.pathname === '/admin/login' && user) {
+  if (request.nextUrl.pathname === '/admin/login' && isAdmin(user)) {
     const url = request.nextUrl.clone()
     url.pathname = '/admin'
     return NextResponse.redirect(url)

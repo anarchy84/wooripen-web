@@ -136,24 +136,26 @@ export async function sendCrmProLead(p: CrmProLeadPayload): Promise<boolean> {
     })
 
     if (!res.ok) {
+      // 응답 본문에 제출값(이름·전화)이 에코될 수 있으므로 길이를 자르고 키를 가린다
       const text = await res.text().catch(() => '')
-      console.warn('[CRMPro] non-2xx', res.status, redactApiKey(text))
+      console.warn('[CRMPro] non-2xx', res.status, safeLog(text))
       return false
     }
 
     const result = await res.json().catch(() => null) as { success?: boolean; message?: string } | null
     if (result && result.success === false) {
-      console.warn('[CRMPro] rejected', result.message ?? 'unknown')
+      console.warn('[CRMPro] rejected', safeLog(result.message ?? 'unknown'))
       return false
     }
     console.info('[CRMPro] submitted', {
       group_no: body.group_no,
       has_utm_source: Boolean(body.utm_source),
-      message: result?.message ?? 'ok',
+      message: safeLog(result?.message ?? 'ok'),
     })
     return true
   } catch (err) {
-    console.warn('[CRMPro] fetch error', err instanceof Error ? err.message : err)
+    // undici 는 헤더 검증 실패 시 문제가 된 값(=API 키)을 메시지에 담을 수 있다 → 반드시 redact
+    console.warn('[CRMPro] fetch error', safeLog(err instanceof Error ? err.message : String(err)))
     return false
   } finally {
     if (timer) clearTimeout(timer)
@@ -197,8 +199,9 @@ function formatKstDatetime(value: string | Date): string {
   return `${byType.year}-${byType.month}-${byType.day} ${byType.hour}:${byType.minute}:${byType.second}`
 }
 
-function redactApiKey(value: string): string {
+// 로그 안전 처리 — API 키 마스킹 + 길이 상한(응답에 제출값이 에코되는 경우 대비)
+function safeLog(value: string): string {
   const key = process.env.CRM_PRO_API_KEY
-  if (!key) return value
-  return value.replaceAll(key, '[redacted]')
+  const masked = key ? value.replaceAll(key, '[redacted]') : value
+  return masked.length > 300 ? `${masked.slice(0, 300)}…(truncated)` : masked
 }

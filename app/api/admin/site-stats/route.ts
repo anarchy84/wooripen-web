@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/auth-admin'
 
 // 숫자 카드 목록 (어드민은 숨김 포함 전체)
 export async function GET() {
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

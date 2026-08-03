@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getAttribution } from '@/lib/attribution'
 import { gtmPush } from '@/lib/gtm'
+import { HONEYPOT_FIELD_NAME } from '@/components/ui/HoneypotField'
 
 interface ConsultationForm {
   name: string
@@ -41,6 +42,13 @@ export function useConsultation(): UseConsultationReturn {
       // 어트리뷰션 데이터 가져오기
       const attr = getAttribution()
 
+      // 허니팟 — 폼에 <HoneypotField /> 가 있으면 그 값을 읽어 함께 보낸다.
+      // (폼마다 state 를 배선하지 않도록 제출 시점에 DOM 에서 직접 조회)
+      const hp =
+        typeof document !== 'undefined'
+          ? (document.querySelector<HTMLInputElement>(`input[name="${HONEYPOT_FIELD_NAME}"]`)?.value ?? '')
+          : ''
+
       // API 호출
       const res = await fetch('/api/consultations', {
         method: 'POST',
@@ -48,6 +56,7 @@ export function useConsultation(): UseConsultationReturn {
         body: JSON.stringify({
           ...form,
           ...attr,
+          _hp: hp,
         }),
       })
 

@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { cacheTagFor, cacheTagForPage } from '@/lib/content-blocks'
+import { isAdmin } from '@/lib/auth-admin'
 
 // -------------------------------------------------------------
 // GET /api/admin/content-blocks?keys=a,b,c
@@ -64,7 +65,7 @@ export async function PATCH(request: NextRequest) {
 
   // 인증 체크
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -147,7 +148,7 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
   const key = searchParams.get('key')

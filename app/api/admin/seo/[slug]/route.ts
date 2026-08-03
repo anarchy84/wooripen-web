@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/auth-admin'
 
 // PUT: 페이지 메타태그 수정
 export async function PUT(
@@ -8,7 +9,7 @@ export async function PUT(
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
 

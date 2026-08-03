@@ -16,7 +16,17 @@ import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 
 export default function ScriptsGate({ children }: { children: ReactNode }) {
-  const pathname = usePathname() ?? ''
-  if (pathname.startsWith('/admin')) return null
+  const raw = usePathname() ?? ''
+  // 경로 정규화 — usePathname 은 대소문자·퍼센트 인코딩을 정규화하지 않는다.
+  // /Admin, /ADMIN, /admin%2Fscripts 같은 변형에서도 차단되도록 맞춘다.
+  let pathname = raw
+  try {
+    pathname = decodeURIComponent(raw)
+  } catch {
+    // 잘못된 인코딩이면 원문으로 판정
+  }
+  pathname = pathname.toLowerCase().replace(/\/+/g, '/')
+
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return null
   return <>{children}</>
 }

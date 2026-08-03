@@ -13,6 +13,7 @@ import { ArrowRight, Phone, Send } from 'lucide-react'
 import FadeIn from '@/components/ui/FadeIn'
 import { useConsultation } from '@/lib/useConsultation'
 import { useAttribution } from '@/lib/attribution'
+import HoneypotField from '@/components/ui/HoneypotField'
 
 export default function TerminalClient() {
   const blocks = useBlocks()
@@ -306,6 +307,7 @@ export default function TerminalClient() {
             <FadeIn delay={200}>
               <form onSubmit={handleConsultSubmit}
                 className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 space-y-5">
+                <HoneypotField />
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">이름 <span className="text-red-400">*</span></label>
                   <input type="text" required placeholder="이름"

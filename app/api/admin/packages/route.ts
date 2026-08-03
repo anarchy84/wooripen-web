@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/auth-admin'
 
 // 패키지 목록 조회 (items 포함)
 // 실제 스키마: packages.is_visible, package_items(product_id, sort_order, is_highlighted, note)
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

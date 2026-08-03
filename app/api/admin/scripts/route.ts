@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
 import { SCRIPTS_CACHE_TAG } from '@/lib/scripts-server'
+import { isAdmin } from '@/lib/auth-admin'
 
 export async function GET() {
   const supabase = createClient()
@@ -13,7 +14,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
   const { data, error } = await supabase

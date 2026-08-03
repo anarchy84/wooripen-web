@@ -22,34 +22,42 @@ import type { Script } from '@/types/database'
 
 export const SCRIPTS_CACHE_TAG = 'scripts'
 
-export const getActiveScripts = unstable_cache(
+// 캐시 대상 — 여기서 throw 하면 unstable_cache 가 결과를 저장하지 않는다.
+// (실패한 빈 배열이 정상 결과처럼 5분간 캐시되어 전 사이트 스크립트 공백이
+//  장기화되는 것을 막기 위함. fail-soft 는 바깥 래퍼에서 처리한다.)
+const fetchActiveScripts = unstable_cache(
   async (): Promise<Script[]> => {
-    try {
-      const supabase = createBareClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        { auth: { persistSession: false, autoRefreshToken: false } }
-      )
+    const supabase = createBareClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { auth: { persistSession: false, autoRefreshToken: false } }
+    )
 
-      // 1차 범위는 scope='global' 만 지원 (현재 등록 스크립트가 전부 global).
-      // scope='page' + target_pages 필터는 pathname 전달 구조 확정 후 확장.
-      const { data, error } = await supabase
-        .from('scripts')
-        .select('*')
-        .eq('is_active', true)
-        .eq('scope', 'global')
-        .order('sort_order')
+    // 1차 범위는 scope='global' 만 지원 (현재 등록 스크립트가 전부 global).
+    // scope='page' + target_pages 필터는 pathname 전달 구조 확정 후 확장.
+    const { data, error } = await supabase
+      .from('scripts')
+      .select('*')
+      .eq('is_active', true)
+      .eq('scope', 'global')
+      .order('sort_order')
 
-      if (error) {
-        console.warn('[scripts] fetch failed:', error.message)
-        return []
-      }
-      return (data as Script[]) ?? []
-    } catch (err) {
-      console.warn('[scripts] fetch error:', err instanceof Error ? err.message : err)
-      return []
-    }
+    if (error) throw new Error(error.message)
+    return (data as Script[]) ?? []
   },
   ['active-scripts'],
   { tags: [SCRIPTS_CACHE_TAG], revalidate: 300 }
 )
+
+/**
+ * 활성 스크립트 조회. 실패 시 빈 배열 (루트 레이아웃에서 쓰이므로 절대 throw 금지).
+ * 실패 결과는 캐시되지 않으므로 다음 요청에서 즉시 재시도된다.
+ */
+export async function getActiveScripts(): Promise<Script[]> {
+  try {
+    return await fetchActiveScripts()
+  } catch (err) {
+    console.warn('[scripts] fetch failed:', err instanceof Error ? err.message : err)
+    return []
+  }
+}

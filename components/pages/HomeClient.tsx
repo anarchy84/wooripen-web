@@ -41,6 +41,7 @@ import {
   pickLinkOrUndef,
   type ContentBlock,
 } from '@/lib/content-blocks'
+import HoneypotField from '@/components/ui/HoneypotField'
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    보조 데이터 (기존 페이지 유지)
@@ -674,6 +675,7 @@ export default function HomeClient({ blocks }: HomeClientProps) {
                 onSubmit={handleConsultSubmit}
                 className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 space-y-5"
               >
+                <HoneypotField />
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     이름 <span className="text-red-400">*</span>

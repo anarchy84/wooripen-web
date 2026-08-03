@@ -7,9 +7,53 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { sendCrmProLead } from '@/lib/integrations/crmpro'
 
+// ─── 남용 방어 ────────────────────────────────
+// 이 API 는 비인증·공개다. 2026-08-03 CRM 연동 이후로는 요청 1건이
+// 외부 영업 시스템(crmpro.kr)까지 그대로 전달되므로 최소 방어를 둔다.
+//
+// ⚠️ 한계 : 아래 레이트리밋은 인스턴스 메모리 기반이라 서버리스 다중 인스턴스에서
+//    완벽하지 않다(인스턴스 수만큼 배수 허용). 단순 curl 루프는 막지만
+//    본격적인 봇 방어가 필요하면 Upstash Ratelimit 같은 공유 저장소 또는
+//    캡차 도입이 필요하다.
+const RATE_LIMIT_WINDOW_MS = 60_000
+const RATE_LIMIT_MAX = 3
+const rateBuckets = new Map<string, number[]>()
+
+function isRateLimited(key: string): boolean {
+  const now = Date.now()
+  const hits = (rateBuckets.get(key) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
+  hits.push(now)
+  rateBuckets.set(key, hits)
+
+  // 메모리 누수 방지 — 오래된 버킷 정리
+  if (rateBuckets.size > 5000) {
+    for (const [k, v] of rateBuckets) {
+      if (v.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) rateBuckets.delete(k)
+    }
+  }
+  return hits.length > RATE_LIMIT_MAX
+}
+
+// x-forwarded-for 는 위조 가능 — IPv4/IPv6 형식만 통과시킨다
+function parseClientIp(header: string | null): string | null {
+  const first = header?.split(',')[0]?.trim()
+  if (!first) return null
+  const isIpv4 = /^(\d{1,3}\.){3}\d{1,3}$/.test(first) &&
+    first.split('.').every((o) => Number(o) <= 255)
+  const isIpv6 = /^[0-9a-fA-F:]+$/.test(first) && first.includes(':')
+  return isIpv4 || isIpv6 ? first : null
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
+
+    // 허니팟 — 사람에게 보이지 않는 필드. 값이 차 있으면 봇으로 간주하고
+    // 저장·CRM 전송 없이 성공처럼 응답한다(봇에게 실패를 알리지 않음).
+    if (typeof body._hp === 'string' && body._hp.trim() !== '') {
+      console.warn('[consultations] honeypot triggered')
+      return NextResponse.json({ success: true, id: randomUUID(), created_at: new Date().toISOString() })
+    }
 
     // 필수 필드 검증
     const { name, phone, product_category } = body
@@ -17,6 +61,16 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: '이름, 전화번호, 관심 상품은 필수입니다.' },
         { status: 400 }
+      )
+    }
+
+    // 레이트리밋 — IP 기준(없으면 전화번호 기준으로 폴백)
+    const rateKey = parseClientIp(request.headers.get('x-forwarded-for'))
+      ?? `phone:${String(phone).replace(/\D/g, '')}`
+    if (isRateLimited(rateKey)) {
+      return NextResponse.json(
+        { error: '잠시 후 다시 시도해주세요.' },
+        { status: 429 }
       )
     }
 
@@ -39,8 +93,10 @@ export async function POST(request: Request) {
     const id = randomUUID()
     const createdAt = new Date().toISOString()
 
-    // 고객 IP — consent_ip 저장과 CRM X-Forwarded-For 전달에 공용
-    const clientIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null
+    // 고객 IP — consent_ip 저장(개보법 증빙)과 CRM X-Forwarded-For 전달에 공용.
+    // x-forwarded-for 는 클라이언트가 위조할 수 있으므로 IP 형식을 검증한다.
+    // (형식 불일치 시 null — 헤더 인젝션·가짜 증빙 IP 차단)
+    const clientIp = parseClientIp(request.headers.get('x-forwarded-for'))
 
     // INSERT 데이터 구성
     const insertData: Record<string, unknown> = {

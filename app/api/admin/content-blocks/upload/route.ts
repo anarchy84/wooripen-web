@@ -19,6 +19,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
+import { isAdmin } from '@/lib/auth-admin'
 
 // Next.js App Router : 이 route 는 반드시 Node 런타임
 export const runtime = 'nodejs'
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
   // 1) 인증 체크
   // -------------------------------------------------------------
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

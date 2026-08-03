@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { isAdmin } from '@/lib/auth-admin'
 
 // GET: 상품 목록 조회 (카테고리 필터 지원)
 export async function GET(request: NextRequest) {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   // 인증 확인
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

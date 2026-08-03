@@ -22,6 +22,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
+import { isAdmin } from '@/lib/auth-admin'
 
 // 허용된 컬럼만 UPDATE — 무분별한 필드 수정 방지
 const ALLOWED_COLUMNS = ['hero_image'] as const
@@ -46,7 +47,7 @@ export async function PATCH(request: NextRequest) {
 
   // 1) 인증
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  if (!isAdmin(user)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

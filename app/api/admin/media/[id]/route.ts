@@ -13,6 +13,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { findUsageForMedia, extractStoragePath } from '@/lib/media-usage'
+import { isAdmin } from '@/lib/auth-admin'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -26,7 +27,7 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data: media, error } = await supabase
     .from('media')
@@ -47,7 +48,7 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const force = req.nextUrl.searchParams.get('force') === '1'
 

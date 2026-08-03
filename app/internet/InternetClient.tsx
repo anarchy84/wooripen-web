@@ -11,6 +11,7 @@ import { EditableText } from '@/components/editable/EditableText'
 import { EditableImage } from '@/components/editable/EditableImage'
 import { useBlocks } from '@/components/editable/BlocksProvider'
 import { pickTextOrUndef, pickImageOrUndef } from '@/lib/content-blocks'
+import HoneypotField from '@/components/ui/HoneypotField'
 
 const PAGE = '/internet'
 const k = (s: string) => `internet.${s}`
@@ -646,6 +647,7 @@ export default function InternetClient() {
             <FadeIn delay={200}>
               <form onSubmit={handleConsultSubmit}
                 className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 space-y-5">
+                <HoneypotField />
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">이름 <span className="text-red-400">*</span></label>
                   <input type="text" required value={formName} onChange={(e) => setFormName(e.target.value)} placeholder="홍길동" className="w-full rounded-xl bg-white/[0.06] border border-white/[0.1] px-4 py-3.5 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-200" />

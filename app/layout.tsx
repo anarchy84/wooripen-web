@@ -16,6 +16,8 @@ import { WebVitalsReporter } from '@/components/WebVitalsReporter'
 import { getActiveScripts } from '@/lib/scripts-server'
 import InjectedScripts from '@/components/layout/InjectedScripts'
 import ScriptsGate from '@/components/layout/ScriptsGate'
+// SPA 소프트 내비게이션 페이지뷰 — GTM 스니펫은 최초 1회만 실행되므로 필요
+import RouteTracker from '@/components/layout/RouteTracker'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -113,6 +115,7 @@ export default async function RootLayout({
         */}
         <ScriptsGate>
           <InjectedScripts scripts={injectedScripts} positions={['head', 'body_start']} />
+          <RouteTracker />
         </ScriptsGate>
         {/*
           AdminGuardProvider : 앱 전체에서 Supabase auth 체크를 1회로 묶음

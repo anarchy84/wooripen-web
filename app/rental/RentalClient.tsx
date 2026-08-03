@@ -13,6 +13,7 @@ import { ArrowRight, Phone, Send, Loader2 } from 'lucide-react'
 import FadeIn from '@/components/ui/FadeIn'
 import { useConsultation } from '@/lib/useConsultation'
 import { useAttribution } from '@/lib/attribution'
+import HoneypotField from '@/components/ui/HoneypotField'
 
 /* ── 렌탈 카테고리 ── */
 type Category = 'all' | 'water' | 'air' | 'multi' | 'ice'
@@ -487,6 +488,7 @@ export default function RentalClient() {
             <FadeIn delay={200}>
               <form onSubmit={handleConsultSubmit}
                 className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 space-y-5">
+                <HoneypotField />
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">이름 <span className="text-red-400">*</span></label>
                   <input type="text" required placeholder="홍길동"

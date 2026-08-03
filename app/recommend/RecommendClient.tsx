@@ -10,6 +10,7 @@ import { useAttribution } from '@/lib/attribution'
 import { EditableText } from '@/components/editable/EditableText'
 import { useBlocks } from '@/components/editable/BlocksProvider'
 import { pickTextOrUndef } from '@/lib/content-blocks'
+import HoneypotField from '@/components/ui/HoneypotField'
 
 const PAGE = '/recommend'
 const k = (s: string) => `recommend.${s}`
@@ -349,6 +350,7 @@ export default function RecommendClient() {
             <FadeIn delay={200}>
               <form onSubmit={handleConsultSubmit}
                 className="rounded-3xl bg-white/[0.06] backdrop-blur-xl border border-white/[0.08] p-8 md:p-10 space-y-5">
+                <HoneypotField />
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">이름 <span className="text-red-400">*</span></label>
                   <input type="text" required placeholder="홍길동"

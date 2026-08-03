@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { normalizeSlug } from '@/lib/slug'
 import { findMediaUsage, extractStoragePath } from '@/lib/media-usage'
+import { isAdmin } from '@/lib/auth-admin'
 
 // sharp 는 native 모듈 — Edge runtime 에서 안 됨. 명시적으로 nodejs 강제
 export const runtime = 'nodejs'
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const formData = await request.formData()
   const file = formData.get('file') as File | null
@@ -167,7 +168,7 @@ export async function DELETE(request: NextRequest) {
   const supabase = createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const all = request.nextUrl.searchParams.get('all') === '1'
   const force = request.nextUrl.searchParams.get('force') === '1'
