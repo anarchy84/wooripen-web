@@ -3,8 +3,6 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
 
 interface QnADetail {
   id: string
@@ -67,7 +65,6 @@ export default function QnADetailPage() {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-gray-950 pt-20 pb-16">
         <div className="max-w-3xl mx-auto px-4">
           {/* 뒤로가기 */}
@@ -165,7 +162,6 @@ export default function QnADetailPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   )
 }

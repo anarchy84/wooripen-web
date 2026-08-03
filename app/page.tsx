@@ -17,10 +17,19 @@
 //     (/api/admin/content-blocks PATCH 에서 tag 무효화)
 // ─────────────────────────────────────────────
 
+import type { Metadata } from 'next'
 import { getBlocksForPage } from '@/lib/content-blocks-server'
 import { blocksMapToRecord } from '@/lib/content-blocks'
 import HomeClient from '@/components/pages/HomeClient'
 import { OrganizationLd, WebSiteLd, LocalBusinessLd } from '@/lib/seo/structured-data'
+import { buildPageMetadata } from '@/lib/seo/page-meta'
+
+// 홈은 자체 metadata 가 없어 루트 layout(app/layout.tsx) 기본값만 쓰고 있었다.
+// 어드민 SEO 관리(slug: home)에서 덮어쓸 수 있도록 연결한다.
+// 빈 fallback = 값이 없으면 루트 layout 기본값이 그대로 유지된다.
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('home', {})
+}
 
 export default async function HomePage() {
   // 서버에서 홈 블록 일괄 조회 (1 쿼리)

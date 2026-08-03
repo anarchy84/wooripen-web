@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import type { PageMeta } from '@/types/database'
+import { SLUG_TO_PATH } from '@/lib/seo/slug-path'
 
 export default function AdminSeoPage() {
   const [pages, setPages] = useState<PageMeta[]>([])
@@ -114,7 +115,7 @@ export default function AdminSeoPage() {
                   {/* 검색 미리보기 */}
                   <div className="bg-white rounded-lg p-3 mt-2">
                     <p className="text-blue-700 text-sm font-medium truncate">{form.seo_title || page.page_name + ' | 우리편'}</p>
-                    <p className="text-green-700 text-xs">ourteam.kr/{page.page_slug === 'home' ? '' : page.page_slug}</p>
+                    <p className="text-green-700 text-xs">ourteam.kr{SLUG_TO_PATH[page.page_slug] ?? '/' + page.page_slug}</p>
                     <p className="text-gray-600 text-xs mt-0.5 line-clamp-2">{form.seo_description || '설명이 없습니다.'}</p>
                   </div>
                 </div>
@@ -124,7 +125,7 @@ export default function AdminSeoPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-medium text-white">{page.page_name}</h3>
-                      <span className="text-xs text-gray-600">/{page.page_slug === 'home' ? '' : page.page_slug}</span>
+                      <span className="text-xs text-gray-600">{SLUG_TO_PATH[page.page_slug] ?? '/' + page.page_slug}</span>
                       <span className={`px-1.5 py-0.5 text-xs rounded ${
                         page.seo_title ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                       }`}>

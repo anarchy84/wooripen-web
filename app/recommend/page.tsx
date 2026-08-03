@@ -4,11 +4,13 @@ import { blocksMapToRecord } from '@/lib/content-blocks'
 import { BlocksProvider } from '@/components/editable/BlocksProvider'
 import RecommendClient from './RecommendClient'
 import type { Metadata } from 'next'
+import { buildPageMetadata } from '@/lib/seo/page-meta'
 
 export const revalidate = 0
 
-export const metadata: Metadata = {
-  title: '맞춤 추천 | 우리편',
+// 코드 fallback — 어드민 SEO 관리(page_meta)에 값이 있으면 그쪽이 우선한다
+const FALLBACK_METADATA: Metadata = {
+  title: '맞춤 추천',
   description: '업종별로 우리편이 추천하는 매장 인프라 패키지를 확인하고, 한 번에 상담받으세요.',
   alternates: { canonical: 'https://ourteam.kr/recommend' },
   openGraph: {
@@ -17,6 +19,10 @@ export const metadata: Metadata = {
     url: 'https://ourteam.kr/recommend',
     type: 'website',
   },
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('recommend', FALLBACK_METADATA)
 }
 
 export default async function RecommendPage() {

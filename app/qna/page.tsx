@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
 
 interface QnAListItem {
   id: string
@@ -62,7 +60,6 @@ export default function QnAListPage() {
 
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-gray-950 pt-20 pb-16">
         <div className="max-w-3xl mx-auto px-4">
           {/* 헤더 */}
@@ -213,7 +210,6 @@ export default function QnAListPage() {
           )}
         </div>
       </main>
-      <Footer />
     </>
   )
 }

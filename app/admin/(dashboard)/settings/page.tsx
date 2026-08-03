@@ -16,6 +16,8 @@ const SETTING_FIELDS: SettingField[] = [
   { key: 'company_name', label: '회사명', type: 'text', placeholder: '(주)우리편', group: '기본 정보' },
   { key: 'ceo_name', label: '대표자명', type: 'text', placeholder: '홍길동', group: '기본 정보' },
   { key: 'business_number', label: '사업자등록번호', type: 'text', placeholder: '000-00-00000', group: '기본 정보' },
+  // 전자상거래법 표시의무 — 푸터 사업자정보 블록에 노출 (2026-08-03 추가)
+  { key: 'ecommerce_license', label: '통신판매업 신고번호', type: 'text', placeholder: '제 2025-서울강서-0000호', group: '기본 정보' },
   { key: 'phone', label: '대표 전화번호', type: 'tel', placeholder: '1800-0000', group: '연락처' },
   { key: 'mobile', label: '상담 연락처', type: 'tel', placeholder: '010-0000-0000', group: '연락처' },
   { key: 'email', label: '이메일', type: 'text', placeholder: 'contact@ourteam.kr', group: '연락처' },
