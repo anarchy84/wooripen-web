@@ -50,7 +50,8 @@ export default async function PackagesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* ─── 히어로 ─────────────────────────────────── */}
-      <section className="relative pt-32 pb-20 px-4 overflow-hidden"
+      {/* px-4 제거 — 좌우 여백은 내부 section-container 가 담당 (이중 패딩 방지) */}
+      <section className="relative pt-32 pb-20 overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #0F3460 100%)' }}
       >
         {/* 어드민이 업로드한 hero 배경 이미지 (선택) — 미업로드 시 기존 그라디언트 그대로 */}
@@ -73,7 +74,10 @@ export default async function PackagesPage() {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl" />
         </div>
 
-        <div className="max-w-4xl mx-auto text-center relative z-10">
+        {/* 좌측 정렬 — 다른 서브페이지 히어로와 통일 (2026-08-04)
+            section-container(max-w-1140px + 좌우 패딩)로 감싸야 여백이 일치한다 */}
+        <div className="section-container relative z-10">
+        <div className="max-w-4xl">
           <span className="inline-block px-4 py-1.5 bg-blue-500/20 text-blue-300 text-sm font-medium rounded-full mb-6 backdrop-blur">
             소상공인 맞춤 패키지
           </span>
@@ -83,7 +87,7 @@ export default async function PackagesPage() {
               한 번에 해결
             </span>
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto mb-8 break-keep">
+          <p className="text-lg text-white/70 max-w-2xl mb-8 break-keep">
             인터넷, 결제단말기, CCTV, 키오스크, 렌탈까지.
             업종과 상황에 맞는 패키지로 비용은 줄이고, 편의는 높이세요.
           </p>
@@ -94,6 +98,7 @@ export default async function PackagesPage() {
             무료 맞춤 상담 받기
             <Icon icon="solar:arrow-right-line-duotone" className="w-5 h-5" />
           </Link>
+        </div>
         </div>
       </section>
 
