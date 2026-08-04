@@ -74,9 +74,23 @@ export function EditOverlay({
   // 이렇게 해야 block 요소를 래핑해도 가운데정렬·여백이 깨지지 않음
   const displayClass = Wrapper === 'span' ? 'inline-block' : 'block'
 
+  // ⚠️ position 충돌 방지 (2026-08-04)
+  //   편집 버튼을 붙이려면 래퍼가 positioned 여야 해서 'relative' 를 넣어왔는데,
+  //   호출부가 이미 absolute/fixed/sticky 를 넘긴 경우 두 유틸리티가 함께 붙었다.
+  //   Tailwind 는 클래스 나열 순서가 아니라 CSS 선언 순서로 승자가 정해지고
+  //   .relative 가 .absolute 보다 뒤에 있어 relative 가 이긴다.
+  //   → 히어로 배경처럼 'absolute inset-0' 로 꽉 채우려던 래퍼가 일반 흐름으로
+  //     돌아가 높이 0 으로 collapse, 자식 img(h-full)도 0 이 되어 안 보였다.
+  //     (비어드민 경로는 relative 를 안 붙이므로 방문자 화면은 정상이었고,
+  //      어드민 화면에서만 이미지가 사라져 '저장은 되는데 안 보인다' 로 보였다)
+  //   호출부가 position 을 지정했으면 그쪽을 존중한다. absolute 래퍼도 그 자체로
+  //   positioned 라 편집 버튼 위치 계산에는 문제가 없다.
+  const hasPositionClass = /(^|\s)(absolute|fixed|sticky|relative)(\s|$)/.test(className)
+  const positionClass = hasPositionClass ? '' : 'relative'
+
   return (
     <Wrapper
-      className={`group relative ${displayClass} ${className}`}
+      className={`group ${positionClass} ${displayClass} ${className}`}
       style={style}
     >
       {children}

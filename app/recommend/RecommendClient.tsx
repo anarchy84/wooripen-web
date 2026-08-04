@@ -9,7 +9,8 @@ import { useConsultation } from '@/lib/useConsultation'
 import { useAttribution } from '@/lib/attribution'
 import { EditableText } from '@/components/editable/EditableText'
 import { useBlocks } from '@/components/editable/BlocksProvider'
-import { pickTextOrUndef } from '@/lib/content-blocks'
+import { pickTextOrUndef, pickImageOrUndef } from '@/lib/content-blocks'
+import { EditableImage } from '@/components/editable/EditableImage'
 import HoneypotField from '@/components/ui/HoneypotField'
 
 const PAGE = '/recommend'
@@ -137,6 +138,17 @@ export default function RecommendClient() {
     <>
       {/* ══════ 히어로 ══════ */}
       <section className="relative overflow-hidden bg-gray-950 pt-32 pb-20 md:pt-40 md:pb-28">
+        {/* 어드민이 업로드한 hero 배경 이미지 (선택) — 미업로드 시 다크 그대로 */}
+        <EditableImage
+          blockKey={k('hero.background')}
+          fallback={{ url: '', alt: '맞춤추천 매장 배경' }}
+          value={pickImageOrUndef(blocks, k('hero.background'))}
+          pagePath={PAGE}
+          className="absolute inset-0 [&_img]:absolute [&_img]:inset-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover [&_img]:opacity-25"
+          imgClassName=""
+          sizes="100vw"
+          priority
+        />
         <div className="absolute inset-0">
           <div className="absolute -top-32 right-[10%] w-[600px] h-[600px] rounded-full bg-primary/15 blur-[160px]" />
           <div className="absolute bottom-0 left-[20%] w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[120px]" />
