@@ -6,6 +6,16 @@ import { createClient } from '@/lib/supabase/server'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Icon } from '@iconify/react'
+// 히어로 배경 인라인 편집 (2026-08-04 추가) — 다른 7개 서브페이지와 동일 방식
+import { getBlocksForPage } from '@/lib/content-blocks-server'
+import { blocksMapToRecord, pickImageOrUndef } from '@/lib/content-blocks'
+import { EditableImage } from '@/components/editable/EditableImage'
+
+const PAGE = '/packages'
+const kp = (s: string) => `packages.${s}`
+
+// 편집 즉시 반영 — 배경 이미지를 올리면 바로 보이도록 캐시 최소화
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: '소상공인 맞춤 패키지 | 우리편',
@@ -31,7 +41,11 @@ async function getPackages() {
 }
 
 export default async function PackagesPage() {
-  const packages = await getPackages()
+  const [packages, blocksMap] = await Promise.all([
+    getPackages(),
+    getBlocksForPage(PAGE),
+  ])
+  const blocks = blocksMapToRecord(blocksMap)
 
   return (
     <div className="min-h-screen bg-white">
@@ -39,8 +53,22 @@ export default async function PackagesPage() {
       <section className="relative pt-32 pb-20 px-4 overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #0F3460 100%)' }}
       >
+        {/* 어드민이 업로드한 hero 배경 이미지 (선택) — 미업로드 시 기존 그라디언트 그대로 */}
+        <EditableImage
+          blockKey={kp('hero.background')}
+          fallback={{ url: '', alt: '소상공인 맞춤 패키지 배경' }}
+          value={pickImageOrUndef(blocks, kp('hero.background'))}
+          pagePath={PAGE}
+          className="absolute inset-0 [&_img]:absolute [&_img]:inset-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover [&_img]:opacity-90"
+          imgClassName=""
+          sizes="100vw"
+          priority
+        />
+        {/* 배경 사진 위 가독성 확보 — 하단만 살짝 어둡게 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/10 to-gray-950/40 pointer-events-none" />
+
         {/* 배경 장식 */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl" />
         </div>
