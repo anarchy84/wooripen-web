@@ -50,11 +50,13 @@ export default async function PackagesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* ─── 히어로 ─────────────────────────────────── */}
-      {/* px-4 제거 — 좌우 여백은 내부 section-container 가 담당 (이중 패딩 방지) */}
-      <section className="relative pt-32 pb-20 overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #1A1A2E 0%, #0F3460 100%)' }}
-      >
-        {/* 어드민이 업로드한 hero 배경 이미지 (선택) — 미업로드 시 기존 그라디언트 그대로 */}
+      {/* 다른 서브페이지(internet·business/*·rental·recommend·about)와 동일 사양 (2026-08-04)
+          - 배경: 하드코딩 남색 그라디언트(#1A1A2E→#0F3460) → bg-gray-950 단색
+          - 높이: md 이상에서 pt-40 pb-28 로 여유 확보 (기존엔 데스크톱에서도 pt-32 pb-20)
+          - 좌우 여백은 내부 section-container 가 담당하므로 px 를 두지 않는다
+          이 페이지는 2026-04-17 생성 후 5/6 디자인 개편 대상에서 빠져 구 스타일이 남아 있었다. */}
+      <section className="relative overflow-hidden bg-gray-950 pt-32 pb-20 md:pt-40 md:pb-28">
+        {/* 어드민이 업로드한 hero 배경 이미지 (선택) — 미업로드 시 다크 배경 그대로 */}
         <EditableImage
           blockKey={kp('hero.background')}
           fallback={{ url: '', alt: '소상공인 맞춤 패키지 배경' }}
