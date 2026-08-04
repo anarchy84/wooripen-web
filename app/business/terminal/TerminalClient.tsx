@@ -47,7 +47,7 @@ export default function TerminalClient() {
   return (
     <>
       {/* ══════ 히어로 ══════ */}
-      <section className="relative overflow-hidden bg-gray-950 pt-32 pb-20 md:pt-40 md:pb-28">
+      <section className="relative overflow-hidden bg-gray-950 flex items-center min-h-[34rem] md:min-h-[44rem] pt-32 pb-20 md:pt-40 md:pb-28">
         {/* 어드민이 업로드한 hero 배경 이미지 (선택) — 미업로드 시 다크 그대로 */}
         <EditableImage
           blockKey={kt('hero.background')}

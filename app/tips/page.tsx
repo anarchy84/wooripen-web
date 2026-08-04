@@ -107,7 +107,7 @@ export default function TipsPage() {
   return (
     <>
       {/* ══════ 히어로 ══════ */}
-      <section className="relative overflow-hidden bg-gray-950 pt-32 pb-20 md:pt-40 md:pb-28">
+      <section className="relative overflow-hidden bg-gray-950 flex items-center min-h-[34rem] md:min-h-[44rem] pt-32 pb-20 md:pt-40 md:pb-28">
         <div className="absolute inset-0">
           <div className="absolute -top-32 right-[10%] w-[600px] h-[600px] rounded-full bg-primary/15 blur-[160px]" />
           <div className="absolute bottom-0 left-[20%] w-[400px] h-[400px] rounded-full bg-teal-500/10 blur-[120px]" />

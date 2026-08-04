@@ -55,7 +55,7 @@ export default async function PackagesPage() {
           - 높이: md 이상에서 pt-40 pb-28 로 여유 확보 (기존엔 데스크톱에서도 pt-32 pb-20)
           - 좌우 여백은 내부 section-container 가 담당하므로 px 를 두지 않는다
           이 페이지는 2026-04-17 생성 후 5/6 디자인 개편 대상에서 빠져 구 스타일이 남아 있었다. */}
-      <section className="relative overflow-hidden bg-gray-950 pt-32 pb-20 md:pt-40 md:pb-28">
+      <section className="relative overflow-hidden bg-gray-950 flex items-center min-h-[34rem] md:min-h-[44rem] pt-32 pb-20 md:pt-40 md:pb-28">
         {/* 어드민이 업로드한 hero 배경 이미지 (선택) — 미업로드 시 다크 배경 그대로 */}
         <EditableImage
           blockKey={kp('hero.background')}
@@ -76,31 +76,33 @@ export default async function PackagesPage() {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl" />
         </div>
 
-        {/* 좌측 정렬 — 다른 서브페이지 히어로와 통일 (2026-08-04)
-            section-container(max-w-1140px + 좌우 패딩)로 감싸야 여백이 일치한다 */}
-        <div className="section-container relative z-10">
-        <div className="max-w-4xl">
-          <span className="inline-block px-4 py-1.5 bg-blue-500/20 text-blue-300 text-sm font-medium rounded-full mb-6 backdrop-blur">
-            소상공인 맞춤 패키지
+        {/* 히어로 콘텐츠 — 다른 서브페이지와 동일 사양 (2026-08-04)
+            뱃지 glass-dark / h1 extrabold+tracking-tight / 본문 gray-400 / CTA btn-primary */}
+        <div className="section-container relative">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-dark mb-6">
+            <Icon icon="solar:box-bold-duotone" className="h-4 w-4 text-blue-400" />
+            <span className="text-small text-gray-400">소상공인 맞춤 패키지</span>
           </span>
-          <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight mb-6 break-keep">
+
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] max-w-3xl break-keep">
             매장에 필요한 건<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
-              한 번에 해결
-            </span>
+            <span className="text-gradient">한 번에 해결</span>
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl mb-8 break-keep">
+
+          <p className="mt-6 text-base md:text-lg text-gray-400 max-w-lg leading-relaxed break-keep">
             인터넷, 결제단말기, CCTV, 키오스크, 렌탈까지.
             업종과 상황에 맞는 패키지로 비용은 줄이고, 편의는 높이세요.
           </p>
-          <Link
-            href="/recommend"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-gray-900 font-bold rounded-full hover:bg-gray-100 transition-colors"
-          >
-            무료 맞춤 상담 받기
-            <Icon icon="solar:arrow-right-line-duotone" className="w-5 h-5" />
-          </Link>
-        </div>
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+            <Link href="/recommend" className="btn-primary group">
+              무료 맞춤 상담 받기
+              <Icon
+                icon="solar:arrow-right-line-duotone"
+                className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+              />
+            </Link>
+          </div>
         </div>
       </section>
 
