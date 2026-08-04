@@ -24,11 +24,13 @@ export default function AboutClient() {
           fallback={{ url: '', alt: '회사소개 배경' }}
           value={pickImageOrUndef(blocks, k('hero.background'))}
           pagePath={PAGE}
-          className="absolute inset-0 [&_img]:absolute [&_img]:inset-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover [&_img]:opacity-25"
+          className="absolute inset-0 [&_img]:absolute [&_img]:inset-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover [&_img]:opacity-90"
           imgClassName=""
           sizes="100vw"
           priority
         />
+        {/* 배경 사진 위 가독성 확보 — 하단만 살짝 어둡게 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/10 to-gray-950/40 pointer-events-none" />
         <div className="absolute inset-0">
           <div className="absolute -top-32 right-[10%] w-[600px] h-[600px] rounded-full bg-primary/15 blur-[160px]" />
           <div className="absolute bottom-0 left-[20%] w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[120px]" />
