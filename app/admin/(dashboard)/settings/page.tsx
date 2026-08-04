@@ -10,28 +10,42 @@ interface SettingField {
   group: string
 }
 
+// ─────────────────────────────────────────────
+// 사이트 설정 필드 (2026-08-04 정리)
+//
+// 정리 배경 :
+//   - 어느 화면에서도 읽지 않는 데드 필드가 6개 있었다
+//     (site_name, site_description, mobile, business_hours, privacy_url, terms_url)
+//     → 입력해도 아무 데도 반영되지 않아 운영자가 혼란을 겪음. 전부 제거.
+//   - 남은 필드의 placeholder 는 전부 '예: ' 접두사를 붙인다.
+//     기존엔 '홍길동' '000-00-00000' 같은 값이 힌트로 떠서
+//     "저장된 값이 잘못 들어가 있다" 는 오해를 반복해서 유발했다.
+//
+// ⚠️ 필드 추가 시 반드시 실제 소비처(렌더 코드)를 함께 만들 것.
+//    사용처 없는 필드는 다시 같은 혼란을 만든다.
+// ─────────────────────────────────────────────
 const SETTING_FIELDS: SettingField[] = [
-  { key: 'site_name', label: '사이트명', type: 'text', placeholder: '우리편', group: '기본 정보' },
-  { key: 'site_description', label: '사이트 설명', type: 'text', placeholder: '사업자를 위한 통합 솔루션', group: '기본 정보' },
-  { key: 'company_name', label: '회사명', type: 'text', placeholder: '(주)우리편', group: '기본 정보' },
-  { key: 'ceo_name', label: '대표자명', type: 'text', placeholder: '홍길동', group: '기본 정보' },
-  { key: 'business_number', label: '사업자등록번호', type: 'text', placeholder: '000-00-00000', group: '기본 정보' },
-  // 전자상거래법 표시의무 — 푸터 사업자정보 블록에 노출 (2026-08-03 추가)
-  { key: 'ecommerce_license', label: '통신판매업 신고번호', type: 'text', placeholder: '제 2025-서울강서-0000호', group: '기본 정보' },
-  { key: 'phone', label: '대표 전화번호', type: 'tel', placeholder: '1800-0000', group: '연락처' },
-  { key: 'mobile', label: '상담 연락처', type: 'tel', placeholder: '010-0000-0000', group: '연락처' },
-  { key: 'email', label: '이메일', type: 'text', placeholder: 'contact@ourteam.kr', group: '연락처' },
-  { key: 'kakao_channel', label: '카카오톡 채널', type: 'text', placeholder: '@우리편', group: '연락처' },
-  { key: 'address', label: '사업장 주소', type: 'text', placeholder: '서울특별시 강남구...', group: '위치' },
-  { key: 'business_hours', label: '운영시간', type: 'text', placeholder: '평일 09:00 ~ 18:00', group: '위치' },
-  { key: 'footer_notice', label: '하단 공지사항', type: 'textarea', placeholder: '통신판매업 제0000호...', group: '기타' },
-  { key: 'privacy_url', label: '개인정보처리방침 URL', type: 'text', placeholder: '/privacy', group: '기타' },
-  { key: 'terms_url', label: '이용약관 URL', type: 'text', placeholder: '/terms', group: '기타' },
-  // 법적 고지: 상담 폼에서 [자세히 보기]로 노출되는 장문 텍스트. /privacy 페이지에서 SSR 렌더링됨.
+  // 기본 정보 — 전부 푸터 사업자정보 블록(components/layout/Footer.tsx)에 노출
+  { key: 'company_name', label: '회사명', type: 'text', placeholder: '예: (주)우리편', group: '기본 정보' },
+  { key: 'ceo_name', label: '대표자명', type: 'text', placeholder: '예: 김대표', group: '기본 정보' },
+  { key: 'business_number', label: '사업자등록번호', type: 'text', placeholder: '예: 000-00-00000', group: '기본 정보' },
+  { key: 'ecommerce_license', label: '통신판매업 신고번호', type: 'text', placeholder: '예: 제 2025-서울강서-0000호', group: '기본 정보' },
+
+  // 연락처 — phone/email 은 푸터, kakao_channel 은 우하단 플로팅 버튼
+  { key: 'phone', label: '대표 전화번호', type: 'tel', placeholder: '예: 1600-0000', group: '연락처' },
+  { key: 'email', label: '이메일', type: 'text', placeholder: '예: contact@ourteam.kr', group: '연락처' },
+  { key: 'kakao_channel', label: '카카오톡 채널', type: 'text', placeholder: '예: https://pf.kakao.com/_AbCdEf', group: '연락처' },
+
+  // 위치 — 푸터 사업자정보
+  { key: 'address', label: '사업장 주소', type: 'text', placeholder: '예: 서울특별시 강서구 공항대로 000', group: '위치' },
+
+  // 기타 — 값이 있을 때만 푸터 하단에 노출 (휴무·연휴 안내 등 임시 공지용)
+  { key: 'footer_notice', label: '하단 공지사항', type: 'textarea', placeholder: '예: 설 연휴(2/9~2/12) 상담이 일시 중단됩니다.', group: '기타' },
+
+  // 법적 고지: 상담 폼의 [자세히 보기] + /privacy · /terms 페이지에서 SSR 렌더링
   { key: 'privacy_policy', label: '개인정보처리방침 전문', type: 'textarea', placeholder: '개인정보 수집·이용 관련 전문...', group: '법적 고지' },
   { key: 'third_party_consent_text', label: '제3자 제공 동의문', type: 'textarea', placeholder: '제공 받는 자, 제공 목적, 제공 항목...', group: '법적 고지' },
   { key: 'marketing_consent_text', label: '마케팅 수신 동의문', type: 'textarea', placeholder: '수신 내용, 수신 수단, 보유 기간...', group: '법적 고지' },
-  // /terms 페이지에서 SSR 렌더링 (2026-08-03 신설). 비어 있으면 안내 문구만 노출.
   { key: 'terms_of_service', label: '이용약관 전문', type: 'textarea', placeholder: '제1조(목적), 제2조(정의)...', group: '법적 고지' },
 ]
 
